@@ -38,11 +38,11 @@ abstract class AppPagesRoutes{
 
   // Auth
   static const String onBoarding = "/onBoarding";
-  static const String registration = "/";
+  static const String registration = "/registration";
 
 
   // Tabs Screens
-  static const String mainScreen = "/mainScreen";
+  static const String mainScreen = "/";
 
   static const String categoriesScreen = "/categoriesScreen";
   static const String productsScreen = "/productsScreen";
@@ -69,17 +69,20 @@ abstract class AppPagesRoutes{
       binding: BindingsBuilder(
             () => {Get.put(RegistrationController())},
       ),
-      middlewares: [StartMiddleWare()],
       transition: Transition.leftToRight,
     ),
 
     // Main Screen
     GetPage(
-        name: mainScreen,
-        page: () => const MainScreen(),
-        binding: BindingsBuilder(
-          () => {Get.put(MainController())},
-        ),
+      name: mainScreen,
+      page: () => const MainScreen(),
+      binding: BindingsBuilder(
+        () {
+          Get.put(RegistrationController());
+          Get.put(MainController());
+          },
+      ),
+      middlewares: [StartMiddleWare()],
       transition: Transition.leftToRight,
     ),
 

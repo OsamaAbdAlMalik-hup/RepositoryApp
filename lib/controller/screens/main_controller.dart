@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
@@ -16,21 +17,17 @@ import 'package:repository/core/helper/design_functions.dart';
 import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/core/helper/validator_functions.dart';
 import 'package:repository/core/service/api_service.dart';
-import 'package:repository/core/service/get_storage_service.dart';
-import 'package:repository/core/service/shared_preferences_service.dart';
 import 'package:repository/data/models/category.dart';
 import 'package:repository/data/models/client.dart';
 import 'package:repository/data/models/money_box_operation.dart';
 import 'package:repository/data/models/monitoring.dart';
 import 'package:repository/data/models/product.dart';
-import 'package:repository/data/models/repository.dart';
 import 'package:repository/data/models/supplier.dart';
-import 'package:repository/data/models/user.dart';
 
 class MainController extends GetxController with GetTickerProviderStateMixin{
-  SharedPreferencesService sharedService = Get.find();
-  MainScreenApiController mainApiController = MainScreenApiController(Get.find(), 0);
-  RegistrationController registrationController = Get.put(RegistrationController());
+
+  RegistrationController registrationController = Get.find() ;
+  MainScreenApiController mainApiController = MainScreenApiController();
 
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey<FormState> formKeyCreateCategory = GlobalKey<FormState>();
@@ -49,10 +46,11 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   TextEditingController detailsFieldController = TextEditingController();
   TextEditingController amountFieldController = TextEditingController();
   TextEditingController dateFieldController = TextEditingController();
-  PageController pageController = PageController(initialPage: 0);
+
   ScrollController monitoringScrollController = ScrollController();
   ScrollController stockingScrollController = ScrollController();
-  ScrollController homeScrollController = ScrollController();
+  ScrollController homeScrollController = ScrollController(); // TODO SCROLL NOTIFICATION
+
   late TabController tabLatestInvoiceController;
   late TabController tabPopularPeopleController;
   late TabController tabProductsController;
@@ -72,11 +70,10 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   StatusView statusView = StatusView.loading;
   DateTime? lastPressedGoBack;
   File? image;
-  String token = '', name = '', email = '', startDate = '', endDate = '';
+  String startDate = '', endDate = '';
   double totalMoneyBox = 10000000000, invoicesHeight = 250, remainder = 0;
   bool isEmailsExpansion = false, isVisibleNav = true, isSearchMode = false;
-  int selectedBottomNavigationBarItem = 1, repositoryId = 0,latestInvoiceTabIndex=0,popularPeopleTabIndex=0,productsTabIndex=0;
-  GetStorageService storageService=Get.find();
+  int selectedBottomNavigationBarItem = 1,latestInvoiceTabIndex=0,popularPeopleTabIndex=0,productsTabIndex=0;
 
   @override
   onInit() async {
@@ -84,17 +81,10 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     tabPopularPeopleController=TabController(length: 2, vsync: this);
     tabProductsController=TabController(length: 2, vsync: this);
 
-    int currentUserId = sharedService.sharedPreferences.getInt(AppSharedKeys.currentUserId) ?? 0;
-    int currentRepositoryId = sharedService.sharedPreferences.getInt(AppSharedKeys.currentRepositoryId) ?? 0;
-    registrationController.currentUser = registrationController.myAccounts
-        .firstWhere((element) => element.id == currentUserId, orElse: () => User());
-    registrationController.currentRepository = registrationController.myRepositories
-        .firstWhere((element) => element.id == currentRepositoryId, orElse: () => Repository());
-
-    mainApiController = MainScreenApiController(Get.find(), repositoryId);
+    mainApiController = MainScreenApiController();
     await getCategoriesNames();
     await registrationController.getRepositoriesForUser();
-    await registrationController.getUsersForRepositories(repositoryId: repositoryId);
+    await registrationController.getUsersForRepositories();
     statusView = StatusView.none;
     update();
     super.onInit();

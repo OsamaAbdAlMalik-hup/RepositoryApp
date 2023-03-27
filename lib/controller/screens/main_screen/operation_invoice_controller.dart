@@ -11,6 +11,7 @@ import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
 import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/core/service/api_service.dart';
+import 'package:repository/core/service/storage_services.dart';
 import 'package:repository/data/models/classes/pair.dart';
 import 'package:repository/data/models/purchases_invoice.dart';
 import 'package:repository/data/models/purchase.dart';
@@ -54,11 +55,11 @@ class OperationsInvoiceController extends GetxController {
       totalFieldController.text = '0';
       mainController.dateFieldController.text = HelperDesignFunctions.formatDate(DateTime.now());
       if(invoiceType==InvoiceType.sales) {
-        invoiceNumber=mainController.sharedService.sharedPreferences.getInt(AppSharedKeys.latestSaleInvoicesNumber) ?? 20000;
+        invoiceNumber=StorageServices.sharedPreferences.getInt(AppSharedKeys.latestSaleInvoicesNumber) ?? 20000;
         await invoicesController.mainController.getClientsNames();
       }
       else {
-        invoiceNumber=mainController.sharedService.sharedPreferences.getInt(AppSharedKeys.latestPurchaseInvoicesNumber) ?? 30000;
+        invoiceNumber=StorageServices.sharedPreferences.getInt(AppSharedKeys.latestPurchaseInvoicesNumber) ?? 30000;
         await invoicesController.mainController.getSuppliersNames();
       }
       unselectedProducts = allProducts;
@@ -170,7 +171,7 @@ class OperationsInvoiceController extends GetxController {
     ApiService.sendRequest(
 
       request: () async {
-        return await invoicesController.invoicesApiController.getProductsSomeDetails(repositoryId: mainController.repositoryId);
+        return await invoicesController.invoicesApiController.getProductsSomeDetails();
       },
       onSuccess: (response) async {
         if(response is List<Product>){
@@ -254,7 +255,7 @@ class OperationsInvoiceController extends GetxController {
               AppResponseKeys.totalSalePrice:element.first.salePrice*element.second,
             });
           }
-          mainController.sharedService.sharedPreferences.setInt(AppSharedKeys.latestSaleInvoicesNumber,++invoiceNumber);
+          StorageServices.sharedPreferences.setInt(AppSharedKeys.latestSaleInvoicesNumber,++invoiceNumber);
           return await invoicesController.invoicesApiController.addSalesInvoice(
               clientId: mainController.selectedClient.id,
               number: invoiceNumber,
@@ -298,7 +299,7 @@ class OperationsInvoiceController extends GetxController {
             AppResponseKeys.totalSalePrice:element.first.salePrice*element.second,
           });
         }
-        mainController.sharedService.sharedPreferences.setInt(AppSharedKeys.latestPurchaseInvoicesNumber,++invoiceNumber);
+        StorageServices.sharedPreferences.setInt(AppSharedKeys.latestPurchaseInvoicesNumber,++invoiceNumber);
         return await invoicesController.invoicesApiController.addPurchasesInvoice(
             supplierId: mainController.selectedSupplier.id,
             number: invoiceNumber,

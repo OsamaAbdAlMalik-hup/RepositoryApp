@@ -1,4 +1,5 @@
-import 'package:repository/core/constant/app_response_keys.dart';
+
+import 'package:repository/core/helper/logic_functions.dart';
 
 class User {
   int id;
@@ -21,41 +22,24 @@ class User {
         'name': name,
         'email': email,
         'photo': photo,
-        'rememberToken': rememberToken,
-        'isAdmin': isAdmin,
+        'remember_token': rememberToken,
+        'is_admin': isAdmin ? 1 : 0,
       };
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-        id: json['id'],
-        name: json['name'],
-        email: json['email'],
-        photo: json['photo'],
-        rememberToken: json['rememberToken'],
-        isAdmin: json['isAdmin'],
+        id: HelperLogicFunctions.getVale(map: json, key: 'id', defaultVal: 0),
+        name: HelperLogicFunctions.getVale(map: json, key: 'name', defaultVal: ''),
+        email: HelperLogicFunctions.getVale(map: json, key: 'email', defaultVal: ''),
+        photo: HelperLogicFunctions.getVale(map: json, key: 'photo', defaultVal: ''),
+        rememberToken: HelperLogicFunctions.getVale(map: json, key: 'remember_token', defaultVal: ''),
+        isAdmin: HelperLogicFunctions.getVale(map: json, key: 'is_admin', defaultVal: 0)==1,
     );
   }
 
-  static List<User> jsonToList(List<dynamic> usersMap) {
+  static List<User> fromJsonToList(List<dynamic> usersMap) {
     List<User> users = [];
     for (var user in usersMap) {
-      users.add(User(
-        id: user.containsKey(AppResponseKeys.id) ? user[AppResponseKeys.id] : 0,
-        name: user.containsKey(AppResponseKeys.name)
-            ? user[AppResponseKeys.name]
-            : '',
-        email: user.containsKey(AppResponseKeys.email)
-            ? user[AppResponseKeys.email]
-            : '',
-        photo: user.containsKey(AppResponseKeys.photo)
-            ? user[AppResponseKeys.photo]
-            : '',
-        rememberToken: user.containsKey(AppResponseKeys.rememberToken)
-            ? user[AppResponseKeys.rememberToken]
-            : '',
-        isAdmin: user.containsKey(AppResponseKeys.isAdmin)
-            ? user[AppResponseKeys.isAdmin] == 1
-            : false,
-      ));
+      users.add(User.fromJson(user));
     }
     return users;
   }

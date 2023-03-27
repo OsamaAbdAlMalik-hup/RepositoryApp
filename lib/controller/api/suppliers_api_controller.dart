@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_api_routes.dart';
 import 'package:repository/core/constant/app_response_keys.dart';
 import 'package:repository/core/helper/logic_functions.dart';
@@ -14,11 +15,11 @@ class SuppliersApiController
   ApiService apiService;
   SuppliersApiController(this.apiService);
 
-  Future<dynamic> getSuppliers({required int repositoryId}) async {
+  Future<dynamic> getSuppliers() async {
     HelperLogicFunctions.printNote('Start getSuppliers() Api');
     var response = await apiService.post(url: AppApiRoute.getSuppliers,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getSuppliers() Api: $response');
     return response.fold((l) => l, (map) {
@@ -109,10 +110,10 @@ class SuppliersApiController
       }
     });
   }
-  Future<dynamic> getArchiveSuppliers({required int repositoryId}) async {
+  Future<dynamic> getArchiveSuppliers() async {
     HelperLogicFunctions.printNote('Start getArchiveSuppliers() Api');
     var response = await apiService.post(url: AppApiRoute.getArchivesSuppliers,headers: {} ,body: {
-      "repository_id":repositoryId.toString()
+      "repository_id":RegistrationController.currentRepository.id.toString()
     });
     HelperLogicFunctions.printNote('End getArchiveSuppliers() Api: $response');
     return response.fold((l) => l, (map) {

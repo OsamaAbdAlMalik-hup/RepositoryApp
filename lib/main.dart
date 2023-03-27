@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,13 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:repository/core/bindings/intial_bindings.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_pages_routes.dart';
-import 'package:repository/core/service/get_storage_service.dart';
-import 'package:repository/core/service/shared_preferences_service.dart';
+import 'package:repository/core/service/storage_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Get.putAsync(() => SharedPreferencesService().init());
-  await Get.putAsync(() => GetStorageService().init());
+  await Get.putAsync(() => StorageServices().init());
   InitialBindings().dependencies();
   runApp(const MyApp());
 }

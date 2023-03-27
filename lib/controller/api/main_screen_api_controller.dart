@@ -1,6 +1,7 @@
 
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_api_routes.dart';
 import 'package:repository/core/constant/app_response_keys.dart';
 import 'package:repository/core/helper/logic_functions.dart';
@@ -21,9 +22,8 @@ import 'package:repository/data/models/supplier.dart';
 
 class MainScreenApiController extends GetxController
 {
-  ApiService apiService;
-  int repositoryId;
-  MainScreenApiController(this.apiService,this.repositoryId);
+  ApiService apiService=Get.find();
+  MainScreenApiController();
 
 
   /// Shortcut Creation
@@ -31,7 +31,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start addCategory() Api');
     var response = await apiService.postMultiPart(url: AppApiRoute.addCategory, body: {
         'name':name,
-        'repository_id':repositoryId.toString(),
+        'repository_id':RegistrationController.currentRepository.id.toString(),
       },headers: {}
       ,file: photo
     );
@@ -76,7 +76,7 @@ class MainScreenApiController extends GetxController
       'name':name,
       'phone_number':phoneNumber,
       'address':address,
-      'repository_id':repositoryId.toString(),
+      'repository_id':RegistrationController.currentRepository.id.toString(),
     },headers: {}
         ,file: photo
     );
@@ -98,7 +98,7 @@ class MainScreenApiController extends GetxController
       'name':name,
       'phone_number':phoneNumber,
       'address':address,
-      'repository_id':repositoryId.toString(),
+      'repository_id':RegistrationController.currentRepository.id.toString(),
     },headers: {}
         ,file: photo
     );
@@ -123,7 +123,7 @@ class MainScreenApiController extends GetxController
       'total_price':totalPrice.toString(),
       'paid':paid.toString(),
       'remained':(totalPrice-paid).toString(),
-      'repository_id':repositoryId.toString(),
+      'repository_id':RegistrationController.currentRepository.id.toString(),
     }
     );
     HelperLogicFunctions.printNote('End addExpense() Api: $response');
@@ -143,7 +143,7 @@ class MainScreenApiController extends GetxController
     var response = await apiService.post(url: AppApiRoute.addOrRemoveCash,headers: {},  body: {
       'total_price':totalPrice.toString(),
       'date':date,
-      'repository_id':repositoryId.toString(),
+      'repository_id':RegistrationController.currentRepository.id.toString(),
     });
     HelperLogicFunctions.printNote('End addOrRemoveCash() Api: $response');
     return response.fold((l) => l, (map) {
@@ -163,7 +163,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start getCategoriesNames() Api');
     var response = await apiService.post(url: AppApiRoute.getCategoriesNames,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getCategoriesNames() Api: $response');
     return response.fold((l) => l, (map) {
@@ -181,7 +181,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start getProductsNames() Api');
     var response = await apiService.post(url: AppApiRoute.getProductsNames,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getProductsNames() Api: $response');
     return response.fold((l) => l, (map) {
@@ -199,7 +199,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start getClientsNames() Api');
     var response = await apiService.post(url: AppApiRoute.getClientNames,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getClientsNames() Api: $response');
     return response.fold((l) => l, (map) {
@@ -217,7 +217,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start getSuppliersNames() Api');
     var response = await apiService.post(url: AppApiRoute.getSuppliersNames,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getSuppliersNames() Api: $response');
     return response.fold((l) => l, (map) {
@@ -236,7 +236,7 @@ class MainScreenApiController extends GetxController
     var response = await apiService.post(url: AppApiRoute.stocktakingAll,
         headers: {},
         body:{
-          'repository_id':repositoryId.toString(),
+          'repository_id':RegistrationController.currentRepository.id.toString(),
           'start_date':startDate,
           'end_date':endDate,
         }
@@ -257,7 +257,7 @@ class MainScreenApiController extends GetxController
     HelperLogicFunctions.printNote('Start getMonitoring() Api');
     var response = await apiService.post(url: AppApiRoute.getMonitoring,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getMonitoring() Api: $response');
     return response.fold((l) => l, (map) {

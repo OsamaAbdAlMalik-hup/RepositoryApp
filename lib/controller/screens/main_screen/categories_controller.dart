@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repository/controller/api/categories_api_controller.dart';
 import 'package:repository/controller/screens/main_controller.dart';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/helper/design_functions.dart';
@@ -47,7 +48,7 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
     return await ApiService.sendRequest(
 
       request: () async {
-        return await categoriesApiController.getCategories(repositoryId: mainController.repositoryId);
+        return await categoriesApiController.getCategories(repositoryId: RegistrationController.currentRepository.id);
       },
       onSuccess: (response) async {
         if(response is List<Category>){

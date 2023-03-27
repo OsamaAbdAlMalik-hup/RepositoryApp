@@ -10,6 +10,7 @@ import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
 import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/core/service/api_service.dart';
+import 'package:repository/core/service/storage_services.dart';
 import 'package:repository/data/models/purchases_invoice.dart';
 import 'package:repository/data/models/sale_invoice.dart';
 import 'package:repository/view/screen/main_screen/products_screen.dart';
@@ -42,10 +43,10 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
     filterTabController = TabController(length: sortItems.length, vsync: this);
     mainTabController = TabController(length: 2, vsync: this);
 
-    if(!(mainController.sharedService.sharedPreferences.getBool(AppSharedKeys.isInitNumbers)??false)){
-      mainController.sharedService.sharedPreferences.setInt(AppSharedKeys.latestSaleInvoicesNumber,20000);
-      mainController.sharedService.sharedPreferences.setInt(AppSharedKeys.latestPurchaseInvoicesNumber,30000);
-      mainController.sharedService.sharedPreferences.setBool(AppSharedKeys.isInitNumbers,true);
+    if(!(StorageServices.sharedPreferences.getBool(AppSharedKeys.isInitNumbers)??false)){
+      StorageServices.sharedPreferences.setInt(AppSharedKeys.latestSaleInvoicesNumber,20000);
+      StorageServices.sharedPreferences.setInt(AppSharedKeys.latestPurchaseInvoicesNumber,30000);
+      StorageServices.sharedPreferences.setBool(AppSharedKeys.isInitNumbers,true);
     }
     viewModeType = HelperLogicFunctions.getVale(
         map: Get.arguments,
@@ -80,8 +81,8 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
 
       request: () async {
         return isArchived
-            ? await invoicesApiController.getSalesInvoicesArchive(repositoryId: mainController.repositoryId)
-            : await invoicesApiController.getSalesInvoices(repositoryId: mainController.repositoryId);
+            ? await invoicesApiController.getSalesInvoicesArchive()
+            : await invoicesApiController.getSalesInvoices();
       },
       onSuccess: (response) async {
         if(response is List<SaleInvoice>) {
@@ -108,8 +109,8 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
 
       request: () async {
         return isArchived
-            ? await invoicesApiController.getPurchasesInvoicesArchive(repositoryId: mainController.repositoryId)
-            : await invoicesApiController.getPurchasesInvoices(repositoryId: mainController.repositoryId);
+            ? await invoicesApiController.getPurchasesInvoicesArchive()
+            : await invoicesApiController.getPurchasesInvoices();
       },
       onSuccess: (response) async {
         if(response is List<PurchasesInvoice>) {

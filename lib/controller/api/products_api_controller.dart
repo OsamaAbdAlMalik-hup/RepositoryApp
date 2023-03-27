@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_api_routes.dart';
 import 'package:repository/core/constant/app_response_keys.dart';
 import 'package:repository/core/helper/logic_functions.dart';
@@ -14,11 +15,11 @@ class ProductsApiController
   ApiService apiService;
   ProductsApiController(this.apiService);
 
-  Future<dynamic> getProducts({required int repositoryId}) async {
+  Future<dynamic> getProducts() async {
     HelperLogicFunctions.printNote('Start getProducts() Api');
     var response = await apiService.post(url: AppApiRoute.getProducts,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getProducts() Api: $response');
     return response.fold((l) => l, (map) {

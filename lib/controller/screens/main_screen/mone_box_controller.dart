@@ -85,8 +85,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     return await ApiService.sendRequest(
 
       request: () async {
-        return await moneyBoxManagementApiController.getExpenses(
-            repositoryId: mainController.repositoryId);
+        return await moneyBoxManagementApiController.getExpenses();
       },
       onSuccess: (response) async {
         if (response is List<Expense>) {
@@ -476,7 +475,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     return await ApiService.sendRequest(
 
       request: () async {
-        return await moneyBoxManagementApiController.getPushOrPullRegisters(isPushed: true,repositoryId: mainController.repositoryId);
+        return await moneyBoxManagementApiController.getPushOrPullRegisters(isPushed: true);
       },
       onSuccess: (response) async {
         if (response is List<MoneyBoxOperation>) {
@@ -502,7 +501,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     return await ApiService.sendRequest(
 
       request: () async {
-        return await moneyBoxManagementApiController.getPushOrPullRegisters(isPushed: false,repositoryId: mainController.repositoryId);
+        return await moneyBoxManagementApiController.getPushOrPullRegisters(isPushed: false);
       },
       onSuccess: (response) async {
         if (response is List<MoneyBoxOperation>) {

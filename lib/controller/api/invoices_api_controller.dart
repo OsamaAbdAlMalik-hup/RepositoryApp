@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_api_routes.dart';
 import 'package:repository/core/constant/app_response_keys.dart';
 import 'package:repository/core/helper/logic_functions.dart';
@@ -16,11 +17,11 @@ class InvoicesApiController
   ApiService apiService;
   InvoicesApiController(this.apiService);
 
-  Future<dynamic> getSalesInvoices({required int repositoryId}) async {
+  Future<dynamic> getSalesInvoices() async {
     HelperLogicFunctions.printNote('Start getSalesInvoices() Api');
     var response = await apiService.post(url: AppApiRoute.getSalesInvoices,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getSalesInvoices() Api: $response');
     return response.fold((l) => l, (map) {
@@ -70,10 +71,10 @@ class InvoicesApiController
       }
     });
   }
-  Future<dynamic> getSalesInvoicesArchive({required int repositoryId}) async {
+  Future<dynamic> getSalesInvoicesArchive() async {
     HelperLogicFunctions.printNote('Start getSalesInvoicesArchive() Api');
     var response = await apiService.post(url: AppApiRoute.getSalesInvoicesArchive,headers: {}, body: {
-      "repository_id":repositoryId.toString()
+      "repository_id":RegistrationController.currentRepository.id.toString()
     });
     HelperLogicFunctions.printNote('End getSalesInvoicesArchive() Api: $response');
     return response.fold((l) => l, (map) {
@@ -262,11 +263,11 @@ class InvoicesApiController
   }
 
 
-  Future<dynamic> getPurchasesInvoices({required int repositoryId}) async {
+  Future<dynamic> getPurchasesInvoices() async {
     HelperLogicFunctions.printNote('Start getPurchasesInvoices() Api');
     var response = await apiService.post(url: AppApiRoute.getPurchasesInvoices,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getPurchasesInvoices() Api: $response');
     return response.fold((l) => l, (map) {
@@ -315,10 +316,10 @@ class InvoicesApiController
       }
     });
   }
-  Future<dynamic> getPurchasesInvoicesArchive({required int repositoryId}) async {
+  Future<dynamic> getPurchasesInvoicesArchive() async {
     HelperLogicFunctions.printNote('Start getPurchasesInvoicesArchive() Api');
     var response = await apiService.post(url: AppApiRoute.getPurchasesInvoicesArchive,headers: {} ,body: {
-    "repository_id":repositoryId.toString()
+    "repository_id":RegistrationController.currentRepository.id.toString()
     });
     HelperLogicFunctions.printNote('End getPurchasesInvoicesArchive() Api: $response');
     return response.fold((l) => l, (map) {
@@ -507,11 +508,11 @@ class InvoicesApiController
     });
   }
 
-  Future<dynamic> getProductsSomeDetails({required int repositoryId}) async {
+  Future<dynamic> getProductsSomeDetails() async {
     HelperLogicFunctions.printNote('Start getProductsSomeDetails() Api');
     var response = await apiService.post(url: AppApiRoute.getProductsSomeDetails,headers: {},
         body: {
-          "repository_id": repositoryId.toString()
+          "repository_id": RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getProductsSomeDetails() Api: $response');
     return response.fold((l) => l, (map) {

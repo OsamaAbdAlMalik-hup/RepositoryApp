@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repository/controller/api/clients_api_controller.dart';
 import 'package:repository/controller/screens/main_controller.dart';
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
@@ -68,8 +69,8 @@ class ClientsController extends GetxController
 
       request: () async {
         return isArchived
-            ? await clientsApiController.getArchivesClients(repositoryId: mainController.repositoryId)
-            : await clientsApiController.getClients(repositoryId: mainController.repositoryId);
+            ? await clientsApiController.getArchivesClients(repositoryId: RegistrationController.currentRepository.id)
+            : await clientsApiController.getClients(repositoryId: RegistrationController.currentRepository.id);
       },
       onSuccess: (response) async {
         if (response is List<Client>) {

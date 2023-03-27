@@ -27,7 +27,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return User.jsonToList([map[AppResponseKeys.data]]).first;
+        return User.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -45,7 +45,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return User.jsonToList([map[AppResponseKeys.data]]).first;
+        return User.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -100,7 +100,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList([map[AppResponseKeys.data]]).first;
+        return Repository.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -117,7 +117,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList([map[AppResponseKeys.data]]).first;
+        return Repository.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -137,7 +137,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList([map[AppResponseKeys.data]]).first;
+        return Repository.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -157,7 +157,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList([map[AppResponseKeys.data]]).first;
+        return Repository.fromJsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -172,7 +172,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList(map[AppResponseKeys.data]);
+        return Repository.fromJsonToList(map[AppResponseKeys.data]);
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -187,7 +187,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Repository.jsonToList(map[AppResponseKeys.data]);
+        return Repository.fromJsonToList(map[AppResponseKeys.data]);
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -205,7 +205,7 @@ class RegistrationApiController {
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return User.jsonToList(map[AppResponseKeys.data]);
+        return User.fromJsonToList(map[AppResponseKeys.data]);
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);

@@ -1,5 +1,4 @@
-
-import 'package:repository/core/constant/app_response_keys.dart';
+import 'package:repository/core/helper/logic_functions.dart';
 
 class Repository {
   int id;
@@ -7,28 +6,29 @@ class Repository {
   String address;
   String code;
 
-  Repository(
-      { this.id=0,
-       this.name='',
-       this.address='',
-       this.code=''});
+  Repository({this.id = 0, this.name = '', this.address = '', this.code = ''});
 
-  static List<Repository> jsonToList(List<dynamic> repositoriesMap) {
+  factory Repository.fromJson(Map<String, dynamic> json) {
+    return Repository(
+      id: HelperLogicFunctions.getVale(map: json, key: 'id', defaultVal: 0),
+      name: HelperLogicFunctions.getVale(map: json, key: 'name', defaultVal: ''),
+      address: HelperLogicFunctions.getVale(map: json, key: 'address', defaultVal: ''),
+      code: HelperLogicFunctions.getVale(map: json, key: 'code', defaultVal: ''),
+    );
+  }
+
+  static List<Repository> fromJsonToList(List<dynamic> repositoriesMap) {
     List<Repository> repositories = [];
     for (var repository in repositoriesMap) {
-      repositories.add(Repository(
-        id: repository.containsKey(AppResponseKeys.id) ? repository[AppResponseKeys.id] : 0,
-        name: repository.containsKey(AppResponseKeys.name)
-            ? repository[AppResponseKeys.name]
-            : '',
-        address: repository.containsKey(AppResponseKeys.address)
-            ? repository[AppResponseKeys.address]
-            : '',
-        code: repository.containsKey(AppResponseKeys.codeCln)
-            ? repository[AppResponseKeys.codeCln]
-            : '',
-      ));
+      repositories.add(Repository.fromJson(repository));
     }
     return repositories;
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'address': address,
+        'code': code,
+      };
 }

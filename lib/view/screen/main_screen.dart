@@ -440,11 +440,19 @@ class MainScreen extends GetView<MainController> {
         body: WillPopScope(
           onWillPop: () async {
             bool canExit = controller.lastPressedGoBack != null &&
-                DateTime.now().difference(controller.lastPressedGoBack!) > const Duration(seconds: 2);
+                DateTime.now().difference(controller.lastPressedGoBack!) < const Duration(seconds: 2);
+            controller.lastPressedGoBack=DateTime.now();
             if(canExit) {
               return true;
-            } else{
-              Get.showSnackbar(const GetSnackBar(title: "Click back again to Exit",));
+            } else {
+              Get.snackbar('Not', "Click back again to Exit",
+                  icon: const Icon(
+                    Icons.done,
+                    color: AppColors.white,
+                  ),
+                  colorText: AppColors.black,
+                  snackPosition: SnackPosition.BOTTOM,
+                  animationDuration: const Duration(seconds: 1));
               return false;
             }
           },

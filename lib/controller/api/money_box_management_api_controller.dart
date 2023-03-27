@@ -1,4 +1,5 @@
 
+import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_api_routes.dart';
 import 'package:repository/core/constant/app_response_keys.dart';
 import 'package:repository/core/helper/logic_functions.dart';
@@ -29,11 +30,11 @@ class MoneyBoxManagementApiController
       }
     });
   }
-  Future<dynamic> getPushOrPullRegisters({required bool isPushed,required int repositoryId}) async {
+  Future<dynamic> getPushOrPullRegisters({required bool isPushed}) async {
     HelperLogicFunctions.printNote('Start getPushOrPullRegisters() $isPushed Api');
     var response = await apiService.post(url: AppApiRoute.getPushOrPullRegisters,headers: {},  body: {
       'type_money': isPushed? 'pushed' : 'pulled',
-      'repository_id': repositoryId.toString()
+      'repository_id': RegistrationController.currentRepository.id.toString()
     });
     HelperLogicFunctions.printNote('End getPushOrPullRegisters() $isPushed Api: $response');
     return response.fold((l) => l, (map) {
@@ -121,11 +122,11 @@ class MoneyBoxManagementApiController
     });
   }
 
-  Future<dynamic> getExpenses({required int repositoryId}) async {
+  Future<dynamic> getExpenses() async {
     HelperLogicFunctions.printNote('Start getExpenses() Api');
     var response = await apiService.post(url: AppApiRoute.getExpenses,headers: {},
         body: {
-          "repository_id":repositoryId.toString()
+          "repository_id":RegistrationController.currentRepository.id.toString()
         });
     HelperLogicFunctions.printNote('End getExpenses() Api: $response');
     return response.fold((l) => l, (map) {

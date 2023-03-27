@@ -49,7 +49,7 @@ class DrawerContentHome extends GetView<MainController> {
                                         padding:
                                         const EdgeInsets.only(left: 10, top: 10),
                                         child: Text(
-                                          controller.registrationController.currentUser.name,
+                                          RegistrationController.currentUser.name,
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleLarge!
@@ -113,7 +113,7 @@ class DrawerContentHome extends GetView<MainController> {
                                 controller.update();
                               },
                               title: Text(
-                                controller.registrationController.currentUser.email,
+                                RegistrationController.currentUser.email,
                                 style:
                                 Theme.of(context).textTheme.titleMedium!.copyWith(
                                   color: AppColors.white,

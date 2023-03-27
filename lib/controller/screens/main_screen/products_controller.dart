@@ -62,7 +62,7 @@ class ProductsController extends GetxController with GetSingleTickerProviderStat
     return await ApiService.sendRequest(
 
       request: () async {
-        return await productsApiController.getProducts(repositoryId: mainController.repositoryId);
+        return await productsApiController.getProducts();
       },
       onSuccess: (response) async {
         if(response is List<Product>) {

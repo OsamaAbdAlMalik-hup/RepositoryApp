@@ -64,10 +64,8 @@ class SuppliersController extends GetxController
 
       request: () async {
         return isArchived
-            ? await suppliersApiController.getArchiveSuppliers(
-                repositoryId: mainController.repositoryId)
-            : await suppliersApiController.getSuppliers(
-                repositoryId: mainController.repositoryId);
+            ? await suppliersApiController.getArchiveSuppliers()
+            : await suppliersApiController.getSuppliers();
       },
       onSuccess: (response) async {
         if (response is List<Supplier>) {

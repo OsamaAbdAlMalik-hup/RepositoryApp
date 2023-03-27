@@ -2,7 +2,7 @@
 class AppApiRoute {
 
   static const String server = "10.0.2.2:8000";
-  // static const String server = "192.168.191.114:8000";
+  // static const String server = "192.168.206.114:8000";
 
   // Registration
     // Auth
