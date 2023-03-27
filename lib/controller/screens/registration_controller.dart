@@ -44,6 +44,7 @@ class RegistrationController extends GetxController {
       var user = StorageServices.getStorage.read(AppSharedKeys.currentUser);
       if(user is User) {
         currentUser = user;
+        currentUser = user;
       } else {
         currentUser = User.fromJson(user ?? {}) ;
       }
