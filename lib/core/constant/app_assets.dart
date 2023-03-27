@@ -31,8 +31,9 @@ class AppAssets {
 
 
   // SVG
-    //Icons
     static const String rootSVG = "assets/svg";
+    static const String profileDefault = "$rootSVG/profile_default.svg";
+    //Icons
     static const String rootSVGIcon = "$rootSVG/icons";
     static const String categoriesIconSvg = "$rootSVGIcon/categories.svg";
     static const String clientsIconSvg = "$rootSVGIcon/clients.svg";

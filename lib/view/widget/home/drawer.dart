@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:repository/controller/screens/main_controller.dart';
 import 'package:repository/controller/screens/registration_controller.dart';
 import 'package:repository/core/constant/app_assets.dart';
@@ -9,6 +13,9 @@ import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
+import 'package:repository/core/helper/design_functions.dart';
+import 'package:repository/core/helper/logic_functions.dart';
+import 'package:repository/core/helper/validator_functions.dart';
 
 class DrawerContentHome extends GetView<MainController> {
   const DrawerContentHome({super.key});
@@ -41,10 +48,21 @@ class DrawerContentHome extends GetView<MainController> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const CircleAvatar(
-                                        radius: 50,
-                                        backgroundImage: AssetImage(AppAssets.screen13),
-                                      ),
+                                      RegistrationController.currentUser.photo==''?
+                                        CircleAvatar(
+                                            radius: 60,
+                                            backgroundColor: AppColors.primary70,
+                                            child: Text(RegistrationController.currentUser.name[0],style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                                              color: AppColors.primary0
+                                            ),)
+                                        )
+                                        :CircleAvatar(
+                                            radius: 60,
+                                            backgroundImage: FileImage(File(RegistrationController.currentUser.photo)),
+                                            child: controller.profileStatusView==StatusView.loading
+                                                ? const SpinKitSpinningLines(color: AppColors.primary90)
+                                                : null,
+                                        ),
                                       Padding(
                                         padding:
                                         const EdgeInsets.only(left: 10, top: 10),
@@ -69,19 +87,24 @@ class DrawerContentHome extends GetView<MainController> {
                                       child: Column(
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: const [
-                                          CircleAvatar(
-                                            radius: 15,
-                                            backgroundColor: AppColors.primary70,
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: AppColors.primary0,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              showDialogUpdateProfile(context);
+                                            },
+                                            child: const CircleAvatar(
+                                              radius: 15,
+                                              backgroundColor: AppColors.primary70,
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: AppColors.primary0,
+                                              ),
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 10,
                                           ),
-                                          CircleAvatar(
+                                          const CircleAvatar(
                                             radius: 15,
                                             backgroundColor: AppColors.primary70,
                                             child: Icon(
@@ -89,10 +112,10 @@ class DrawerContentHome extends GetView<MainController> {
                                               color: AppColors.primary0,
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 10,
                                           ),
-                                          CircleAvatar(
+                                          const CircleAvatar(
                                             radius: 15,
                                             backgroundColor: AppColors.primary70,
                                             child: Icon(
@@ -124,7 +147,38 @@ class DrawerContentHome extends GetView<MainController> {
                                     (index) => ListTile(
                                   focusColor: AppColors.primary30,
                                   tileColor: AppColors.primary50,
-                                  onTap: () {},
+                                  onTap: () {
+                                    HelperDesignFunctions.showAwesomeDialog(context,
+                                        btnOkOnPress: () async {
+                                          controller.registrationController.emailTextController.text=controller.registrationController.myAccounts[index].email;
+                                          controller.registrationController.passwordTextController.text=controller.registrationController.myAccounts[index].password;
+                                          controller.registrationController.login(isDefault: false);
+                                        },
+                                        btnCancelOnPress: () {},
+                                        body: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Form(
+                                            key: controller.formKeyUpdateProfileDebt,
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  "Switch Account",
+                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                ),
+                                                const Divider(
+                                                  thickness: 2,
+                                                  height: 20,
+                                                ),
+                                                Text(
+                                                  "Are you login by: ${controller.registrationController.myAccounts[index].name}",
+                                                  style: Theme.of(context).textTheme.bodyMedium,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                    );
+                                  },
                                   title: Text(
                                     controller.registrationController.myAccounts[index].email,
                                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -351,6 +405,104 @@ class DrawerContentHome extends GetView<MainController> {
       ),
     );
   }
+
+  void showDialogUpdateProfile(BuildContext context) {
+    controller.clearFields();
+    controller.nameFieldController.text=RegistrationController.currentUser.name;
+    HelperDesignFunctions.showAwesomeDialog(context,
+        btnOkOnPress: () async {
+          if(controller.formKeyUpdateProfileDebt.currentState!.validate()){
+            controller.profileStatusView=StatusView.loading;
+            controller.update();
+            bool result = await controller.registrationController.updateProfile(
+              name: controller.nameFieldController.text,
+              image: controller.image,
+            );
+            if (result) {
+              controller.profileStatusView=StatusView.none;
+              controller.update();
+            }
+          } else{
+            HelperDesignFunctions.showErrorSnackBar(message: "the name can't be empty ");
+          }
+        },
+        btnCancelOnPress: () {},
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            key: controller.formKeyUpdateProfileDebt,
+            child: Column(
+              children: [
+                Text(
+                  "Update Your Profile",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const Divider(
+                  thickness: 2,
+                  height: 20,
+                ),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    GetBuilder<MainController>(
+                      builder: (controller) => CircleAvatar(
+                        radius: 52,
+                        backgroundColor: AppColors.primary60,
+                        child: CircleAvatar(
+                          backgroundImage: controller.image != null
+                              ? FileImage(controller.image!)
+                              : RegistrationController.currentUser.photo!=''
+                              ? FileImage(File(RegistrationController.currentUser.photo))
+                              : null,
+                          radius: 50,
+                          backgroundColor: AppColors.primary5,
+                          child: controller.image == null && RegistrationController.currentUser.photo==''
+                              ? Image.asset(
+                            AppAssets.person,
+                          )
+                              : null,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -10,
+                      right: -10,
+                      child: InkWell(
+                        onTap: () async {
+                          controller.image = await HelperLogicFunctions.pickImage(
+                              ImageSource.gallery);
+                          controller.update();
+                        },
+                        child: const CircleAvatar(
+                          radius: 20,
+                          backgroundColor: AppColors.primary10,
+                          child: Icon(
+                            Icons.camera,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 25),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    label: Text("Name"),
+                    hintText: 'Enter your name',
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: controller.nameFieldController,
+                  validator: (text) {
+                    return Validate.valid(text!);
+                  },
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+
 }
 
 

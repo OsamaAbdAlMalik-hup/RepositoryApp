@@ -137,7 +137,7 @@ class SuppliersApiController
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return Supplier.jsonToList(map[AppResponseKeys.data]);
+        return Supplier.jsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);

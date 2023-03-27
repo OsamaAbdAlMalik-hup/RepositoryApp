@@ -3,6 +3,8 @@
 
 import 'dart:core';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -65,6 +67,17 @@ class HelperLogicFunctions{
     return file.path;
   }
 
+  static Future<String> saveFileToStorageFromURL(String url, {bool visible = false}) async {
+    Directory? directory = visible
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    String filename = path.basename(url);
+    String extension = path.extension(filename);
+    final response = await http.get(Uri.parse(url));
+    final file = File('${directory!.path}/${DateTime.now().millisecondsSinceEpoch}.$extension');
+    await file.writeAsBytes(response.bodyBytes);
+    return file.path;
+  }
   static String listToColumns(List<String> columnsList) {
     String columns = "";
     if (columnsList.isEmpty) {
@@ -117,6 +130,5 @@ class HelperLogicFunctions{
     }
     return values;
   }
-
 }
 

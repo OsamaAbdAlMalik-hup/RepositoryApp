@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/api/registration_api_controller.dart';
@@ -6,6 +8,7 @@ import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
+import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/core/service/api_service.dart';
 import 'package:repository/core/service/storage_services.dart';
 import 'package:repository/data/models/repository.dart';
@@ -94,6 +97,7 @@ class RegistrationController extends GetxController {
             StorageServices.sharedPreferences.setBool(AppSharedKeys.isAuthenticated, true);
             user.name=nameTextController.text;
             user.email=emailTextController.text;
+            user.password=passwordTextController.text;
             currentUser=user;
             var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
             if(users is List<User>) {
@@ -122,8 +126,8 @@ class RegistrationController extends GetxController {
     }
     return false;
   }
-  Future<bool> login() async {
-    if (formLoginKey.currentState!.validate()) {
+  Future<bool> login({bool isDefault=true}) async {
+    if (isDefault ? formLoginKey.currentState!.validate() : true) {
       statusView = StatusView.loading;
       update();
       return await ApiService.sendRequest(
@@ -136,6 +140,8 @@ class RegistrationController extends GetxController {
         onSuccess: (user) async {
           if (user is User) {
             StorageServices.sharedPreferences.setBool(AppSharedKeys.isAuthenticated, true);
+            user.password=passwordTextController.text;
+            user.photo = await HelperLogicFunctions.saveFileToStorageFromURL(user.photo);
             currentUser=user;
             var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
             if(users is List<User>) {
@@ -187,14 +193,25 @@ class RegistrationController extends GetxController {
       },
     );
   }
-  Future<bool> updateProfile() async {
-    statusView = StatusView.loading;
-    update();
+  Future<bool> updateProfile({required String name,required File? image}) async {
+
     return await ApiService.sendRequest(
       request: () async {
-        // return await registrationApiController.updateProfile();
+        return await registrationApiController.updateProfile(
+          name: name,
+          photo: image
+        );
       },
       onSuccess: (response) async {
+        if(image!=null){
+          if(currentUser.photo!='') {
+            HelperLogicFunctions.deleteFileFromStorage(File(currentUser.photo));
+          }
+          String photoPath = await HelperLogicFunctions.saveFileToStorage(image,"profile image ${DateTime.now()}");
+          currentUser.photo=photoPath;
+        }
+        currentUser.name=name;
+        StorageServices.getStorage.write(AppSharedKeys.currentUser, currentUser);
         statusView = StatusView.none;
         update();
       },

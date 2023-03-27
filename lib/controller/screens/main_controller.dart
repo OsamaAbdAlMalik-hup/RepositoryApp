@@ -36,6 +36,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   GlobalKey<FormState> formKeyCreateExpense = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyCreateMoneyOperation = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyMeetDebt = GlobalKey<FormState>();
+  GlobalKey<FormState> formKeyUpdateProfileDebt = GlobalKey<FormState>();
 
   TextEditingController searchFieldController = TextEditingController();
   TextEditingController nameFieldController = TextEditingController();
@@ -68,6 +69,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   Monitoring monitoring = Monitoring();
   FullStocktaking fullStocktaking = FullStocktaking();
   StatusView statusView = StatusView.loading;
+  StatusView profileStatusView = StatusView.none;
   DateTime? lastPressedGoBack;
   File? image;
   String startDate = '', endDate = '';
