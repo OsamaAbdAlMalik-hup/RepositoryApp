@@ -142,55 +142,87 @@ class DrawerContentHome extends GetView<MainController> {
                                   color: AppColors.white,
                                 ),
                               ),
-                              children: List.generate(
-                                controller.registrationController.myAccounts.length,
-                                    (index) => ListTile(
+                              children:[
+                                ...List.generate(
+                                  controller.registrationController.myAccounts.length,
+                                      (index) => ListTile(
+                                    focusColor: AppColors.primary30,
+                                    tileColor: AppColors.primary50,
+                                    onTap: () {
+                                      HelperDesignFunctions.showAwesomeDialog(context,
+                                          btnOkOnPress: () async {
+                                            await controller.registrationController.loginWithToken(newAccount: controller.registrationController.myAccounts[index]);
+                                            controller.update();
+                                          },
+                                          btnCancelOnPress: () {},
+                                          body: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Form(
+                                              key: controller.formKeyUpdateProfileDebt,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    "Switch Account",
+                                                    style: Theme.of(context).textTheme.titleLarge,
+                                                  ),
+                                                  const Divider(
+                                                    thickness: 2,
+                                                    height: 20,
+                                                  ),
+                                                  Text(
+                                                    "Are you login by: ${controller.registrationController.myAccounts[index].name}",
+                                                    style: Theme.of(context).textTheme.bodyMedium,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                      );
+                                    },
+                                    title: Text(
+                                      controller.registrationController.myAccounts[index].email,
+                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                          color: AppColors.primary0
+                                      ),
+                                    ),
+                                    leading: controller.registrationController.myAccounts[index].photo==''?
+                                    CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: AppColors.primary70,
+                                        child: Text(controller.registrationController.myAccounts[index].name[0],style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                                            color: AppColors.primary0
+                                        ),)
+                                    )
+                                        :CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage: FileImage(File(controller.registrationController.myAccounts[index].photo)),
+                                    ),
+                                  ),
+                                ),
+                                ListTile(
                                   focusColor: AppColors.primary30,
                                   tileColor: AppColors.primary50,
                                   onTap: () {
-                                    HelperDesignFunctions.showAwesomeDialog(context,
-                                        btnOkOnPress: () async {
-                                          controller.registrationController.emailTextController.text=controller.registrationController.myAccounts[index].email;
-                                          controller.registrationController.passwordTextController.text=controller.registrationController.myAccounts[index].password;
-                                          controller.registrationController.login(isDefault: false);
-                                        },
-                                        btnCancelOnPress: () {},
-                                        body: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Form(
-                                            key: controller.formKeyUpdateProfileDebt,
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  "Switch Account",
-                                                  style: Theme.of(context).textTheme.titleLarge,
-                                                ),
-                                                const Divider(
-                                                  thickness: 2,
-                                                  height: 20,
-                                                ),
-                                                Text(
-                                                  "Are you login by: ${controller.registrationController.myAccounts[index].name}",
-                                                  style: Theme.of(context).textTheme.bodyMedium,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                    );
+                                    controller.registrationController.statusView=StatusView.none;
+                                    controller.registrationController.update();
+                                    Get.toNamed(AppPagesRoutes.registration);
                                   },
                                   title: Text(
-                                    controller.registrationController.myAccounts[index].email,
+                                    "Add Account",
                                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                                         color: AppColors.primary0
                                     ),
                                   ),
-                                  leading: const CircleAvatar(
-                                    radius: 20,
-                                    backgroundImage: AssetImage(AppAssets.screen7),
+                                  leading: const Padding(
+                                    padding: EdgeInsets.only(left: 2),
+                                    child: CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: AppColors.primary30,
+                                      child: Icon(Icons.add),
+                                    ),
                                   ),
                                 ),
-                              )
+                              ]
                             ),
                           ]),
                     ],
@@ -217,7 +249,37 @@ class DrawerContentHome extends GetView<MainController> {
               children: [
                 ...List.generate(controller.registrationController.myRepositories.length,
                       (index) => ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    HelperDesignFunctions.showAwesomeDialog(context,
+                        btnOkOnPress: () async {
+                          await controller.registrationController.switchRepo(newRepository: controller.registrationController.myRepositories[index]);
+                          controller.update();
+                        },
+                        btnCancelOnPress: () {},
+                        body: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Form(
+                            key: controller.formKeyUpdateProfileDebt,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Switch Repository",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                const Divider(
+                                  thickness: 2,
+                                  height: 20,
+                                ),
+                                Text(
+                                  "Are you switch to: ${controller.registrationController.myRepositories[index].name}",
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                    );
+                  },
                   title: Text(
                     controller.registrationController.myRepositories[index].name,
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -226,14 +288,27 @@ class DrawerContentHome extends GetView<MainController> {
                     controller.registrationController.myRepositories[index].address,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  leading: const CircleAvatar(
+                  leading: RegistrationController.currentRepository.id==controller.registrationController.myRepositories[index].id
+                    ? const CircleAvatar(
+                        radius: 23,
+                        backgroundColor: AppColors.success50,
+                        child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: AssetImage(AppAssets.screen7),
+                      ),
+                    ) :const CircleAvatar(
                     radius: 20,
                     backgroundImage: AssetImage(AppAssets.screen7),
                   ),
                 ),),
                 ListTile(
                   focusColor: AppColors.primary30,
-                  onTap: () {},
+                  onTap: () {
+                    controller.registrationController.currentStep=1;
+                    controller.registrationController.statusView=StatusView.none;
+                    controller.registrationController.update();
+                    Get.toNamed(AppPagesRoutes.registration);
+                  },
                   title: Text(
                     "Add Repository",
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -393,7 +468,34 @@ class DrawerContentHome extends GetView<MainController> {
               title: Text('Logout', style: Theme.of(context).textTheme.bodyLarge),
               leading: const Icon(Icons.exit_to_app),
               onTap: () async {
-                await controller.registrationController.logout();
+                HelperDesignFunctions.showAwesomeDialog(context,
+                    btnOkOnPress: () async {
+                      await controller.registrationController.logout();
+                    },
+                    btnCancelOnPress: () {},
+                    body: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Form(
+                        key: controller.formKeyUpdateProfileDebt,
+                        child: Column(
+                          children: [
+                            Text(
+                              "Logout",
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const Divider(
+                              thickness: 2,
+                              height: 20,
+                            ),
+                            Text(
+                              "Are you sure remove the account : ${RegistrationController.currentUser.name}",
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                );
               },
             ),
             const Divider(

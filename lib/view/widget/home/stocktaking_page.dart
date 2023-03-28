@@ -221,6 +221,7 @@ class StocktakingPage extends GetView<MainController> {
                             backgroundColor: AppColors.primary0,
                             onPressed: () async {
                               await controller.choseDateRange(context);
+                              await controller.getFullStocktaking();
                             },
                           ),
                         ],
@@ -237,6 +238,7 @@ class StocktakingPage extends GetView<MainController> {
                             backgroundColor: AppColors.primary0,
                             onPressed: () async {
                               await controller.choseDateRange(context);
+                              await controller.getFullStocktaking();
                             },
                           ),
                         ],

@@ -1,6 +1,5 @@
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/api/registration_api_controller.dart';
@@ -44,7 +43,6 @@ class RegistrationController extends GetxController {
       var user = StorageServices.getStorage.read(AppSharedKeys.currentUser);
       if(user is User) {
         currentUser = user;
-        currentUser = user;
       } else {
         currentUser = User.fromJson(user ?? {}) ;
       }
@@ -58,7 +56,7 @@ class RegistrationController extends GetxController {
       if(users is List<User>) {
         myAccounts = users;
       } else {
-        myAccounts = User.fromJsonToList(users ?? []) ;
+        myAccounts = User.fromJsonToList(users ?? []);
       }
       var repositories = StorageServices.getStorage.read(AppSharedKeys.repositories);
       if(repositories is List<Repository>) {
@@ -98,16 +96,7 @@ class RegistrationController extends GetxController {
             StorageServices.sharedPreferences.setBool(AppSharedKeys.isAuthenticated, true);
             user.name=nameTextController.text;
             user.email=emailTextController.text;
-            user.password=passwordTextController.text;
             currentUser=user;
-            var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
-            if(users is List<User>) {
-              myAccounts = users;
-            } else {
-              myAccounts = User.fromJsonToList(users ?? []) ;
-            }
-            myAccounts.add(currentUser);
-            StorageServices.getStorage.write(AppSharedKeys.accounts, myAccounts);
             StorageServices.getStorage.write(AppSharedKeys.currentUser, currentUser);
             StorageServices.getStorage.save();
             currentStep++;
@@ -127,23 +116,27 @@ class RegistrationController extends GetxController {
     }
     return false;
   }
-  Future<bool> login({bool isDefault=true}) async {
-    if (isDefault ? formLoginKey.currentState!.validate() : true) {
+  Future<bool> registerAddAccount() async {
+    if (passwordTextController.text != confirmPasswordTextController.text) {
+      HelperDesignFunctions.showErrorSnackBar(title: "Password and confirm dont not match", message: "Please try again");
+      return false;
+    }
+    if (formRegisterKey.currentState!.validate()) {
       statusView = StatusView.loading;
       update();
       return await ApiService.sendRequest(
         request: () async {
-          return await registrationApiController.login(
+          return await registrationApiController.register(
+            name: nameTextController.text,
             email: emailTextController.text,
             password: passwordTextController.text,
+            confirmPassword: confirmPasswordTextController.text,
           );
         },
         onSuccess: (user) async {
           if (user is User) {
-            StorageServices.sharedPreferences.setBool(AppSharedKeys.isAuthenticated, true);
-            user.password=passwordTextController.text;
-            user.photo = await HelperLogicFunctions.saveFileToStorageFromURL(user.photo);
-            currentUser=user;
+            user.name=nameTextController.text;
+            user.email=emailTextController.text;
             var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
             if(users is List<User>) {
               myAccounts = users;
@@ -152,6 +145,7 @@ class RegistrationController extends GetxController {
             }
             myAccounts.add(currentUser);
             StorageServices.getStorage.write(AppSharedKeys.accounts, myAccounts);
+            currentUser=user;
             StorageServices.getStorage.write(AppSharedKeys.currentUser, currentUser);
             StorageServices.getStorage.save();
             currentStep++;
@@ -170,6 +164,118 @@ class RegistrationController extends GetxController {
       );
     }
     return false;
+  }
+  Future<bool> login() async {
+    if (formLoginKey.currentState!.validate()) {
+      statusView = StatusView.loading;
+      update();
+      return await ApiService.sendRequest(
+        request: () async {
+          return await registrationApiController.login(
+            email: emailTextController.text,
+            password: passwordTextController.text,
+          );
+        },
+        onSuccess: (user) async {
+          if (user is User) {
+            StorageServices.sharedPreferences.setBool(AppSharedKeys.isAuthenticated, true);
+            user.photo = await HelperLogicFunctions.saveFileToStorageFromURL(user.photo);
+            var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
+            if(users is List<User>) {
+              myAccounts = users;
+            } else {
+              myAccounts = User.fromJsonToList(users ?? []) ;
+            }
+            myAccounts.add(user);
+            StorageServices.getStorage.write(AppSharedKeys.accounts, myAccounts);
+            StorageServices.getStorage.write(AppSharedKeys.currentUser, user);
+            StorageServices.getStorage.save();
+            currentUser=user;
+            currentStep++;
+            clearField();
+            statusView = StatusView.none;
+            update();
+          }
+        },
+        onFailure: (statusView, message) async {
+          this.statusView = statusView;
+          if (statusView == StatusView.none) {
+            HelperDesignFunctions.showErrorSnackBar(message: message.text);
+          }
+          update();
+        },
+      );
+    }
+    return false;
+  }
+  Future<bool> loginAddAccount() async {
+    if (formLoginKey.currentState!.validate()) {
+      statusView = StatusView.loading;
+      update();
+      return await ApiService.sendRequest(
+        request: () async {
+          return await registrationApiController.login(
+            email: emailTextController.text,
+            password: passwordTextController.text,
+          );
+        },
+        onSuccess: (user) async {
+          if (user is User) {
+            user.photo = await HelperLogicFunctions.saveFileToStorageFromURL(user.photo);
+            var users = StorageServices.getStorage.read(AppSharedKeys.accounts);
+            if(users is List<User>) {
+              myAccounts = users;
+            } else {
+              myAccounts = User.fromJsonToList(users ?? []) ;
+            }
+            myAccounts.add(currentUser);
+            StorageServices.getStorage.write(AppSharedKeys.accounts, myAccounts);
+            currentUser=user;
+            StorageServices.getStorage.write(AppSharedKeys.currentUser, user);
+            StorageServices.getStorage.save();
+            currentStep++;
+            clearField();
+            statusView = StatusView.none;
+            update();
+          }
+        },
+        onFailure: (statusView, message) async {
+          this.statusView = statusView;
+          if (statusView == StatusView.none) {
+            HelperDesignFunctions.showErrorSnackBar(message: message.text);
+          }
+          update();
+        },
+      );
+    }
+    return false;
+  }
+  Future<bool> loginWithToken({required User newAccount}) async {
+    return await ApiService.sendRequest(
+      request: () async {
+        return await registrationApiController.loginWithToken(
+          token: newAccount.rememberToken,
+        );
+      },
+      onSuccess: (user) async {
+        if (user is User) {
+          myAccounts.add(currentUser);
+          myAccounts.removeWhere((element) => element.id==newAccount.id);
+          StorageServices.getStorage.write(AppSharedKeys.accounts, myAccounts);
+          currentUser=user;
+          currentUser.photo=newAccount.photo;
+          StorageServices.getStorage.write(AppSharedKeys.currentUser, currentUser);
+          StorageServices.getStorage.save();
+        }
+      },
+      onFailure: (statusView, message) async {
+        this.statusView = statusView;
+        if (statusView == StatusView.none) {
+          HelperDesignFunctions.showErrorSnackBar(message: message.text);
+        }
+        update();
+      },
+    );
   }
   Future<bool> logout() async {
     Get.back();
@@ -257,6 +363,7 @@ class RegistrationController extends GetxController {
             StorageServices.getStorage.write(AppSharedKeys.repositories, myRepositories);
             StorageServices.getStorage.write(AppSharedKeys.currentRepository, response);
             StorageServices.getStorage.save();
+            currentRepository=response;
             Get.offAllNamed(AppPagesRoutes.mainScreen);
           }
         },
@@ -294,6 +401,7 @@ class RegistrationController extends GetxController {
             StorageServices.getStorage.write(AppSharedKeys.repositories, myRepositories);
             StorageServices.getStorage.write(AppSharedKeys.currentRepository, response);
             StorageServices.getStorage.save();
+            currentRepository=response;
             Get.offAllNamed(AppPagesRoutes.mainScreen);
           }
         },
@@ -307,6 +415,11 @@ class RegistrationController extends GetxController {
       );
     }
     return false;
+  }
+  Future<void> switchRepo({required Repository newRepository}) async {
+    RegistrationController.currentRepository=newRepository;
+    StorageServices.getStorage.write(AppSharedKeys.currentRepository, newRepository);
+    StorageServices.getStorage.save();
   }
   Future<bool> getRepositoriesForUser() async {
     statusView = StatusView.loading;

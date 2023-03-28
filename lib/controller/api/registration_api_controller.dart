@@ -52,6 +52,23 @@ class RegistrationApiController {
       }
     });
   }
+  Future<dynamic> loginWithToken({required String token}) async {
+    HelperLogicFunctions.printNote('Start login() Api');
+    var response = await apiService.get(url: AppApiRoute.loginWithToken,headers: {
+      'Authorization': 'Bearer $token',
+    },);
+    HelperLogicFunctions.printNote('End login() Api: $response');
+    return response.fold((l) => l, (map) {
+      if (map.containsKey(AppResponseKeys.success)
+          && map.containsKey(AppResponseKeys.data)
+          && map[AppResponseKeys.success]) {
+        return User.fromJsonToList([map[AppResponseKeys.data]]).first;
+      }
+      if(map.containsKey(AppResponseKeys.message)) {
+        return ValidationMessage(map[AppResponseKeys.message]);
+      }
+    });
+  }
   Future<dynamic> logout() async {
     HelperLogicFunctions.printNote('Start logout() Api');
     var response = await apiService.get(url: AppApiRoute.logout,headers: {});

@@ -1,13 +1,14 @@
 
 class AppApiRoute {
 
-  // static const String server = "10.0.2.2:8000";
-  static const String server = "192.168.43.114:8000";
+  static const String server = "10.0.2.2:8000";
+  // static const String server = "192.168.43.114:8000";
 
   // Registration
     // Auth
     static const String register = "/auth/register";
     static const String login = "/auth/login";
+    static const String loginWithToken = "/auth/login_with_token";
     static const String logout = "/auth/logout";
     static const String updateProfile = "/auth/add_info";
 

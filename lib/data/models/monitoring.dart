@@ -42,7 +42,7 @@ class Monitoring {
         HelperLogicFunctions.getVale(map: monitoringMap, key: AppResponseKeys.mostSaleProducts, defaultVal: []),
       ),
       leastAmountProducts: Product.jsonToList(
-        HelperLogicFunctions.getVale(map: monitoringMap, key: AppResponseKeys.leastAmountProducts, defaultVal: []),
+        HelperLogicFunctions.getVale(map: monitoringMap, key: AppResponseKeys.leastAmountProducts, defaultVal: {}),
       ),
       mostPopularSuppliers: Supplier.jsonToList(HelperLogicFunctions.getVale(map: monitoringMap, key: AppResponseKeys.mostPopularSuppliers, defaultVal: []),),
       mostPopularClients: Client.jsonToList(HelperLogicFunctions.getVale(map: monitoringMap, key: AppResponseKeys.mostPopularClients, defaultVal: []),)

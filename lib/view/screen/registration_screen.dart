@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/screens/registration_controller.dart';
+import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/helper/validator_functions.dart';
 import 'package:repository/view/widget/auth/button_auth.dart';
 import 'package:repository/view/widget/auth/text_auth.dart';
@@ -160,7 +161,11 @@ class RegistrationScreen extends GetView<RegistrationController> {
             ButtonAuth(
                 text: "Register",
                 onPressed: () {
-                  controller.register();
+                  if(Get.previousRoute==AppPagesRoutes.mainScreen) {
+                    controller.registerAddAccount();
+                  } else {
+                    controller.register();
+                  }
                 }),
             const SizedBox(height: 40),
             TextAuth(
@@ -227,7 +232,11 @@ class RegistrationScreen extends GetView<RegistrationController> {
             ButtonAuth(
                 text: "Login",
                 onPressed: () {
-                  controller.login();
+                  if(Get.previousRoute==AppPagesRoutes.mainScreen){
+                    controller.loginAddAccount();
+                  } else {
+                    controller.login();
+                  }
                 }),
             const SizedBox(height: 40),
             TextAuth(

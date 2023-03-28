@@ -48,9 +48,11 @@ class ApiService extends GetxService {
   }
   Future<Either<StatusView, Map>> get({required String url, required Map<String, String> headers}) async {
     try {
-      headers.addAll({
+      if(!headers.containsKey('Authorization')) {
+        headers.addAll({
         'Authorization': 'Bearer ${RegistrationController.currentUser.rememberToken}',
       });
+      }
       var response = await http.get(Uri.http(AppApiRoute.server, url), headers: headers);
       if (response.statusCode == StatusCodeRequest.ok || response.statusCode == StatusCodeRequest.badRequest) {
         return Right(jsonDecode(response.body));
