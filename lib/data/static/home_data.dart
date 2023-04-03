@@ -47,3 +47,5 @@ class CardDataHome{
 
   CardDataHome(this.imagePath, this.title, this.screen);
 }
+
+List<String> units=['Kg','Litter','Meter','Piece'];

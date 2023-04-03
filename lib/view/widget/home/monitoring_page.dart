@@ -9,7 +9,7 @@ import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/view/widget/shared/empty.dart';
-import 'package:repository/view/widget/shared/section.dart';
+import 'package:repository/view/widget/shared/section_tabs.dart';
 import 'package:repository/view/widget/shared/text_icon.dart';
 
 class MonitoringPage extends GetView<MainController> {
@@ -23,9 +23,9 @@ class MonitoringPage extends GetView<MainController> {
             return controller.onNotification(notification);
           },
           child: ListView(
-            padding: const EdgeInsets.symmetric(vertical: 10,),
+            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
             children: [
-              Section(
+              SectionTabs(
                 title: "Least Invoices",
                 tabsTitles: const [
                   "Purchases",
@@ -201,7 +201,7 @@ class MonitoringPage extends GetView<MainController> {
                                                     .monetization_on_rounded,
                                               ),
                                               TextIcon(
-                                                text: controller.monitoring.leastSalesInvoices[index].remainder.toString(),
+                                                text: controller.monitoring.leastSalesInvoices[index].remained.toString(),
                                                 color: AppColors.black,
                                                 icon: Icons.money_off,
                                               ),
@@ -312,13 +312,13 @@ class MonitoringPage extends GetView<MainController> {
                   ),
                 ],
               ),
-              Section(
+              SectionTabs(
                 title: "Popular People",
                 tabsTitles: const [
                   "Clients",
                   "Suppliers",
                 ],
-                tabViewHeight: 0.5 * Get.width,
+                tabViewHeight: 0.6 * Get.width,
                 controller: controller.tabPopularPeopleController,
                 onArrowPressed: controller.onArrowPopularPeopleTabPressed,
                 onTab: controller.onPopularPeopleTabChange,
@@ -400,7 +400,7 @@ class MonitoringPage extends GetView<MainController> {
                                 clipBehavior: Clip.hardEdge,
                                 decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: AppColors.primaryAccent201,
+                                    color: AppColors.primary20,
                                     boxShadow: [
                                       BoxShadow(
                                           offset: Offset(0, 3),
@@ -414,7 +414,7 @@ class MonitoringPage extends GetView<MainController> {
                                   placeholder: (context, url) => const CircularProgressIndicator(),
                                   errorWidget: (context, url, error) => CircleAvatar(
                                     radius: 42,
-                                    backgroundColor: AppColors.whiteSecondary,
+                                    backgroundColor: AppColors.primary0,
                                     child: Text('${controller.monitoring.mostPopularSuppliers[index].name[0]}${controller.monitoring.mostPopularSuppliers[index].name[1]}',
                                         style: const TextStyle(
                                             fontSize: 40,
@@ -443,7 +443,7 @@ class MonitoringPage extends GetView<MainController> {
                   ),
                 ],
               ),
-              Section(
+              SectionTabs(
                 title: "Products",
                 tabsTitles: const [
                   "Most Benefit",

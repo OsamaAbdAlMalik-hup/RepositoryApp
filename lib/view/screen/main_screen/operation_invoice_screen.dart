@@ -1,4 +1,4 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
+
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -31,34 +31,22 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
             controller.remained =
                 double.parse(controller.totalFieldController.text);
             if (controller.selectedPairProducts.isNotEmpty) {
-              HelperDesignFunctions.showAwesomeDialog(context,
+              HelperDesignFunctions.showAlertDialog(context,
                   btnOkOnPress: () {
-                if (controller.operationType == OperationType.create) {
-                  controller.createInvoice();
-                } else {
-                  controller.updateInvoice();
-                }
-              },
-                  btnCancelOnPress: () {},
-                  body: GetBuilder<OperationsInvoiceController>(
-                    builder: (controller) => Form(
-                      key: controller.formKeySaveInvoice,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                    if (controller.operationType == OperationType.create) {
+                      controller.createInvoice();
+                    } else {
+                      controller.updateInvoice();
+                    }
+                  },
+                  title: "Sort Invoices",
+                  children: [
+                    GetBuilder<OperationsInvoiceController>(
+                      builder: (controller) => Form(
+                        key: controller.formKeySaveInvoice,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            const Text(
-                              "Save Invoice",
-                              style: TextStyle(
-                                  color: AppColors.black,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const Divider(
-                              thickness: 2,
-                              height: 40,
-                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -67,7 +55,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.primary),
+                                      color: AppColors.primary50),
                                 ),
                                 Text(
                                   "${controller.totalFieldController.text} \$",
@@ -86,7 +74,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.primary),
+                                      color: AppColors.primary50),
                                 ),
                                 Text(
                                   "${controller.remained} \$",
@@ -119,7 +107,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                 },
                                 controller: controller.paidMoneyFieldController,
                                 autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
+                                AutovalidateMode.onUserInteraction,
                                 validator: (text) {
                                   String? message = Validate.valid(text!,
                                       type: Validate.positiveNum,
@@ -140,8 +128,9 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                           ],
                         ),
                       ),
-                    ),
-                  ));
+                    )
+                  ]
+              );
             } else {
               HelperDesignFunctions.showErrorSnackBar(
                   message: "you must add sales");
@@ -255,7 +244,9 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: IconButton(
-                                onPressed: () {}, icon: const Icon(Icons.add)),
+                                onPressed: () {
+                                  controller.mainController.showSheetCreateClientOrSupplier(context, isClient: true);
+                                }, icon: const Icon(Icons.add)),
                           ),
                         ),
                       ],
@@ -310,7 +301,9 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: IconButton(
-                                onPressed: () {}, icon: const Icon(Icons.add)),
+                                onPressed: () {
+                                  controller.mainController.showSheetCreateClientOrSupplier(context, isClient: false);
+                                }, icon: const Icon(Icons.add)),
                           ),
                         ),
                       ],
@@ -352,30 +345,21 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                             onChanged: (value) {
                               controller.selectedProduct = value!;
                               controller.paidMoneyFieldController.clear();
-                              controller.mainController.amountFieldController.clear();
-                              HelperDesignFunctions.showAwesomeDialog(context,
-                                  btnCancelOnPress: () {}, btnOkOnPress: () {
-                                controller.addProduct(value);
-                              },
-                                  body: Container(
-                                    height: 0.4 * Get.height,
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Form(
+                              controller.mainController.totalPriceFieldController.clear();
+                              HelperDesignFunctions.showAlertDialog(context,
+                                  btnOkOnPress: () {
+                                    controller.addProduct(value);
+                                  },
+                                  title: "Adding ${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'}",
+                                  children: [
+                                    Form(
                                       key: controller.formKeyAddProduct,
                                       child: Column(
                                         children: [
                                           Text(
-                                            "Adding ${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'}",
-                                            style: const TextStyle(
-                                                color: AppColors.black,
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 15),
-                                          Text(
                                             controller.selectedProduct.name,
                                             style: const TextStyle(
-                                                color: AppColors.primary,
+                                                color: AppColors.primary50,
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -385,7 +369,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                           IntrinsicHeight(
                                             child: Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                              MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 Column(
                                                   children: [
@@ -395,7 +379,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                                           color: AppColors.black,
                                                           fontSize: 18,
                                                           fontWeight:
-                                                              FontWeight.bold),
+                                                          FontWeight.bold),
                                                     ),
                                                     const SizedBox(
                                                       height: 10,
@@ -406,7 +390,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                                           color: AppColors.gray,
                                                           fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.bold),
+                                                          FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -423,7 +407,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                                           color: AppColors.black,
                                                           fontSize: 18,
                                                           fontWeight:
-                                                              FontWeight.bold),
+                                                          FontWeight.bold),
                                                     ),
                                                     const SizedBox(
                                                       height: 10,
@@ -434,7 +418,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                                           color: AppColors.gray,
                                                           fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.bold),
+                                                          FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -447,7 +431,7 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                           TextFormField(
                                             decoration: InputDecoration(
                                                 labelText:
-                                                    '${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'} Amount',
+                                                '${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'} Amount',
                                                 border: const OutlineInputBorder(
                                                   borderRadius: BorderRadius.all(
                                                       Radius.circular(10)),
@@ -457,208 +441,17 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                             autovalidateMode: AutovalidateMode
                                                 .onUserInteraction,
                                             controller: controller.mainController
-                                                .amountFieldController,
+                                                .totalPriceFieldController,
                                             validator: (text) {
                                               String? message = Validate.valid(
                                                   text!,
                                                   type: Validate.positiveNum,
                                                   maxVal:
-                                                      controller.invoiceType ==
-                                                              InvoiceType.sales
-                                                          ? controller
-                                                              .selectedProduct
-                                                              .amount
-                                                          : double.infinity);
-                                              if (message == null &&
-                                                  controller.invoiceType !=
-                                                      InvoiceType.sales &&
-                                                  double.parse(text) >
-                                                      controller.mainController
-                                                          .totalMoneyBox) {
-                                                return 'Money not enough to buy ${controller.mainController.totalMoneyBox} \$';
-                                              }
-                                              return message;
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ));
-                            },
-                            items: controller.unselectedProducts,
-                            selectedItem: controller.selectedProduct,
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.add),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                      child: ListView.builder(
-                    padding: const EdgeInsets.all(10),
-                    itemCount: controller.selectedPairProducts.length,
-                    itemBuilder: (context, index) {
-                      return Slidable(
-                        startActionPane: ActionPane(
-                          motion: const StretchMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (c) async {
-                                HelperDesignFunctions.showAwesomeDialog(context,
-                                    dialogType: DialogType.error,
-                                    btnOkOnPress: () async {
-                                  controller.deleteProduct(index);
-                                },
-                                    btnCancelOnPress: () {},
-                                    body: SizedBox(
-                                      height: 50,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                            "Are you sure from delete ${controller.selectedPairProducts[index].first.name}  !"),
-                                      ),
-                                    ));
-                              },
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              backgroundColor: AppColors.red,
-                              icon: Icons.delete_outlined,
-                              label: 'Delete',
-                            ),
-                            SlidableAction(
-                              onPressed: (c) {
-                                controller.mainController.amountFieldController
-                                        .text =
-                                    controller.selectedPairProducts[index].second
-                                        .toString();
-                                HelperDesignFunctions.showAwesomeDialog(
-                                  context,
-                                  btnCancelOnPress: () {},
-                                  btnOkOnPress: () {
-                                    controller.updateProduct(index);
-                                  },
-                                  body: Container(
-                                    height: 0.35 * Get.height,
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Form(
-                                      key: controller.formKeyUpdateProduct,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "update ${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Buy'}",
-                                            style: const TextStyle(
-                                                color: AppColors.black,
-                                                fontSize: 25,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 15),
-                                          Text(
-                                            controller.selectedPairProducts[index]
-                                                .first.name,
-                                            style: const TextStyle(
-                                                color: AppColors.primary,
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(
-                                            height: 20,
-                                          ),
-                                          IntrinsicHeight(
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Text(
-                                                      controller.invoiceType ==
-                                                              InvoiceType.sales
-                                                          ? "${controller.selectedPairProducts[index].first.salePrice} \$"
-                                                          : "${controller.selectedPairProducts[index].first.purchasePrice} \$",
-                                                      style: const TextStyle(
-                                                          color: AppColors.black,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    Text(
-                                                      "${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'} Price",
-                                                      style: const TextStyle(
-                                                          color: AppColors.gray,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const VerticalDivider(
-                                                  thickness: 3,
-                                                  width: 10,
-                                                  color: AppColors.black,
-                                                ),
-                                                Column(
-                                                  children: [
-                                                    Text(
-                                                      "${controller.selectedPairProducts[index].first.amount}",
-                                                      style: const TextStyle(
-                                                          color: AppColors.black,
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    const Text(
-                                                      "Available",
-                                                      style: TextStyle(
-                                                          color: AppColors.gray,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 40,
-                                          ),
-                                          TextFormField(
-                                            decoration: const InputDecoration(
-                                                labelText: 'Sale Amount',
-                                                border: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(10)),
-                                                )),
-                                            autofocus: true,
-                                            keyboardType: TextInputType.number,
-                                            autovalidateMode: AutovalidateMode
-                                                .onUserInteraction,
-                                            controller: controller.mainController
-                                                .amountFieldController,
-                                            validator: (text) {
-                                              String? message = Validate.valid(
-                                                  text!,
-                                                  type: Validate.positiveNum,
-                                                  maxVal: controller
-                                                              .invoiceType ==
-                                                          InvoiceType.sales
+                                                  controller.invoiceType ==
+                                                      InvoiceType.sales
                                                       ? controller
-                                                          .selectedPairProducts[
-                                                              index]
-                                                          .first
-                                                          .amount
+                                                      .selectedProduct
+                                                      .amount
                                                       : double.infinity);
                                               if (message == null &&
                                                   controller.invoiceType !=
@@ -673,16 +466,197 @@ class OperationsInvoiceScreen extends GetView<OperationsInvoiceController> {
                                           ),
                                         ],
                                       ),
-                                    ),
-                                  ),
+                                    )
+                                  ]
+                              );
+                            },
+                            items: controller.unselectedProducts,
+                            selectedItem: controller.selectedProduct,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: IconButton(
+                              onPressed: () {
+                                controller.mainController.showSheetCreateProduct(context);
+                              }, icon: const Icon(Icons.add)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                    padding: const EdgeInsets.all(10),
+                    itemCount: controller.selectedPairProducts.length,
+                    itemBuilder: (context, index) {
+                      return Slidable(
+                        startActionPane: ActionPane(
+                          extentRatio: 0.25,
+                          motion: const StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (c) async {
+                                HelperDesignFunctions.showAlertDialog(context,
+                                    btnOkOnPress: () async {
+                                      controller.deleteProduct(index);
+                                    },
+                                    title: "Delete Product",
+                                    subTitle: "Are you sure from delete ${controller.selectedPairProducts[index].first.name}  !",
+                                    okText: "Delete",
+                                    dialogType: "delete",
+                                );
+                              },
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(10)),
+                              backgroundColor: AppColors.danger50,
+                              icon: Icons.delete_outlined,
+                            ),
+                          ],
+                        ),
+                        endActionPane: ActionPane(
+                          extentRatio: 0.25,
+                          motion: const StretchMotion(),
+                          children: [
+                            SlidableAction(
+                              onPressed: (c) {
+                                controller.mainController.totalPriceFieldController.text =
+                                    controller.selectedPairProducts[index].second.toString();
+                                HelperDesignFunctions.showAlertDialog(context,
+                                    btnOkOnPress: () {
+                                      controller.updateProduct(index);
+                                    },
+                                    title: "Update ${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'}",
+                                    children: [
+                                      Form(
+                                        key: controller.formKeyUpdateProduct,
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              controller.selectedPairProducts[index].first.name,
+                                              style: const TextStyle(
+                                                  color: AppColors.primary50,
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            IntrinsicHeight(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        controller.invoiceType ==
+                                                            InvoiceType.sales
+                                                            ? "${controller.selectedPairProducts[index].first.salePrice} \$"
+                                                            : "${controller.selectedPairProducts[index].first.purchasePrice} \$",
+                                                        style: const TextStyle(
+                                                            color: AppColors.black,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text(
+                                                        "${controller.invoiceType == InvoiceType.sales ? 'Sale' : 'Purchase'} Price",
+                                                        style: const TextStyle(
+                                                            color: AppColors.gray,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const VerticalDivider(
+                                                    thickness: 3,
+                                                    width: 10,
+                                                    color: AppColors.black,
+                                                  ),
+                                                  Column(
+                                                    children: [
+                                                      Text(
+                                                        "${controller.selectedPairProducts[index].first.amount}",
+                                                        style: const TextStyle(
+                                                            color: AppColors.black,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      const Text(
+                                                        "Available",
+                                                        style: TextStyle(
+                                                            color: AppColors.gray,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                            FontWeight.bold),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 40,
+                                            ),
+                                            TextFormField(
+                                              decoration: const InputDecoration(
+                                                  labelText: 'Sale Amount',
+                                                  border: OutlineInputBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(10)),
+                                                  )),
+                                              autofocus: true,
+                                              keyboardType: TextInputType.number,
+                                              autovalidateMode: AutovalidateMode
+                                                  .onUserInteraction,
+                                              controller: controller.mainController
+                                                  .totalPriceFieldController,
+                                              validator: (text) {
+                                                String? message = Validate.valid(
+                                                    text!,
+                                                    type: Validate.positiveNum,
+                                                    maxVal: controller
+                                                        .invoiceType ==
+                                                        InvoiceType.sales
+                                                        ? controller
+                                                        .selectedPairProducts[
+                                                    index]
+                                                        .first
+                                                        .amount
+                                                        : double.infinity);
+                                                if (message == null &&
+                                                    controller.invoiceType !=
+                                                        InvoiceType.sales &&
+                                                    double.parse(text) >
+                                                        controller.mainController
+                                                            .totalMoneyBox) {
+                                                  return 'Money not enough to buy ${controller.mainController.totalMoneyBox} \$';
+                                                }
+                                                return message;
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ]
                                 );
                               },
                               foregroundColor: AppColors.white,
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
-                              backgroundColor: AppColors.primary,
+                              const BorderRadius.all(Radius.circular(10)),
+                              backgroundColor: AppColors.success50,
                               icon: Icons.edit_outlined,
-                              label: 'Edit',
                             ),
                           ],
                         ),

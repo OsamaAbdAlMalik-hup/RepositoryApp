@@ -43,65 +43,31 @@ class InvoicesScreen extends GetView<InvoicesController> {
           ),
           Visibility(
             visible: !controller.isSearchMode,
-            child: PopupMenuButton<OperationType>(
-              tooltip: "Operation",
-              onSelected: (value) async {
-                switch (value) {
-                  case OperationType.sort:
-                    {
-                      HelperDesignFunctions.showAwesomeDialog(context,
-                          btnOkOnPress: () async {
-                        List invoices = controller.mainTabIndex==0
-                            ? controller.purchasesInvoices
-                            : controller.saleInvoices;
-                        await controller.sort(invoices);
-                      },
-                          btnCancelOnPress: () {},
-                          body: SortDialog<InvoicesController>(
-                            title: "Sort Suppliers",
-                            ascending: controller.ascending,
-                            onAscending: (isAscending) {
-                              controller.ascending = isAscending;
-                              controller.update();
-                            },
-                            sortItems: controller.sortItems,
-                          ));
-                      break;
-                    }
-                  default:
-                    break;
-                }
+            child: IconButton(
+              onPressed: () {
+                HelperDesignFunctions.showAlertDialog(context,
+                    btnOkOnPress: () async {
+                      List invoices = controller.mainTabIndex==0
+                          ? controller.purchasesInvoices
+                          : controller.saleInvoices;
+                      await controller.sort(invoices);
+                    },
+                    title: "Sort Invoices",
+                    children: [
+                      SortDialog<InvoicesController>(
+                        ascending: controller.ascending,
+                        onChange: (sortItems,isAscending) {
+                          controller.ascending = isAscending;
+                          controller.sortItems = sortItems;
+                          controller.update();
+                        },
+                        sortItems: controller.sortItems,
+                      )
+                    ]);
               },
-              itemBuilder: (context) => [
-                PopupMenuItem<OperationType>(
-                  value: OperationType.sort,
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.filter_list,
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text('Sort'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<OperationType>(
-                    value: OperationType.archive,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.receipt_long_outlined,
-                          color: AppColors.gray,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Registers'),
-                      ],
-                    )),
-              ],
+              icon: const Icon(
+                Icons.sort_by_alpha,
+              ),
             ),
           ),
           Visibility(
@@ -184,94 +150,79 @@ class InvoicesScreen extends GetView<InvoicesController> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          HelperDesignFunctions.showAwesomeDialog(context,
-              body: Container(
-                height: 0.2 * Get.height,
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Invoice Type",
-                      style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(
-                      thickness: 2,
-                      height: 40,
-                    ),
-                    IntrinsicHeight(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Get.back();
-                              Get.toNamed(
-                                  AppPagesRoutes.operationOnInvoiceScreen,
-                                  arguments: {
-                                    AppSharedKeys.passInvoiceType:
-                                        InvoiceType.purchases,
-                                    AppSharedKeys.passOperationType:
-                                        OperationType.create,
-                                  });
-                            },
-                            child: Column(
-                              children: const [
-                                Icon(
-                                  Icons.login,
-                                  color: AppColors.primary,
-                                ),
-                                Text(
-                                  "Buy",
-                                  style: TextStyle(
-                                      color: AppColors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+          HelperDesignFunctions.showAlertDialog(context,
+              title: 'Invoice Type',
+              hasButtonsAction: false,
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(
+                              AppPagesRoutes.operationOnInvoiceScreen,
+                              arguments: {
+                                AppSharedKeys.passInvoiceType:
+                                InvoiceType.purchases,
+                                AppSharedKeys.passOperationType:
+                                OperationType.create,
+                              });
+                        },
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.login,
+                              color: AppColors.primary50,
                             ),
-                          ),
-                          const VerticalDivider(
-                            thickness: 1,
-                            width: 10,
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Get.back();
-                              Get.toNamed(
-                                  AppPagesRoutes.operationOnInvoiceScreen,
-                                  arguments: {
-                                    AppSharedKeys.passInvoiceType:
-                                        InvoiceType.sales,
-                                    AppSharedKeys.passOperationType:
-                                        OperationType.create,
-                                  });
-                            },
-                            child: Column(
-                              children: const [
-                                Icon(
-                                  Icons.logout,
-                                  color: AppColors.primary,
-                                ),
-                                Text(
-                                  "Sale",
-                                  style: TextStyle(
-                                      color: AppColors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+                            Text(
+                              "Purchase",
+                              style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const VerticalDivider(
+                        thickness: 1,
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Get.back();
+                          Get.toNamed(
+                              AppPagesRoutes.operationOnInvoiceScreen,
+                              arguments: {
+                                AppSharedKeys.passInvoiceType:
+                                InvoiceType.sales,
+                                AppSharedKeys.passOperationType:
+                                OperationType.create,
+                              });
+                        },
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.logout,
+                              color: AppColors.primary50,
+                            ),
+                            Text(
+                              "     Sale    ",
+                              style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ));
+              ],
+          );
         },
         child: const Icon(Icons.add, color: AppColors.black),
       ),
@@ -337,7 +288,7 @@ class InvoicesScreen extends GetView<InvoicesController> {
                                                 borderRadius:
                                                     const BorderRadius.all(
                                                         Radius.circular(10)),
-                                                backgroundColor: AppColors.red,
+                                                backgroundColor: AppColors.danger50,
                                                 icon: Icons.delete_outlined,
                                               ),
                                             ],
@@ -617,7 +568,7 @@ class InvoicesScreen extends GetView<InvoicesController> {
                                                                   text: controller
                                                                       .saleInvoices[
                                                                           index]
-                                                                      .remainder
+                                                                      .remained
                                                                       .toString(),
                                                                   color: AppColors
                                                                       .black,

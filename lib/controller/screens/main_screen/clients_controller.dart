@@ -1,5 +1,5 @@
+
 import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -106,118 +106,109 @@ class ClientsController extends GetxController
     mainController.nameFieldController.text = client.name;
     mainController.phoneNumberFieldController.text = client.phoneNumber;
     mainController.addressFieldController.text = client.address;
-    HelperDesignFunctions.showMainBottomSheet(
-      context,
-      height: Get.height,
-      title: "Update Client",
-      btnOkOnPress: () async {
-        bool result = await _updateClient(client);
-        if (result && onSuccess != null) {
-          await onSuccess.call();
-        }
-      },
-      btnCancelOnPress: () {},
-      content: Form(
-        key: formKeyUpdate,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.topCenter,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  GetBuilder<ClientsController>(
-                    builder: (controller) => CircleAvatar(
-                      radius: 105,
-                      backgroundColor: AppColors.primary,
-                      child: CircleAvatar(
-                        radius: 100,
-                        backgroundColor: AppColors.whiteSecondary,
-                        backgroundImage: controller.mainController.image == null
-                            ? FileImage(File(client.photo))
-                            : FileImage(controller.mainController.image!),
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyUpdate,
+        btnOkOnPress: () async {
+          bool result = await _updateClient(client);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
+        title: "Update Client",
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GetBuilder<ClientsController>(
+                  builder: (controller) => CircleAvatar(
+                    radius: 105,
+                    backgroundColor: AppColors.primary50,
+                    child: CircleAvatar(
+                      radius: 100,
+                      backgroundColor: AppColors.primary0,
+                      backgroundImage: controller.mainController.image == null
+                          ? FileImage(File(client.photo))
+                          : FileImage(controller.mainController.image!),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: InkWell(
+                    onTap: () async {
+                      mainController.image =
+                      await HelperLogicFunctions.pickImage(
+                          ImageSource.gallery);
+                      update();
+                    },
+                    child: const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.primary30,
+                      child: Icon(
+                        Icons.camera,
+                        color: AppColors.black,
+                        size: 35,
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: InkWell(
-                      onTap: () async {
-                        mainController.image =
-                            await HelperLogicFunctions.pickImage(
-                                ImageSource.gallery);
-                        update();
-                      },
-                      child: const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: AppColors.primaryAccent200,
-                        child: Icon(
-                          Icons.camera,
-                          color: AppColors.black,
-                          size: 35,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-            const SizedBox(height: 25),
-            const SizedBox(
-              height: 15,
+          ),
+          const SizedBox(height: 25),
+          const SizedBox(
+            height: 15,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              controller: mainController.nameFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                autofocus: true,
-                controller: mainController.nameFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Phone number',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.phone,
+              controller: mainController.phoneNumberFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!, type: Validate.phone);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Phone number',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.phone,
-                controller: mainController.phoneNumberFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!, type: Validate.phone);
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.text,
+              controller: mainController.addressFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Address',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.text,
-                controller: mainController.addressFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ]
     );
-    update();
   }
 
   Future<bool> _updateClient(Client client) async {
@@ -258,33 +249,20 @@ class ClientsController extends GetxController
 
   Future<void> showDialogDeleteClient(BuildContext context,
       {required Client client, Future Function()? onSuccess}) async {
-    HelperDesignFunctions.showAwesomeDialog(context,
-        dialogType: DialogType.error, btnOkOnPress: () async {
-      bool result = await _deleteClient(client);
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-        HelperDesignFunctions.showSuccessSnackBar(
-            message: "Client '${client.name}' deleted");
-      }
-    },
-        btnCancelOnPress: () {},
-        body: Container(
-          height: 0.15 * Get.height,
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const Text(
-                "Delete Client",
-                style: TextStyle(
-                    color: AppColors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${client.name} !")
-            ],
-          ),
-        ));
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          bool result = await _deleteClient(client);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "Client '${client.name}' deleted");
+          }
+        },
+        title: "Delete Client",
+        subTitle: "Are you sure from delete ${client.name} !",
+        okText: "Delete",
+        dialogType: "delete",
+    );
   }
 
   Future<bool> _deleteClient(Client client) async {

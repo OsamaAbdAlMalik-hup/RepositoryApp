@@ -42,7 +42,6 @@
     static const int ok = 200;
     static const int badRequest = 400;
     static const int unauthorised= 401;
-    // static const int invalidToken= 402; // Unused Status Code
   }
   abstract class MoneyType{
     static const String addCashMoney='add_cash';
@@ -50,4 +49,10 @@
     static const String expenseMoney='expenses';
     static const String salesMoney='sales';
     static const String purchasesMoney='purchases';
+  }
+  abstract class Units{
+    static const String kg = 'Kg';
+    static const String litter = 'Litter';
+    static const String meter = 'Meter';
+    static const String piece = 'Piece';
   }

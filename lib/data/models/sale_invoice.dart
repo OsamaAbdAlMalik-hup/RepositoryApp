@@ -7,7 +7,7 @@ class SaleInvoice {
   int number;
   double totalPrice;
   double paid;
-  double remainder;
+  double remained;
   String date;
   int clientId;
   String clientName;
@@ -19,7 +19,7 @@ class SaleInvoice {
       this.number = 0,
       this.totalPrice = 0,
       this.paid = 0,
-      this.remainder = 0,
+      this.remained = 0,
       this.clientName = '',
       this.clientId = 0,
       this.moneyOperationId = 0,
@@ -42,7 +42,7 @@ class SaleInvoice {
           paid: saleInvoice.containsKey(AppResponseKeys.paid)
               ? double.parse(saleInvoice[AppResponseKeys.paid].toString())
               : 0,
-          remainder: saleInvoice.containsKey(AppResponseKeys.remained)
+          remained: saleInvoice.containsKey(AppResponseKeys.remained)
               ? double.parse(saleInvoice[AppResponseKeys.remained].toString())
               : 0,
           clientName: HelperLogicFunctions.getNestedVale(map: saleInvoice, firstKey: AppResponseKeys.client, secondKey: AppResponseKeys.name , defaultVal: ''),

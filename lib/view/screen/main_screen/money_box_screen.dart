@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/screens/main_screen/mone_box_controller.dart';
@@ -41,69 +42,40 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
             ),
             Visibility(
               visible: !controller.isSearchMode,
-              child: PopupMenuButton<OperationType>(
-                tooltip: "Operation",
-                onSelected: (value) async {
-                  switch (value) {
-                    case OperationType.sort:
-                      {
-                        HelperDesignFunctions.showAwesomeDialog(context,
-                            btnOkOnPress: () async {
-                          List operations = controller.mainTabIndex == 0
-                              ? controller.pushCacheOperations
-                              : controller.mainTabIndex == 1
-                                  ? controller.pullCacheOperations
-                                  : controller.expenses;
-                          await controller.sort(operations);
-                        },
-                            btnCancelOnPress: () {},
-                            body: SortDialog<MoneyBoxController>(
-                              title: "Sort Operations",
-                              ascending: controller.ascending,
-                              onAscending: (isAscending) {
-                                controller.ascending = isAscending;
-                                controller.update();
-                              },
-                              sortItems: controller.mainTabIndex != 2
-                                  ? controller.sortItemsCache
-                                  : controller.sortItemsExpense,
-                            ));
-                        break;
-                      }
-                    default:
-                      break;
-                  }
+              child: IconButton(
+                onPressed: () {
+                  HelperDesignFunctions.showAlertDialog(context,
+                      btnOkOnPress: () async {
+                        List operations = controller.mainTabIndex == 0
+                            ? controller.pushCacheOperations
+                            : controller.mainTabIndex == 1
+                            ? controller.pullCacheOperations
+                            : controller.expenses;
+                        await controller.sort(operations);
+                      },
+                      title: "Sort Operations",
+                      btnCancelOnPress: () {},
+                      children: [
+                        SortDialog<MoneyBoxController>(
+                          ascending: controller.ascending,
+                          onChange: (sortItems,isAscending) {
+                            controller.ascending = isAscending;
+                            if(controller.mainTabIndex != 2) {
+                              controller.sortItemsCache = sortItems;
+                            } else {
+                              controller.sortItemsExpense = sortItems;
+                            }
+                            controller.update();
+                          },
+                          sortItems: controller.mainTabIndex != 2
+                              ? controller.sortItemsCache
+                              : controller.sortItemsExpense,
+                        )
+                      ]);
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem<OperationType>(
-                    value: OperationType.sort,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.filter_list,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Sort'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<OperationType>(
-                      value: OperationType.archive,
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.receipt_long_outlined,
-                            color: AppColors.gray,
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Text('Registers'),
-                        ],
-                      )),
-                ],
+                icon: const Icon(
+                  Icons.sort_by_alpha,
+                ),
               ),
             ),
             Visibility(
@@ -210,107 +182,92 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            HelperDesignFunctions.showAwesomeDialog(context,
-                body: Container(
-                  height: 0.2 * Get.height,
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+            HelperDesignFunctions.showAlertDialog(context,
+              title: "Money Operation",
+              hasButtonsAction: false,
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Text(
-                        "Money Operation",
-                        style: TextStyle(
-                            color: AppColors.black,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold),
+                      InkWell(
+                        onTap: () async {
+                          Get.back();
+                          await controller.createCacheMoney(context,
+                              isPush: true);
+                        },
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.login,
+                              color: AppColors.primary50,
+                            ),
+                            Text(
+                              "Push",
+                              style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
-                      const Divider(
-                        thickness: 2,
-                        height: 40,
+                      const VerticalDivider(
+                        thickness: 1,
+                        width: 10,
                       ),
-                      IntrinsicHeight(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            InkWell(
-                              onTap: () async {
-                                Get.back();
-                                await controller.createCacheMoney(context,
-                                    isPush: true);
-                              },
-                              child: Column(
-                                children: const [
-                                  Icon(
-                                    Icons.login,
-                                    color: AppColors.primary,
-                                  ),
-                                  Text(
-                                    "Push",
-                                    style: TextStyle(
-                                        color: AppColors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
+                      InkWell(
+                        onTap: () async {
+                          Get.back();
+                          await controller.createExpense(context);
+                        },
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.clean_hands,
+                              color: AppColors.primary50,
                             ),
-                            const VerticalDivider(
-                              thickness: 1,
-                              width: 10,
+                            Text(
+                              "expense",
+                              style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            InkWell(
-                              onTap: () async {
-                                Get.back();
-                                await controller.createExpense(context);
-                              },
-                              child: Column(
-                                children: const [
-                                  Icon(
-                                    Icons.clean_hands,
-                                    color: AppColors.primary,
-                                  ),
-                                  Text(
-                                    "expense",
-                                    style: TextStyle(
-                                        color: AppColors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
+                          ],
+                        ),
+                      ),
+                      const VerticalDivider(
+                        thickness: 1,
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          Get.back();
+                          await controller.createCacheMoney(context,
+                              isPush: false);
+                        },
+                        child: Column(
+                          children: const [
+                            Icon(
+                              Icons.logout,
+                              color: AppColors.primary50,
                             ),
-                            const VerticalDivider(
-                              thickness: 1,
-                              width: 10,
-                            ),
-                            InkWell(
-                              onTap: () async {
-                                Get.back();
-                                await controller.createCacheMoney(context,
-                                    isPush: false);
-                              },
-                              child: Column(
-                                children: const [
-                                  Icon(
-                                    Icons.logout,
-                                    color: AppColors.primary,
-                                  ),
-                                  Text(
-                                    "Pull",
-                                    style: TextStyle(
-                                        color: AppColors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              "Pull",
+                              style: TextStyle(
+                                  color: AppColors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                ));
+                )
+              ]
+            );
           },
           child: const Icon(Icons.add, color: AppColors.black),
         ),

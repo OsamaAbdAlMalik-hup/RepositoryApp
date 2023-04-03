@@ -5,11 +5,12 @@ class Sale {
   double amount;
   double totalSalePrice;
   double totalPurchasePrice;
-  String productName;
-  String clientName;
-  int saleInvoiceNumber;
+  int invoiceNumber;
   int productId;
   int clientId;
+  String productName;
+  String clientName;
+
   int saleInvoiceId;
 
   Sale(
@@ -19,7 +20,7 @@ class Sale {
        this.totalPurchasePrice=0,
        this.productName='',
        this.clientName='',
-       this.saleInvoiceNumber=0,
+       this.invoiceNumber=0,
        this.productId=0,
        this.clientId=0,
        this.saleInvoiceId=0});
@@ -46,7 +47,7 @@ class Sale {
         clientName: sale.containsKey(AppResponseKeys.client) && sale[AppResponseKeys.client].containsKey(AppResponseKeys.name)
             ? sale[AppResponseKeys.client][AppResponseKeys.name]
             : '',
-        saleInvoiceNumber: sale.containsKey(AppResponseKeys.salesInvoice) && sale[AppResponseKeys.salesInvoice].containsKey(AppResponseKeys.number)
+        invoiceNumber: sale.containsKey(AppResponseKeys.salesInvoice) && sale[AppResponseKeys.salesInvoice].containsKey(AppResponseKeys.number)
             ? sale[AppResponseKeys.salesInvoice][AppResponseKeys.number]
             : 0,
         productId: sale.containsKey(AppResponseKeys.product) && sale[AppResponseKeys.product].containsKey(AppResponseKeys.id)

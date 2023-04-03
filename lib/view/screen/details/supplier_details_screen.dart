@@ -102,7 +102,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                       children: const [
                         Icon(
                           Icons.delete_outlined,
-                          color: AppColors.red,
+                          color: AppColors.danger50,
                         ),
                         SizedBox(
                           width: 15,
@@ -173,7 +173,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                         flex: 1,
                         child: CircleAvatar(
                             radius: 50,
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: AppColors.primary50,
                             child: CircleAvatar(
                                 radius: 45,
                                 backgroundColor: AppColors.white,
@@ -199,7 +199,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.phone,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -215,7 +215,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.location_on,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -337,7 +337,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
+                        color: AppColors.primary30),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: const {
                       0: FractionColumnWidth(0.2),
@@ -348,7 +348,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                     children: [
                       TableRow(
                           decoration: BoxDecoration(
-                            color: AppColors.blackAccentT,
+                            color: AppColors.black90,
                             borderRadius: BorderRadius.vertical(
                               top: const Radius.circular(15),
                               bottom: controller
@@ -364,7 +364,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "#",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -374,7 +374,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Date",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -384,7 +384,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Debts",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -394,7 +394,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Total",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -403,7 +403,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                           controller.supplier.details.purchasesInvoices.length,
                           (index) => TableRow(
                                   decoration: const BoxDecoration(
-                                    color: AppColors.whiteSecondary,
+                                    color: AppColors.primary0,
                                   ),
                                   children: [
                                     ElevatedButton(
@@ -472,7 +472,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
+                        color: AppColors.primary30),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: const {
                       0: FractionColumnWidth(0.25),
@@ -483,7 +483,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                     children: [
                       TableRow(
                           decoration: BoxDecoration(
-                            color: AppColors.blackAccentT,
+                            color: AppColors.black90,
                             borderRadius: BorderRadius.vertical(
                               top: const Radius.circular(15),
                               bottom:
@@ -499,7 +499,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Name",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -509,7 +509,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Count",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -519,7 +519,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "purchase Price",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -529,7 +529,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                 "Total",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -538,7 +538,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                           controller.supplier.details.purchases.length,
                           (index) => TableRow(
                                   decoration: const BoxDecoration(
-                                    color: AppColors.whiteSecondary,
+                                    color: AppColors.primary0,
                                   ),
                                   children: [
                                     ElevatedButton(
@@ -561,9 +561,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                           .supplier
                                           .details
                                           .purchases[index]
-                                          .details
-                                          .product
-                                          .name),
+                                          .productName),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -573,26 +571,28 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text(controller
+                                      child: Text((controller
                                           .supplier
                                           .details
                                           .purchases[index]
+                                          .totalPurchasePrice / controller
+                                          .supplier
                                           .details
-                                          .product
-                                          .purchasePrice
+                                          .purchases[index]
+                                          .amount)
                                           .toString()),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Text((controller.supplier.details
-                                                  .purchases[index].amount *
-                                              controller
-                                                  .supplier
-                                                  .details
-                                                  .purchases[index]
-                                                  .details
-                                                  .product
-                                                  .purchasePrice)
+                                      child: Text((controller
+                                          .supplier
+                                          .details
+                                          .purchases[index]
+                                          .totalPurchasePrice / controller
+                                          .supplier
+                                          .details
+                                          .purchases[index]
+                                          .amount)
                                           .toString()),
                                     ),
                                   ]))

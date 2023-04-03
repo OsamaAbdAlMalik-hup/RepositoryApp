@@ -46,20 +46,22 @@ class ClientsScreen extends GetView<ClientsController> {
                   visible: !controller.isSearchMode,
                   child: IconButton(
                     onPressed: () {
-                      HelperDesignFunctions.showAwesomeDialog(context,
+                      HelperDesignFunctions.showAlertDialog(context,
                           btnOkOnPress: () async {
                             await controller.sort(controller.allClients);
                           },
-                          btnCancelOnPress: () {},
-                          body: SortDialog<ClientsController>(
-                            title: "Sort Clients",
-                            ascending: controller.ascending,
-                            onAscending: (isAscending) {
-                              controller.ascending = isAscending;
-                              controller.update();
-                            },
-                            sortItems: controller.sortItems,
-                          ));
+                          title: "Sort Clients",
+                          children: [
+                            SortDialog<ClientsController>(
+                              ascending: controller.ascending,
+                              onChange: (sortItems,isAscending) {
+                                controller.ascending = isAscending;
+                                controller.sortItems = sortItems;
+                                controller.update();
+                              },
+                              sortItems: controller.sortItems,
+                            )
+                          ]);
                     },
                     icon: const Icon(
                       Icons.sort_by_alpha,
@@ -199,7 +201,7 @@ class ClientsScreen extends GetView<ClientsController> {
                                                         CircleAvatar(
                                                   radius: 42,
                                                   backgroundColor:
-                                                      AppColors.whiteSecondary,
+                                                      AppColors.primary0,
                                                   child: Text(
                                                       '${controller.clients[index].name[0]}${controller.clients[index].name[1]}',
                                                       style: const TextStyle(

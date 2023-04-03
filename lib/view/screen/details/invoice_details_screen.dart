@@ -13,7 +13,6 @@ import 'package:repository/view/widget/shared/title_section.dart';
 class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
   const InvoiceDetailsScreen({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<InvoiceDetailsController>(
@@ -24,7 +23,14 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                controller.invoicesController.mainController.showDialogMeetDebt(
+                    context,
+                    controller.invoiceType == InvoiceType.purchases
+                        ? controller.purchasesInvoice.remained
+                        : controller.saleInvoice.remained,
+                    controller.meetDebtInvoice);
+              },
               icon: const Icon(
                 Icons.account_balance_wallet_outlined,
               ),
@@ -35,30 +41,52 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
               tooltip: "Operation",
               onSelected: (value) async {
                 switch (value) {
-                  case OperationType.update:{
-                    Get.toNamed(
-                        AppPagesRoutes.operationOnInvoiceScreen,
-                        arguments: {AppSharedKeys.passInvoiceType: controller.invoiceType,
-                          AppSharedKeys.passOperationType: OperationType.update,
-                          AppSharedKeys.passId: controller.invoiceType==InvoiceType.sales? controller.saleInvoice.id:controller.purchasesInvoice.id,
-                        });
-                    break;
-                  }
-                  case OperationType.delete:{
-                    controller.invoicesController.showDialogDeleteInvoice(context,
-                      invoice: controller.invoiceType==InvoiceType.sales ? controller.saleInvoice:controller.purchasesInvoice,
-                      invoiceType: controller.invoiceType,
-                      onSuccess: () async {
-                        Get.back();
-                      },
-                    );
-                    break;
-                  }
+                  case OperationType.update:
+                    {
+                      Get.toNamed(AppPagesRoutes.operationOnInvoiceScreen,
+                          arguments: {
+                            AppSharedKeys.passInvoiceType:
+                                controller.invoiceType,
+                            AppSharedKeys.passOperationType:
+                                OperationType.update,
+                            AppSharedKeys.passId:
+                                controller.invoiceType == InvoiceType.sales
+                                    ? controller.saleInvoice.id
+                                    : controller.purchasesInvoice.id,
+                          });
+                      break;
+                    }
+                  case OperationType.delete:
+                    {
+                      controller.invoicesController.showDialogDeleteInvoice(
+                        context,
+                        invoice: controller.invoiceType == InvoiceType.sales
+                            ? controller.saleInvoice
+                            : controller.purchasesInvoice,
+                        invoiceType: controller.invoiceType,
+                        onSuccess: () async {
+                          Get.back();
+                        },
+                      );
+                      break;
+                    }
                   case OperationType.archive:
-                  case OperationType.debts:
-                  case OperationType.create:
-                  case OperationType.sort:
+                    {
+                      await controller.invoicesController.archiveInvoice(
+                          invoice:
+                              controller.invoiceType == InvoiceType.purchases
+                                  ? controller.purchasesInvoice
+                                  : controller.saleInvoice,
+                          invoiceType: controller.invoiceType,
+                          onSuccess: () {
+                            Get.back();
+
+                          },
+                      );
+                      break;
+                    }
                   case OperationType.registers:
+                  default:
                     break;
                 }
               },
@@ -69,7 +97,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                     children: const [
                       Icon(
                         Icons.edit_outlined,
-                        color: AppColors.green,
+                        color: AppColors.success50,
                       ),
                       SizedBox(
                         width: 15,
@@ -98,7 +126,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                       children: const [
                         Icon(
                           Icons.delete_outlined,
-                          color: AppColors.red,
+                          color: AppColors.danger50,
                         ),
                         SizedBox(
                           width: 15,
@@ -123,15 +151,15 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                     Expanded(
                         flex: 1,
                         child: CircleAvatar(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: AppColors.primary50,
                           radius: 55,
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundColor: AppColors.whiteSecondary,
+                            backgroundColor: AppColors.primary0,
                             child: SvgPicture.asset(
                               AppAssets.invoiceIconSvg,
                               height: 60,
-                              color: AppColors.primary,
+                              color: AppColors.primary50,
                               width: 60,
                             ),
                           ),
@@ -156,7 +184,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.person,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -172,7 +200,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.date_range,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -226,7 +254,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                           children: [
                             Expanded(
                                 child: Text(
-                              ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice - controller.purchasesInvoice.remained : controller.saleInvoice.totalPrice - controller.saleInvoice.remainder} \$',
+                              ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice - controller.purchasesInvoice.remained : controller.saleInvoice.totalPrice - controller.saleInvoice.remained} \$',
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
@@ -251,7 +279,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                           children: [
                             Expanded(
                                 child: Text(
-                              ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remainder} \$',
+                              ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remained} \$',
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
@@ -287,7 +315,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
+                        color: AppColors.primary30),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: const {
                       0: FractionColumnWidth(0.25),
@@ -298,7 +326,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                     children: [
                       TableRow(
                           decoration: BoxDecoration(
-                            color: AppColors.blackAccentT,
+                            color: AppColors.black90,
                             borderRadius: BorderRadius.vertical(
                               top: const Radius.circular(15),
                               bottom: controller.isEmpty
@@ -313,7 +341,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                 "Name",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -323,7 +351,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                 "Count",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -335,7 +363,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                     : 'Sales Price',
                                 style: const TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -345,7 +373,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                 "Total",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -357,7 +385,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                               : controller.saleInvoice.details.sales.length,
                           (index) => TableRow(
                                   decoration: const BoxDecoration(
-                                    color: AppColors.whiteSecondary,
+                                    color: AppColors.primary0,
                                   ),
                                   children: [
                                     ElevatedButton(
@@ -367,12 +395,21 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                             arguments: {
                                               AppSharedKeys.passId:
                                                   controller.isPurchase
-                                                      ? controller.purchasesInvoice.details.purchases[index].productId
-                                                      : controller.saleInvoice.details.sales[index].productId,
+                                                      ? controller
+                                                          .purchasesInvoice
+                                                          .details
+                                                          .purchases[index]
+                                                          .productId
+                                                      : controller
+                                                          .saleInvoice
+                                                          .details
+                                                          .sales[index]
+                                                          .productId,
                                             });
                                       },
                                       style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.transparent,
+                                          backgroundColor:
+                                              AppColors.transparent,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(0),
@@ -381,16 +418,21 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                           fixedSize: const Size(60, 15)),
                                       child: Text(
                                         controller.isPurchase
-                                            ? controller.purchasesInvoice.details.purchases[index].productName
-                                            : controller.saleInvoice.details.sales[index].productName,
+                                            ? controller
+                                                .purchasesInvoice
+                                                .details
+                                                .purchases[index]
+                                                .productName
+                                            : controller.saleInvoice.details
+                                                .sales[index].productName,
                                       ),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         controller.isPurchase
-                                            ? controller.purchasesInvoice.details
-                                                .purchases[index].amount
+                                            ? controller.purchasesInvoice
+                                                .details.purchases[index].amount
                                                 .toString()
                                             : controller.saleInvoice.details
                                                 .sales[index].amount
@@ -401,8 +443,19 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         controller.isPurchase
-                                            ? controller.purchasesInvoice.details.purchases[index].details.product.purchasePrice.toString()
-                                            : (controller.saleInvoice.details.sales[index].totalSalePrice/controller.saleInvoice.details.sales[index].amount).toString(),
+                                            ? (controller.purchasesInvoice.details.purchases[index].totalPurchasePrice/controller.purchasesInvoice.details.purchases[index].amount)
+                                                .toString()
+                                            : (controller
+                                                        .saleInvoice
+                                                        .details
+                                                        .sales[index]
+                                                        .totalSalePrice /
+                                                    controller
+                                                        .saleInvoice
+                                                        .details
+                                                        .sales[index]
+                                                        .amount)
+                                                .toString(),
                                       ),
                                     ),
                                     Padding(
@@ -413,16 +466,14 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                                         .purchasesInvoice
                                                         .details
                                                         .purchases[index]
-                                                        .details
-                                                        .product
-                                                        .purchasePrice *
-                                                    controller
-                                                        .purchasesInvoice
-                                                        .details
-                                                        .purchases[index]
-                                                        .amount)
+                                                        .totalPurchasePrice)
                                                 .toString()
-                                            : (controller.saleInvoice.details.sales[index].totalSalePrice).toString(),
+                                            : (controller
+                                                    .saleInvoice
+                                                    .details
+                                                    .sales[index]
+                                                    .totalSalePrice)
+                                                .toString(),
                                       ),
                                     ),
                                   ]))
@@ -437,4 +488,3 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
     );
   }
 }
-

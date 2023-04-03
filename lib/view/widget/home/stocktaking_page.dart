@@ -218,7 +218,6 @@ class StocktakingPage extends GetView<MainController> {
                           ),
                           ActionChip(
                             label: Text(controller.startDate),
-                            backgroundColor: AppColors.primary0,
                             onPressed: () async {
                               await controller.choseDateRange(context);
                               await controller.getFullStocktaking();

@@ -2,7 +2,7 @@
 class AppApiRoute {
 
   static const String server = "10.0.2.2:8000";
-  // static const String server = "192.168.43.114:8000";
+  // static const String server = "192.168.79.114:8000";
 
   // Registration
     // Auth
@@ -111,11 +111,11 @@ class AppApiRoute {
       static const String addSalesInvoice = "/sale_invoice/add_sale_invoice";
       static const String updateSalesInvoice = "/sale_invoice/update_sale_invoice";
       static const String deleteSalesInvoice = "/sale_invoice/delete_sale_invoice";
-      static const String meetDebtSalesInvoice = "/sale_invoice/meet_debt_purchase_invoice";
+      static const String meetDebtSalesInvoice = "/sale_invoice/meet_debt_sale_invoice";
 
       static const String getSalesInvoicesBetween = "/sale_invoice/get_sale_invoices_between_tow_date";
       static const String getSalesInvoicesArchive = "/sale_invoice/get_archives_sales_invoices";
-      static const String getSalesInvoiceArchive = "/sale_invoice/et_archive_sales_invoice";
+      static const String getSalesInvoiceArchive = "/sale_invoice/get_archive_sales_invoice";
       static const String addSalesInvoiceToArchive = "/sale_invoice/add_to_archives_sale_invoice";
       static const String removeSalesInvoiceFromArchive = "/sale_invoice/remove_to_archives_sale_invoice";
       static const String getSalesInvoiceRegisters = "/sale_invoice/get_sale_invoice_register";

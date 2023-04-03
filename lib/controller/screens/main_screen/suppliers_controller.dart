@@ -1,5 +1,5 @@
+
 import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -101,118 +101,109 @@ class SuppliersController extends GetxController
     mainController.nameFieldController.text = supplier.name;
     mainController.phoneNumberFieldController.text = supplier.phoneNumber;
     mainController.addressFieldController.text = supplier.address;
-    HelperDesignFunctions.showMainBottomSheet(
-      context,
-      height: Get.height,
-      title: "Update Supplier",
-      btnOkOnPress: () async {
-        bool result = await _updateSupplier(supplier);
-        if (result && onSuccess != null) {
-          await onSuccess.call();
-        }
-      },
-      btnCancelOnPress: () {},
-      content: Form(
-        key: formKeyUpdate,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Align(
-              alignment: Alignment.topCenter,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  GetBuilder<SuppliersController>(
-                    builder: (controller) => CircleAvatar(
-                      radius: 105,
-                      backgroundColor: AppColors.primary,
-                      child: CircleAvatar(
-                        radius: 100,
-                        backgroundColor: AppColors.whiteSecondary,
-                        backgroundImage: controller.mainController.image == null
-                            ? FileImage(File(supplier.photo))
-                            : FileImage(controller.mainController.image!),
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyUpdate,
+        btnOkOnPress: () async {
+          bool result = await _updateSupplier(supplier);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
+        title: "Update Supplier",
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GetBuilder<SuppliersController>(
+                  builder: (controller) => CircleAvatar(
+                    radius: 105,
+                    backgroundColor: AppColors.primary50,
+                    child: CircleAvatar(
+                      radius: 100,
+                      backgroundColor: AppColors.primary0,
+                      backgroundImage: controller.mainController.image == null
+                          ? FileImage(File(supplier.photo))
+                          : FileImage(controller.mainController.image!),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: InkWell(
+                    onTap: () async {
+                      mainController.image =
+                      await HelperLogicFunctions.pickImage(
+                          ImageSource.gallery);
+                      update();
+                    },
+                    child: const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.primary30,
+                      child: Icon(
+                        Icons.camera,
+                        color: AppColors.black,
+                        size: 35,
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: InkWell(
-                      onTap: () async {
-                        mainController.image =
-                            await HelperLogicFunctions.pickImage(
-                                ImageSource.gallery);
-                        update();
-                      },
-                      child: const CircleAvatar(
-                        radius: 30,
-                        backgroundColor: AppColors.primaryAccent200,
-                        child: Icon(
-                          Icons.camera,
-                          color: AppColors.black,
-                          size: 35,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-            const SizedBox(height: 25),
-            const SizedBox(
-              height: 15,
+          ),
+          const SizedBox(height: 25),
+          const SizedBox(
+            height: 15,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              controller: mainController.nameFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                autofocus: true,
-                controller: mainController.nameFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Phone number',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.phone,
+              controller: mainController.phoneNumberFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!, type: Validate.phone);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Phone number',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.phone,
-                controller: mainController.phoneNumberFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!, type: Validate.phone);
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.text,
+              controller: mainController.addressFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Address',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.text,
-                controller: mainController.addressFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ]
     );
-    update();
   }
 
   Future<bool> _updateSupplier(Supplier supplier) async {
@@ -252,33 +243,20 @@ class SuppliersController extends GetxController
 
   Future<void> showDialogDeleteSupplier(BuildContext context,
       {required Supplier supplier, Future Function()? onSuccess}) async {
-    HelperDesignFunctions.showAwesomeDialog(context,
-        dialogType: DialogType.error, btnOkOnPress: () async {
-      bool result = await _deleteSupplier(supplier);
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-        HelperDesignFunctions.showSuccessSnackBar(
-            message: "Supplier '${supplier.name}' deleted");
-      }
-    },
-        btnCancelOnPress: () {},
-        body: Container(
-          height: 0.15 * Get.height,
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const Text(
-                "Delete Supplier",
-                style: TextStyle(
-                    color: AppColors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${supplier.name} !")
-            ],
-          ),
-        ));
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          bool result = await _deleteSupplier(supplier);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "Supplier '${supplier.name}' deleted");
+          }
+        },
+        title: "Delete Product",
+        subTitle: "Are you sure from delete ${supplier.name}  !",
+        okText: "Delete",
+        dialogType: "delete",
+    );
   }
 
   Future<bool> _deleteSupplier(Supplier supplier) async {

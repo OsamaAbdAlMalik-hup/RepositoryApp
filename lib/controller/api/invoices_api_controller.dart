@@ -98,7 +98,7 @@ class InvoicesApiController
       if (map.containsKey(AppResponseKeys.success)
           && map.containsKey(AppResponseKeys.data)
           && map[AppResponseKeys.success]) {
-        return SaleInvoice.jsonToList(map[AppResponseKeys.data]);
+        return SaleInvoice.jsonToList([map[AppResponseKeys.data]]).first;
       }
       if(map.containsKey(AppResponseKeys.message)) {
         return ValidationMessage(map[AppResponseKeys.message]);
@@ -333,10 +333,10 @@ class InvoicesApiController
       }
     });
   }
-  Future<dynamic> getPurchasesInvoiceArchive({required int purchasesInvoiceId}) async {
+  Future<dynamic> getPurchasesInvoiceArchive({required int id}) async {
     HelperLogicFunctions.printNote('Start getPurchasesInvoiceArchive() Api');
     var response = await apiService.post(url: AppApiRoute.getPurchasesInvoiceArchive,headers: {} ,body: {
-      "id":purchasesInvoiceId.toString()
+      "id":id.toString()
     });
     HelperLogicFunctions.printNote('End getPurchasesInvoiceArchive() Api: $response');
     return response.fold((l) => l, (map) {

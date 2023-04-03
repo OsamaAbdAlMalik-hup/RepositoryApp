@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
       initialBinding: InitialBindings(),
       theme: ThemeData(
         scaffoldBackgroundColor: AppColors.primary0,
-        backgroundColor: AppColors.redAccent,
         splashColor: AppColors.primary20,
         canvasColor: AppColors.primary0,
         colorScheme: ColorScheme.fromSwatch(
@@ -36,19 +35,19 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: TextTheme(
           headlineLarge: GoogleFonts.oswald(
-            fontSize: 40,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1,
-            color: AppColors.primary90,
-          ),
-          headlineMedium: GoogleFonts.oswald(
             fontSize: 36,
             fontWeight: FontWeight.w700,
             letterSpacing: 1,
             color: AppColors.primary90,
           ),
+          headlineMedium: GoogleFonts.oswald(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1,
+            color: AppColors.primary90,
+          ),
           headlineSmall: GoogleFonts.oswald(
-            fontSize: 30,
+            fontSize: 28,
             fontWeight: FontWeight.w700,
             letterSpacing: 1,
             color: AppColors.primary90,
@@ -212,7 +211,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w700 ,
           ),
           selectedColor: AppColors.primary20,
-          backgroundColor: AppColors.primary10,
+          backgroundColor: AppColors.primary0,
         ),
         iconTheme: const IconThemeData(
           color: AppColors.primary70,

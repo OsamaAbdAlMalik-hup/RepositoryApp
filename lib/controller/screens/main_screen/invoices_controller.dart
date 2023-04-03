@@ -1,10 +1,8 @@
 
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/api/invoices_api_controller.dart';
 import 'package:repository/controller/screens/main_controller.dart';
-import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
@@ -132,7 +130,7 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
   }
 
   void showDialogDeleteInvoice(BuildContext context, {invoice,required InvoiceType invoiceType, Future Function()? onSuccess}) {
-    HelperDesignFunctions.showAwesomeDialog(context, dialogType: DialogType.error,
+    HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
           bool result = await _deleteInvoice(invoice: invoice,invoiceType: invoiceType);
           if(result){
@@ -141,24 +139,11 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
             }
             HelperDesignFunctions.showSuccessSnackBar(message: "${invoiceType==InvoiceType.sales?'Sales':'Purchases'} Invoice ${invoice.number} deleted");
           }
-        }, btnCancelOnPress: () {},
-        body: Container(
-          height: 0.15 * Get.height,
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Text(
-                "Delete ${invoiceType==InvoiceType.sales?'Sales':'Purchases'} Invoice",
-                style: const TextStyle(
-                    color: AppColors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${invoiceType==InvoiceType.sales?'Sales':'Purchases'} Invoice ${invoice.number} !")
-            ],
-          ),
-        )
+        },
+        title: "Delete Invoice",
+        subTitle: "Are you sure from delete ${invoiceType==InvoiceType.sales?'Sales':'Purchases'} Invoice ${invoice.number} !",
+        okText: "Delete",
+        dialogType: "delete",
     );
   }
   Future<bool> _deleteInvoice({invoice,required InvoiceType invoiceType,}) async {
@@ -207,18 +192,20 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
     }
   }
 
-  Future<bool> archiveInvoice({invoice,required InvoiceType invoiceType,}) async {
+  Future<bool> archiveInvoice({invoice,required InvoiceType invoiceType,void Function()? onSuccess}) async {
     if(invoiceType==InvoiceType.sales) {
       statusView = StatusView.loading;
         update();
     return await ApiService.sendRequest(
-
         request: () async {
             return isArchived
             ? await invoicesApiController.removeSalesInvoiceFromArchive(id: invoice.id)
             : await invoicesApiController.addSalesInvoiceToArchive(id: invoice.id);
         },
         onSuccess: (response) async {
+          if(onSuccess!=null){
+            onSuccess.call();
+          }
           getSaleInvoices();
           await mainController.onNavBarChange(mainController.selectedBottomNavigationBarItem);
           HelperDesignFunctions.showSuccessSnackBar(message: "Sales Invoice ${invoice.number} archived");
@@ -267,7 +254,7 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
         } else if (sortItems[1].isSelected) {
           saleInvoices = allSaleInvoices.where((element) => element.totalPrice.toString().contains(val.toLowerCase())).toList();
         } else if (sortItems[2].isSelected) {
-          saleInvoices = allSaleInvoices.where((element) => element.remainder.toString().contains(val.toLowerCase())).toList();
+          saleInvoices = allSaleInvoices.where((element) => element.remained.toString().contains(val.toLowerCase())).toList();
         }else if (sortItems[3].isSelected) {
           saleInvoices = allSaleInvoices.where((element) => element.date.contains(val.toLowerCase())).toList();
         }else if (sortItems[4].isSelected) {
@@ -312,7 +299,7 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
       }
       else if (sortItems[2].isSelected) {
         saleInvoices = invoices
-          ..sort((a, b) => ascending ? (a.remainder - b.remainder).ceil() : (b.remainder - a.remainder).ceil()
+          ..sort((a, b) => ascending ? (a.remained - b.remained).ceil() : (b.remained - a.remained).ceil()
           );
       }
       else if (sortItems[3].isSelected) {

@@ -193,7 +193,7 @@ class OperationsInvoiceController extends GetxController {
   }
   void addProduct(Product value) {
     if (formKeyAddProduct.currentState!.validate()) {
-      double amount = double.parse(mainController.amountFieldController.text);
+      double amount = double.parse(mainController.totalPriceFieldController.text);
       double oldTotal = double.parse(totalFieldController.text);
       double total=0;
       if(invoiceType==InvoiceType.sales){
@@ -218,7 +218,7 @@ class OperationsInvoiceController extends GetxController {
   }
   void updateProduct(int i) {
     if (formKeyUpdateProduct.currentState!.validate()) {
-      double amount = double.parse(mainController.amountFieldController.text);
+      double amount = double.parse(mainController.totalPriceFieldController.text);
       double oldTotal = double.parse(totalFieldController.text);
       double total = oldTotal - selectedPairProducts[i].first.salePrice * selectedPairProducts[i].second;
       total += selectedPairProducts[i].first.salePrice * amount;

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:repository/controller/screens/main_screen/suppliers_controller.dart';
 import 'package:repository/core/constant/app_assets.dart';
 import 'package:repository/core/constant/app_colors.dart';
-import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
 import 'package:repository/view/widget/shared/empty.dart';
@@ -44,62 +43,28 @@ class SuppliersScreen extends GetView<SuppliersController> {
             ),
             Visibility(
               visible: !controller.isSearchMode,
-              child: PopupMenuButton<OperationType>(
-                tooltip: "Operation",
-                onSelected: (value) async {
-                  switch (value) {
-                    case OperationType.sort:
-                      {
-                        HelperDesignFunctions.showAwesomeDialog(context,
-                            btnOkOnPress: () async {
-                              await controller.sort(controller.allSuppliers);
-                            },
-                            btnCancelOnPress: () {},
-                            body: SortDialog<SuppliersController>(
-                              title: "Sort Suppliers",
-                              ascending: controller.ascending,
-                              onAscending: (isAscending) {
-                                controller.ascending = isAscending;
-                                controller.update();
-                              },
-                              sortItems: controller.sortItems,
-                            ));
-                        break;
-                      }
-                    default:
-                      break;
-                  }
+              child: IconButton(
+                onPressed: () {
+                  HelperDesignFunctions.showAlertDialog(context,
+                      btnOkOnPress: () async {
+                        await controller.sort(controller.allSuppliers);
+                      },
+                      title: "Sort Suppliers",
+                      children: [
+                        SortDialog<SuppliersController>(
+                          ascending: controller.ascending,
+                          onChange: (sortItems,isAscending) {
+                            controller.ascending = isAscending;
+                            controller.sortItems = sortItems;
+                            controller.update();
+                          },
+                          sortItems: controller.sortItems,
+                        )
+                      ]);
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem<OperationType>(
-                    value: OperationType.sort,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.filter_list,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Sort'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem<OperationType>(
-                      value: OperationType.archive,
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.receipt_long_outlined,
-                            color: AppColors.gray,
-                          ),
-                          SizedBox(
-                            width: 15,
-                          ),
-                          Text('Registers'),
-                        ],
-                      )),
-                ],
+                icon: const Icon(
+                  Icons.sort_by_alpha,
+                ),
               ),
             ),
             Visibility(
@@ -235,7 +200,7 @@ class SuppliersScreen extends GetView<SuppliersController> {
                                                     placeholder: (context, url) => const CircularProgressIndicator(),
                                                     errorWidget: (context, url, error) => CircleAvatar(
                                                       radius: 42,
-                                                      backgroundColor: AppColors.whiteSecondary,
+                                                      backgroundColor: AppColors.primary0,
                                                       child: Text('${controller.suppliers[index].name[0]}${controller.suppliers[index].name[1]}',
                                                           style: const TextStyle(
                                                               fontSize: 40,

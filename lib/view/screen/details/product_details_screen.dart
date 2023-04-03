@@ -6,9 +6,10 @@ import 'package:repository/controller/screens/details/product_details_controller
 import 'package:repository/core/constant/app_assets.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
-import 'package:repository/core/constant/app_pages_routes.dart';
-import 'package:repository/core/constant/app_shared_keys.dart';
+import 'package:repository/view/widget/shared/empty.dart';
 import 'package:repository/view/widget/shared/handle_request.dart';
+import 'package:repository/view/widget/shared/section_tabs.dart';
+import 'package:repository/view/widget/shared/text_icon.dart';
 import 'package:repository/view/widget/shared/title_section.dart';
 
 class ProductDetailsScreen extends GetView<ProductDetailsController> {
@@ -18,543 +19,577 @@ class ProductDetailsScreen extends GetView<ProductDetailsController> {
   Widget build(BuildContext context) {
     return GetBuilder<ProductDetailsController>(
         builder: (controller) => Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "${controller.product.name} Product",
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                controller.productsController.mainController.individualStocktaking(context,
-                    stocktakingType: StocktakingType.product,
-                    enabledSelect: false,
-                    item: controller.product
-                );
-              },
-              icon: const Icon(
-                Icons.featured_play_list_outlined,
+              appBar: AppBar(
+                title: Text(
+                  "${controller.product.name} Product",
+                ),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      controller.productsController.mainController
+                          .individualStocktaking(context,
+                              stocktakingType: StocktakingType.product,
+                              enabledSelect: false,
+                              item: controller.product);
+                    },
+                    icon: const Icon(
+                      Icons.featured_play_list_outlined,
+                    ),
+                  ),
+                  PopupMenuButton<OperationType>(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    tooltip: "Operation",
+                    onSelected: (value) async {
+                      switch (value) {
+                        case OperationType.update:
+                          {
+                            controller.productsController
+                                .showSheetUpdateProduct(
+                              context,
+                              product: controller.product,
+                              onSuccess: () async {
+                                await controller.getProduct();
+                              },
+                            );
+                            break;
+                          }
+                        case OperationType.delete:
+                          {
+                            controller.productsController
+                                .showDialogDeleteProduct(
+                              context,
+                              product: controller.product,
+                              onSuccess: () async {
+                                Get.back();
+                              },
+                            );
+                            break;
+                          }
+                        case OperationType.registers:
+                          {
+                            controller.getProductRegisters(context: context);
+                            break;
+                          }
+                        default:
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem<OperationType>(
+                        value: OperationType.update,
+                        child: Row(
+                          children: const [
+                            Icon(
+                              Icons.edit_outlined,
+                            ),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Text('Edit'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<OperationType>(
+                          value: OperationType.delete,
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.delete_outlined,
+                                color: AppColors.danger50,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Text('Delete'),
+                            ],
+                          )),
+                      PopupMenuItem<OperationType>(
+                          value: OperationType.registers,
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.receipt_long_outlined,
+                                color: AppColors.gray,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Text('Registers'),
+                            ],
+                          )),
+                    ],
+                  )
+                ],
               ),
-            ),
-            PopupMenuButton<OperationType>(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              tooltip: "Operation",
-              onSelected: (value) async {
-                switch (value) {
-                  case OperationType.update:
-                    {
-                      controller.productsController
-                          .showSheetUpdateProduct(context,
-                        product: controller.product,
-                        onSuccess: () async {
-                          await controller.getProduct();
-                        },
-                      );
-                      break;
-                    }
-                  case OperationType.delete:
-                    {
-                      controller.productsController
-                          .showDialogDeleteProduct(
-                        context,
-                        product: controller.product,
-                        onSuccess: () async {
-                          Get.back();
-                        },
-                      );
-                      break;
-                    }
-                  case OperationType.registers:
-                    {
-                      controller.getProductRegisters(context: context);
-                      break;
-                    }
-                  default:
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<OperationType>(
-                  value: OperationType.update,
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.edit_outlined,
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text('Edit'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<OperationType>(
-                    value: OperationType.delete,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.delete_outlined,
-                          color: AppColors.danger50,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Delete'),
-                      ],
-                    )),
-                PopupMenuItem<OperationType>(
-                    value: OperationType.registers,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.receipt_long_outlined,
-                          color: AppColors.gray,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Registers'),
-                      ],
-                    )),
-              ],
-            )
-          ],
-        ),
-        body: HandleRequest(
-          statusView: controller.statusView,
-          child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 10),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: CachedNetworkImage(
-                            fit: BoxFit.fill,
-                            imageUrl: controller.product.photo,
-                            placeholder: (context, url) => const CircularProgressIndicator(),
-                            errorWidget: (context, url, error) => CircleAvatar(
-                              radius: 35,
-                              backgroundColor: AppColors.whiteSecondary,
-                              child: Text('${controller.product.name[0]}${controller.product.name[1]}',
-                                  style:const TextStyle(fontSize: 40, fontWeight: FontWeight.bold,color: AppColors.black)),
+              body: HandleRequest(
+                statusView: controller.statusView,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: CachedNetworkImage(
+                              fit: BoxFit.fill,
+                              imageUrl: controller.product.photo,
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  CircleAvatar(
+                                radius: 35,
+                                backgroundColor: AppColors.primary0,
+                                child: Text(
+                                    '${controller.product.name[0]}${controller.product.name[1]}',
+                                    style: const TextStyle(
+                                        fontSize: 40,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.black)),
+                              ),
                             ),
-                          ),),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                controller.product.name,
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Text(
+                                    controller.product.name,
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        "Sale price: ",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.gray,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      Text(
+                                        "${controller.product.salePrice} \$",
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.primary50,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        "Buy price: ",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.gray,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      Text(
+                                        "${controller.product.purchasePrice} \$",
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: AppColors.primary50,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
+                        ],
+                      ),
+                    ),
+                    IntrinsicHeight(
+                      child: Row(
+                        children: [
+                          Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${controller.product.amount}",
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const Icon(
+                                        Icons.event_available,
+                                        color: AppColors.primary50,
+                                      ),
+                                    ],
+                                  ),
                                   const Text(
-                                    "Sale price: ",
+                                    "Amount",
                                     style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 12,
                                         color: AppColors.gray,
                                         fontWeight: FontWeight.w400),
                                   ),
-                                  Text(
-                                    "${controller.product.salePrice} \$",
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w400),
-                                  ),
                                 ],
-                              ),
-                              Row(
+                              )),
+                          const VerticalDivider(
+                            width: 5,
+                            color: AppColors.black,
+                            thickness: 1,
+                          ),
+                          Expanded(
+                              flex: 1,
+                              child: Column(
                                 children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${controller.product.details.sales.length} ",
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const Icon(
+                                        Icons.trending_up,
+                                        color: AppColors.primary50,
+                                      ),
+                                    ],
+                                  ),
                                   const Text(
-                                    "Buy price: ",
+                                    "Sales",
                                     style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 12,
                                         color: AppColors.gray,
                                         fontWeight: FontWeight.w400),
                                   ),
-                                  Text(
-                                    "${controller.product.purchasePrice} \$",
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.primary,
+                                ],
+                              )),
+                          const VerticalDivider(
+                            width: 5,
+                            color: AppColors.black,
+                            thickness: 1,
+                          ),
+                          Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${controller.product.details.purchases.length}",
+                                        style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const Icon(
+                                        Icons.trending_down,
+                                        color: AppColors.primary50,
+                                      ),
+                                    ],
+                                  ),
+                                  const Text(
+                                    "Buys",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.gray,
                                         fontWeight: FontWeight.w400),
                                   ),
                                 ],
-                              ),
-                            ],
-                          )),
-                    ],
-                  ),
-                ),
-                IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${controller.product.amount}",
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Icon(
-                                    Icons.event_available,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
-                              ),
-                              const Text(
-                                "Amount",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.gray,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          )),
-                      const VerticalDivider(
-                        width: 5,
-                        color: AppColors.black,
-                        thickness: 1,
+                              )),
+                        ],
                       ),
-                      Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${controller.product.details.sales.length} ",
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Icon(
-                                    Icons.trending_up,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
-                              ),
-                              const Text(
-                                "Sales",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.gray,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          )),
-                      const VerticalDivider(
-                        width: 5,
-                        color: AppColors.black,
-                        thickness: 1,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Divider(
+                      thickness: 2,
+                      height: 20,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: AppColors.primary0,
+                        boxShadow: const [
+                          BoxShadow(
+                              offset: Offset(0, 1),
+                              spreadRadius: 0,
+                              blurRadius: 1,
+                              color: AppColors.gray)
+                        ],
                       ),
-                      Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${controller.product.details.purchases.length}",
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Hero(
+                              tag: controller.product.id,
+                              child: Container(
+                                height: 0.8 * Get.width,
+                                width: 0.8 * Get.width,
+                                clipBehavior: Clip.hardEdge,
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  imageUrl: controller.product.photo,
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      CircleAvatar(
+                                    radius: 36,
+                                    backgroundColor: AppColors.primary0,
+                                    child: Text(
+                                        '${controller.product.name[0]}${controller.product.name[1]}',
+                                        style: const TextStyle(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.black)),
                                   ),
-                                  const Icon(
-                                    Icons.trending_down,
-                                    color: AppColors.primary,
-                                  ),
-                                ],
-                              ),
-                              const Text(
-                                "Buys",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.gray,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          )),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Divider(
-                  thickness: 2,
-                  height: 20,
-                ),
-                TitleSection(
-                  title: "Sales",
-                ),
-                SizedBox(
-                  height: 0.01 * Get.height,
-                ),
-                Scrollbar(
-                  child: SingleChildScrollView(
-                    child: Table(
-                      border: TableBorder.all(
-                          width: 2,
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.primaryAccent200),
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                      children: [
-                        TableRow(
-                            decoration: BoxDecoration(
-                              color: AppColors.blackAccentT,
-                              borderRadius: BorderRadius.vertical(
-                                top: const Radius.circular(15),
-                                bottom: controller.product.details.sales.isEmpty
-                                    ? const Radius.circular(15)
-                                    : const Radius.circular(0),
+                                ),
                               ),
                             ),
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Client Name",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Products amount: ",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(color: AppColors.primary60),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Invoice Number",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                                Text(
+                                  "${controller.product.amount}",
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Amount",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Total",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ]),
-                        ...List.generate(
-                            controller.product.details.sales.length,
-                            (index) => TableRow(
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.whiteSecondary,
-                                    ),
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Get.toNamed(
-                                              AppPagesRoutes.clientDetailsScreen,
-                                              arguments: {
-                                                AppSharedKeys.passId: controller.product.details.sales[index].clientId
-                                              });
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(0),
-                                            ),
-                                            elevation: 0,
-                                            fixedSize: const Size(60, 15)),
-                                        child: Text(controller.product.details.sales[index].clientName),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                            "# ${controller.product.details.sales[index].saleInvoiceNumber}"),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(controller
-                                            .product.details.sales[index].amount
-                                            .toString()),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                            "${controller.product.details.sales[index].amount * controller.product.salePrice} \$"),
-                                      ),
-                                    ]))
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 0.05 * Get.height,
-                ),
-                TitleSection(
-                  title: "Purchases",
-                ),
-                SizedBox(
-                  height: 0.01 * Get.height,
-                ),
-                Scrollbar(
-                  child: SingleChildScrollView(
-                    child: Table(
-                      border: TableBorder.all(
-                          width: 2,
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.primaryAccent200),
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                      children: [
-                        TableRow(
-                            decoration: BoxDecoration(
-                              color: AppColors.blackAccentT,
-                              borderRadius: BorderRadius.vertical(
-                                top: const Radius.circular(15),
-                                bottom:
-                                    controller.product.details.purchases.isEmpty
-                                        ? const Radius.circular(15)
-                                        : const Radius.circular(0),
-                              ),
+                              ],
                             ),
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Supplier Name",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Sales amount: ",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(color: AppColors.primary60),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Invoice Number",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                                Text(
+                                  "${controller.product.salePrice}",
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Amount",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Purchases amount: ",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(color: AppColors.primary60),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Total",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: AppColors.primaryAccent200,
-                                      fontWeight: FontWeight.bold),
+                                Text(
+                                  "${controller.product.purchasePrice}",
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                              ),
-                            ]),
-                        ...List.generate(
-                            controller.product.details.purchases.length,
-                            (index) => TableRow(
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.whiteSecondary,
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SectionTabs(
+                      title: "Recently",
+                      tabsTitles: const [
+                        "Purchases",
+                        "Sales",
+                      ],
+                      tabViewHeight: 0.7 * Get.width,
+                      controller: controller.tabController,
+                      onArrowPressed: null,
+                      onTab: (index) {},
+                      tabs: [
+                        controller.product.details.purchases.isNotEmpty
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: controller.product.details.purchases.length,
+                                itemBuilder: (context, index) => Card(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(15),
+                                    onTap: () {},
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                controller
+                                                    .product
+                                                    .details
+                                                    .purchases[index]
+                                                    .supplierName,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge!
+                                                    .copyWith(
+                                                        fontSize: 22,
+                                                        letterSpacing: 1),
+                                              ),
+                                              TextIcon(
+                                                text: " ${controller.product.details.purchases[index].invoiceNumber}",
+                                                icon: Icons.numbers,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextIcon(
+                                                text: "${controller.product.details.purchases[index].amount}",
+                                                icon: Icons.upload,
+                                              ),
+                                              TextIcon(
+                                                text: " ${controller.product.details.purchases[index].totalPurchasePrice} \$",
+                                                icon: Icons.download,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    children: [
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Get.toNamed(
-                                              AppPagesRoutes.clientDetailsScreen,
-                                              arguments: {
-                                                AppSharedKeys.passId: controller.product.details.purchases[index].supplierId
-                                              });
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.transparent,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(0),
-                                            ),
-                                            elevation: 0,
-                                            fixedSize: const Size(60, 15)),
-                                        child: Text(controller
-                                            .product
-                                            .details
-                                            .purchases[index]
-                                            .details
-                                            .purchasesInvoice
-                                            .supplierName),
+                                  ),
+                                ),
+                              )
+                            : Empty(
+                                imagePath: AppAssets.noOrder,
+                                text: "No any Purchase",
+                                height: 200,
+                                fontSize: 24,
+                              ),
+                        controller.product.details.sales.isNotEmpty
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                itemCount:
+                                    controller.product.details.sales.length,
+                                itemBuilder: (context, index) => Card(
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(15))),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(15),
+                                    onTap: () {},
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                controller.product.details
+                                                    .sales[index].clientName,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyLarge!
+                                                    .copyWith(
+                                                        fontSize: 22,
+                                                        letterSpacing: 1),
+                                              ),
+                                              TextIcon(
+                                                text:
+                                                    " ${controller.product.details.sales[index].invoiceNumber}",
+                                                icon: Icons.numbers,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              TextIcon(
+                                                text:
+                                                    "${controller.product.details.sales[index].amount}",
+                                                icon: Icons.upload,
+                                              ),
+                                              TextIcon(
+                                                text: " ${controller.product.details.sales[index].totalSalePrice} \$",
+                                                icon: Icons.download,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                            "# ${controller.product.details.purchases[index].details.purchasesInvoice.number}"),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(controller.product.details
-                                            .purchases[index].amount
-                                            .toString()),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                            "${controller.product.details.purchases[index].amount * controller.product.purchasePrice} \$"),
-                                      ),
-                                    ]))
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Empty(
+                                imagePath: AppAssets.noOrder,
+                                text: "No any Sale",
+                                height: 200,
+                                fontSize: 24,
+                              ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-                SizedBox(
-                  height: 0.05 * Get.height,
-                ),
-              ],
-            ),
-        ),
-        ));
+              ),
+            ));
   }
 }
-
-
 
 class Tables extends StatelessWidget {
   const Tables({Key? key}) : super(key: key);
@@ -582,7 +617,7 @@ class Tables extends StatelessWidget {
                   border: TableBorder.all(
                       width: 2,
                       borderRadius: BorderRadius.circular(10),
-                      color: AppColors.primaryAccent200),
+                      color: AppColors.primary30),
                   defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                   columnWidths: const {
                     0: FractionColumnWidth(0.1),
@@ -600,7 +635,7 @@ class Tables extends StatelessWidget {
                           "Photo",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -610,7 +645,7 @@ class Tables extends StatelessWidget {
                           "Name",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -620,7 +655,7 @@ class Tables extends StatelessWidget {
                           "Sale Price",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -630,7 +665,7 @@ class Tables extends StatelessWidget {
                           "Bay Price",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -640,7 +675,7 @@ class Tables extends StatelessWidget {
                           "Sales Count",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -650,7 +685,7 @@ class Tables extends StatelessWidget {
                           "Bays Count",
                           style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.primaryDeep,
+                              color: AppColors.primary80,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -711,12 +746,11 @@ class Tables extends StatelessWidget {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
-                    dataRowColor:
-                        MaterialStateProperty.all(AppColors.whiteSecondary),
+                        color: AppColors.primary30),
+                    dataRowColor: MaterialStateProperty.all(AppColors.primary0),
                     headingTextStyle: const TextStyle(
                         fontSize: 20,
-                        color: AppColors.red,
+                        color: AppColors.danger50,
                         fontWeight: FontWeight.bold),
                     sortColumnIndex: 0,
                     sortAscending: false,

@@ -1,4 +1,4 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -118,102 +118,112 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   void showSheetUpdateExpense(BuildContext context,
       {required Expense expense, Future Function()? onSuccess}) {
     mainController.nameFieldController.text = expense.name;
-    mainController.amountFieldController.text = expense.totalPrice.toString();
+    mainController.totalPriceFieldController.text = expense.totalPrice.toString();
+    mainController.paidFieldController.text = expense.paid.toString();
     mainController.detailsFieldController.text = expense.details;
     mainController.dateFieldController.text = expense.date;
-    HelperDesignFunctions.showMainBottomSheet(
-      context,
-      height: Get.height,
-      title: "Update Expense",
-      btnOkOnPress: () async {
-        bool result = await _updateExpense(expense);
-        if (result && onSuccess != null) {
-          await onSuccess.call();
-          HelperDesignFunctions.showSuccessSnackBar(
-              message:
-                  "Expense '${mainController.nameFieldController.text}' updated");
-        }
-      },
-      btnCancelOnPress: () {},
-      content: Form(
-        key: formKeyUpdateExpense,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 15,
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyUpdateExpense,
+        btnOkOnPress: () async {
+          bool result = await _updateExpense(expense);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "Expense '${mainController.nameFieldController.text}' updated");
+          }
+        },
+        title: "Update Expense",
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              controller: mainController.nameFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Details',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.text,
+              controller: mainController.detailsFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
+            ),
+          ),
+          Row(children: [
+            Expanded(child: Padding(
+              padding: const EdgeInsets.all(10).copyWith(left: 0),
               child: TextFormField(
                 decoration: const InputDecoration(
-                    labelText: 'Name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                autofocus: true,
-                controller: mainController.nameFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Cost',
+                    labelText: 'Total',
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)))),
                 keyboardType: TextInputType.number,
-                controller: mainController.amountFieldController,
+                controller: mainController.totalPriceFieldController,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (text) {
                   String? message =
-                      Validate.valid(text!, type: Validate.positiveNum);
-                  if (message == null &&
-                      double.parse(text) > mainController.totalMoneyBox) {
+                  Validate.valid(text!, type: Validate.positiveNum);
+                  if (message == null && double.parse(text) > mainController.totalMoneyBox) {
                     return 'Money not enough to Expense you have ${mainController.totalMoneyBox} \$';
                   }
                   return message;
                 },
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+            ),),
+            Expanded(child: Padding(
+              padding: const EdgeInsets.all(10).copyWith(right: 0),
               child: TextFormField(
                 decoration: const InputDecoration(
-                    labelText: 'Details',
+                    labelText: 'Paid',
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.text,
-                controller: mainController.detailsFieldController,
+                keyboardType: TextInputType.number,
+                controller: mainController.paidFieldController,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (text) {
-                  return Validate.valid(text!);
+                  String? message =
+                  Validate.valid(text!, type: Validate.positiveNum);
+                  if (message == null && double.parse(text) > mainController.totalMoneyBox) {
+                    return 'Money not enough to Expense you have ${mainController.totalMoneyBox} \$';
+                  }
+                  return message;
                 },
               ),
+            ),),
+          ],),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Date',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              readOnly: true,
+              onTap: () async {
+                String date =
+                    await HelperDesignFunctions.choseDate(context) ??
+                        mainController.dateFieldController.text;
+                mainController.dateFieldController.text = date;
+              },
+              controller: mainController.dateFieldController,
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Date',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                readOnly: true,
-                onTap: () async {
-                  String date =
-                      await HelperDesignFunctions.choseDate(context) ??
-                          mainController.dateFieldController.text;
-                  mainController.dateFieldController.text = date;
-                },
-                controller: mainController.dateFieldController,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ]
     );
   }
 
@@ -227,8 +237,8 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
           return await moneyBoxManagementApiController.updateExpense(
               name: mainController.nameFieldController.text,
               totalPrice:
-                  double.parse(mainController.amountFieldController.text),
-              paid: double.parse(mainController.amountFieldController.text),
+                  double.parse(mainController.totalPriceFieldController.text),
+              paid: double.parse(mainController.totalPriceFieldController.text),
               date: mainController.dateFieldController.text,
               details: mainController.detailsFieldController.text,
               id: expense.id);
@@ -256,33 +266,20 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
 
   void showDialogDeleteExpense(BuildContext context,
       {required Expense expense, Future Function()? onSuccess}) {
-    HelperDesignFunctions.showAwesomeDialog(context,
-        dialogType: DialogType.error, btnOkOnPress: () async {
-      bool result = await _deleteExpense(expense);
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-        HelperDesignFunctions.showSuccessSnackBar(
-            message: "Expense ${expense.name} deleted");
-      }
-    },
-        btnCancelOnPress: () {},
-        body: Container(
-          height: 0.15 * Get.height,
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const Text(
-                "Delete Expense",
-                style: TextStyle(
-                    color: AppColors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${expense.name} !")
-            ],
-          ),
-        ));
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          bool result = await _deleteExpense(expense);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "Expense ${expense.name} deleted");
+          }
+        },
+        title: "Delete Expense",
+        subTitle: "Are you sure from delete ${expense.name} !",
+        okText: "Delete",
+        dialogType: "delete",
+    );
   }
 
   Future<bool> _deleteExpense(Expense expense) async {
@@ -352,58 +349,60 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperLogicFunctions.printNote(registers.length);
-          HelperDesignFunctions.showMainBottomSheet(context,
-              height: Get.height,
+          HelperDesignFunctions.showAlertDialog(context,
+              hasButtonsAction: false,
               title: "Registers",
-              content: SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: registers.length,
-                  itemBuilder: (context, index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      extentRatio: 0.25,
-                      children: [
-                        SlidableAction(
-                          onPressed: (c) async {
-                            await deleteExpenseRegister(registerId: registers[index].id);
-                          },
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          backgroundColor: AppColors.red,
-                          icon: Icons.delete_outlined,
+              children:[
+                SlidableAutoCloseBehavior(
+                  closeWhenOpened: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: registers.length,
+                    itemBuilder: (context, index) => Slidable(
+                      startActionPane: ActionPane(
+                        motion: const StretchMotion(),
+                        extentRatio: 0.25,
+                        children: [
+                          SlidableAction(
+                            onPressed: (c) async {
+                              await deleteExpenseRegister(registerId: registers[index].id);
+                            },
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            backgroundColor: AppColors.danger50,
+                            icon: Icons.delete_outlined,
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              const Icon(Icons.person),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].userName),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.date_range),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].date),
+                            ],
+                          ),
+                          trailing: registers[index].typeOperation == "edit"
+                              ? const Icon(Icons.edit)
+                              : const Icon(Icons.add),
                         ),
-                      ],
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].userName),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].date),
-                          ],
-                        ),
-                        trailing: registers[index].typeOperation == "edit"
-                            ? const Icon(Icons.edit)
-                            : const Icon(Icons.add),
                       ),
                     ),
                   ),
-                ),
-              ));
+                )
+              ]
+          );
         }
         statusView = StatusView.none;
         update();
@@ -532,78 +531,65 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   }
 
   void showSheetUpdateCacheMoney(BuildContext context, {required MoneyBoxOperation operation, Future Function()? onSuccess}) {
-    mainController.amountFieldController.text = operation.totalPrice.toString();
+    mainController.totalPriceFieldController.text = operation.totalPrice.toString();
     mainController.dateFieldController.text = operation.date;
-    HelperDesignFunctions.showMainBottomSheet(
-      context,
-      height: Get.height,
-      title:
-          "Update ${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money",
-      btnOkOnPress: () async {
-        bool result = await _updateCacheMoney(operation);
-        if (result && onSuccess != null) {
-          await onSuccess.call();
-          HelperDesignFunctions.showSuccessSnackBar(
-              message:
-                  "${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money  ${operation.totalPrice}updated");
-        }
-      },
-      btnCancelOnPress: () {},
-      content: Form(
-        key: formKeyUpdateMoneyOperation,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 13,
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyUpdateMoneyOperation,
+        btnOkOnPress: () async {
+          bool result = await _updateCacheMoney(operation);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money  ${operation.totalPrice}updated");
+          }
+        },
+        title: "Update ${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money",
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Money amount',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              controller: mainController.totalPriceFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                String? message =
+                Validate.valid(text!, type: Validate.positiveNum);
+                if (operation.typeMoney == MoneyType.addCashMoney &&
+                    message == null &&
+                    double.parse(text) > mainController.totalMoneyBox) {
+                  return 'Money not enough to Pull ${mainController.totalMoneyBox} \$';
+                }
+                return message;
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Money amount',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                autofocus: true,
-                keyboardType: TextInputType.number,
-                controller: mainController.amountFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (text) {
-                  String? message =
-                      Validate.valid(text!, type: Validate.positiveNum);
-                  if (operation.typeMoney == MoneyType.addCashMoney &&
-                      message == null &&
-                      double.parse(text) > mainController.totalMoneyBox) {
-                    return 'Money not enough to Pull ${mainController.totalMoneyBox} \$';
-                  }
-                  return message;
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: InputDecoration(
+                  labelText:
+                  '${operation.typeMoney == MoneyType.addCashMoney ? 'Push' : 'Pull'} date',
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.number,
+              controller: mainController.dateFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              readOnly: true,
+              onTap: () async {
+                // String date=await choseDate(context) ?? controller.dateFieldController.text;
+                // controller.dateFieldController.text = date;
+              },
+              validator: (text) {
+                return Validate.valid(text!);
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: TextFormField(
-                decoration: InputDecoration(
-                    labelText:
-                        '${operation.typeMoney == MoneyType.addCashMoney ? 'Push' : 'Pull'} date',
-                    border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)))),
-                keyboardType: TextInputType.number,
-                controller: mainController.dateFieldController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                readOnly: true,
-                onTap: () async {
-                  // String date=await choseDate(context) ?? controller.dateFieldController.text;
-                  // controller.dateFieldController.text = date;
-                },
-                validator: (text) {
-                  return Validate.valid(text!);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ]
     );
   }
 
@@ -615,7 +601,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
 
         request: () async {
           return await moneyBoxManagementApiController.updateRegister(
-            totalPrice: double.parse(mainController.amountFieldController.text),
+            totalPrice: double.parse(mainController.totalPriceFieldController.text),
             date: mainController.dateFieldController.text,
             id: operation.id,
           );
@@ -640,34 +626,20 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   }
 
   void showDialogDeleteCacheMoney(BuildContext context, {required MoneyBoxOperation operation, Future Function()? onSuccess}) {
-    HelperDesignFunctions.showAwesomeDialog(context,
-        dialogType: DialogType.error, btnOkOnPress: () async {
-      bool result = await _deleteCacheMoney(operation);
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-        HelperDesignFunctions.showSuccessSnackBar(
-            message:
-                "${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money ${operation.totalPrice} deleted");
-      }
-    },
-        btnCancelOnPress: () {},
-        body: Container(
-          height: 0.15 * Get.height,
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Text(
-                "Delete ${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money",
-                style: const TextStyle(
-                    color: AppColors.black,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${operation.totalPrice} !")
-            ],
-          ),
-        ));
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          bool result = await _deleteCacheMoney(operation);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+            HelperDesignFunctions.showSuccessSnackBar(
+                message: "${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money ${operation.totalPrice} deleted");
+          }
+        },
+        title: "Delete ${operation.typeMoney == MoneyType.addCashMoney ? 'Pushed' : 'Pulled'} Money",
+        subTitle: "Are you sure from delete ${operation.totalPrice}  !",
+        okText: "Delete",
+        dialogType: "delete",
+    );
   }
 
   Future<bool> _deleteCacheMoney(MoneyBoxOperation operation) async {
@@ -696,9 +668,8 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   }
   Future<bool> getCacheRegisters({required BuildContext context,required int id}) async {
     statusView = StatusView.loading;
-        update();
+    update();
     return await ApiService.sendRequest(
-
       request: () async {
         return await moneyBoxManagementApiController.getRegisterRegisters(
             id: id
@@ -707,57 +678,60 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showMainBottomSheet(context,
-              height: Get.height,
+          HelperDesignFunctions.showAlertDialog(context,
+              hasButtonsAction: false,
               title: "Registers",
-              content: SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: registers.length,
-                  itemBuilder: (context, index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      extentRatio: 0.25,
-                      children: [
-                        SlidableAction(
-                          onPressed: (c) async {
-                            await deleteCacheRegister(registerId: registers[index].id);
-                          },
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          backgroundColor: AppColors.red,
-                          icon: Icons.delete_outlined,
+              children:[
+                SlidableAutoCloseBehavior(
+                  closeWhenOpened: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: registers.length,
+                    itemBuilder: (context, index) => Slidable(
+                      startActionPane: ActionPane(
+                        motion: const StretchMotion(),
+                        extentRatio: 0.25,
+                        children: [
+                          SlidableAction(
+                            onPressed: (c) async {
+                              await deleteCacheRegister(registerId: registers[index].id);
+                            },
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            backgroundColor: AppColors.danger50,
+                            icon: Icons.delete_outlined,
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              const Icon(Icons.person),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].userName),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.date_range),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].date),
+                            ],
+                          ),
+                          trailing: registers[index].typeOperation == "edit"
+                              ? const Icon(Icons.edit)
+                              : const Icon(Icons.add),
                         ),
-                      ],
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].userName),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].date),
-                          ],
-                        ),
-                        trailing: registers[index].typeOperation == "edit"
-                            ? const Icon(Icons.edit)
-                            : const Icon(Icons.add),
                       ),
                     ),
                   ),
-                ),
-              ));
+                )
+              ]
+          );
         }
         statusView = StatusView.none;
         update();

@@ -106,7 +106,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                       children: const [
                         Icon(
                           Icons.delete_outlined,
-                          color: AppColors.red,
+                          color: AppColors.danger50,
                         ),
                         SizedBox(
                           width: 15,
@@ -203,7 +203,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.phone,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -219,7 +219,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                               children: [
                                 const Icon(
                                   Icons.location_on,
-                                  color: AppColors.primary,
+                                  color: AppColors.primary50,
                                   size: 18,
                                 ),
                                 Text(
@@ -335,7 +335,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
+                        color: AppColors.primary30),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: const {
                       0: FractionColumnWidth(0.2),
@@ -346,7 +346,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                     children: [
                       TableRow(
                           decoration: BoxDecoration(
-                            color: AppColors.blackAccentT,
+                            color: AppColors.black90,
                             borderRadius: BorderRadius.vertical(
                               top: const Radius.circular(15),
                               bottom: controller
@@ -362,7 +362,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "#",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -372,7 +372,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Date",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -382,7 +382,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Debts",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -392,7 +392,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Total",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -401,7 +401,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                           controller.client.details.salesInvoices.length,
                           (index) => TableRow(
                                   decoration: const BoxDecoration(
-                                    color: AppColors.whiteSecondary,
+                                    color: AppColors.primary0,
                                   ),
                                   children: [
                                     ElevatedButton(
@@ -439,7 +439,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(controller.client.details
-                                          .salesInvoices[index].remainder
+                                          .salesInvoices[index].remained
                                           .toString()),
                                     ),
                                     Padding(
@@ -471,7 +471,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                     border: TableBorder.all(
                         width: 2,
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primaryAccent200),
+                        color: AppColors.primary30),
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     columnWidths: const {
                       0: FractionColumnWidth(0.25),
@@ -482,7 +482,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                     children: [
                       TableRow(
                           decoration: BoxDecoration(
-                            color: AppColors.blackAccentT,
+                            color: AppColors.black90,
                             borderRadius: BorderRadius.vertical(
                               top: const Radius.circular(15),
                               bottom: controller.client.details.sales.isEmpty
@@ -497,7 +497,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Name",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -507,7 +507,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Count",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -517,7 +517,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Sale Price",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -527,7 +527,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                                 "Total",
                                 style: TextStyle(
                                     fontSize: 18,
-                                    color: AppColors.primaryAccent200,
+                                    color: AppColors.primary30,
                                     fontWeight: FontWeight.bold),
                               ),
                             ),
@@ -536,7 +536,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                           controller.client.details.sales.length,
                           (index) => TableRow(
                                   decoration: const BoxDecoration(
-                                    color: AppColors.whiteSecondary,
+                                    color: AppColors.primary0,
                                   ),
                                   children: [
                                     ElevatedButton(

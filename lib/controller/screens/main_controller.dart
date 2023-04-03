@@ -23,6 +23,7 @@ import 'package:repository/data/models/money_box_operation.dart';
 import 'package:repository/data/models/monitoring.dart';
 import 'package:repository/data/models/product.dart';
 import 'package:repository/data/models/supplier.dart';
+import 'package:repository/data/static/home_data.dart';
 
 class MainController extends GetxController with GetTickerProviderStateMixin{
 
@@ -45,7 +46,8 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   TextEditingController phoneNumberFieldController = TextEditingController();
   TextEditingController addressFieldController = TextEditingController();
   TextEditingController detailsFieldController = TextEditingController();
-  TextEditingController amountFieldController = TextEditingController();
+  TextEditingController totalPriceFieldController = TextEditingController();
+  TextEditingController paidFieldController = TextEditingController();
   TextEditingController dateFieldController = TextEditingController();
 
   ScrollController monitoringScrollController = ScrollController();
@@ -72,7 +74,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   StatusView profileStatusView = StatusView.none;
   DateTime? lastPressedGoBack;
   File? image;
-  String startDate = '', endDate = '';
+  String startDate = '', endDate = '', selectedUnit = units.first;
   double totalMoneyBox = 10000000000, invoicesHeight = 250, remainder = 0;
   bool isEmailsExpansion = false, isVisibleNav = true, isSearchMode = false;
   int selectedBottomNavigationBarItem = 1,latestInvoiceTabIndex=0,popularPeopleTabIndex=0,productsTabIndex=0;
@@ -94,27 +96,20 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
 
   void showDialogCreateCategory(BuildContext context, {Future Function()? onSuccess}) {
     clearFields();
-    HelperDesignFunctions.showAwesomeDialog(context, btnOkOnPress: () async {
-      bool result = await _createCategory();
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-      }
-    },
-        btnCancelOnPress: () {},
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          bool result = await _createCategory();
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
+        barrierDismissible: false,
+        title: "Create Category",
+        children: [
+          Form(
             key: formKeyCreateCategory,
             child: Column(
               children: [
-                Text(
-                  "Create Category",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Divider(
-                  thickness: 2,
-                  height: 20,
-                ),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -130,9 +125,9 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                           backgroundColor: AppColors.primary5,
                           child: controller.image == null
                               ? SvgPicture.asset(
-                                  AppAssets.categoriesIconSvg,
-                                  color: AppColors.primary60,
-                                )
+                            AppAssets.categoriesIconSvg,
+                            color: AppColors.primary60,
+                          )
                               : null,
                         ),
                       ),
@@ -172,9 +167,9 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                 )
               ],
             ),
-          ),
-        ));
-    update();
+          )
+        ]
+    );
   }
   Future<bool> _createCategory() async {
     if (formKeyCreateCategory.currentState!.validate()) {
@@ -212,170 +207,204 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
               "you can't create any product you must add one category at least");
       return;
     }
-    HelperDesignFunctions.showMainBottomSheet(context,
-        title: "Create Product", height: Get.height, btnOkOnPress: () async {
-      bool result = await _createProduct();
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-      }
-    }, btnCancelOnPress: () {
-      Get.back();
-    },
-        content: Form(
-          key: formKeyCreateProduct,
-          child: Column(
+    HelperDesignFunctions.showFormDialog(context,
+      formKey: formKeyCreateProduct,
+      btnOkOnPress: () async {
+        bool result = await _createProduct();
+        if (result && onSuccess != null) {
+          await onSuccess.call();
+        }
+      },
+      title: "Create Product",
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              const SizedBox(height: 15),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    GetBuilder<MainController>(
-                      builder: (controller) => CircleAvatar(
-                        radius: 105,
-                        backgroundColor: AppColors.primary,
-                        child: CircleAvatar(
-                          backgroundImage: controller.image != null
-                              ? FileImage(controller.image!)
-                              : null,
-                          radius: 100,
-                          backgroundColor: AppColors.whiteSecondary,
-                          child: controller.image == null
-                              ? SvgPicture.asset(
-                                  AppAssets.productsIconSvg,
-                                  color: AppColors.primary,
-                                  height: 100,
-                                )
-                              : null,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: -10,
-                      right: -10,
-                      child: InkWell(
-                        onTap: () async {
-                          image = await HelperLogicFunctions.pickImage(
-                              ImageSource.gallery);
-                          update();
-                        },
-                        child: const CircleAvatar(
-                          radius: 30,
-                          backgroundColor: AppColors.primaryAccent200,
-                          child: Icon(
-                            Icons.camera,
-                            size: 30,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ),
+              GetBuilder<MainController>(
+                builder: (controller) => CircleAvatar(
+                  radius: 105,
+                  backgroundColor: AppColors.primary50,
+                  child: CircleAvatar(
+                    backgroundImage: controller.image != null
+                        ? FileImage(controller.image!)
+                        : null,
+                    radius: 100,
+                    backgroundColor: AppColors.primary0,
+                    child: controller.image == null
+                        ? SvgPicture.asset(
+                      AppAssets.productsIconSvg,
+                      color: AppColors.primary50,
+                      height: 100,
                     )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 25),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Product name',
+                        : null,
                   ),
-                  controller: nameFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'product pay price',
-                  ),
-                  keyboardType: TextInputType.number,
-                  controller: purchasePriceFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    double max = double.infinity;
-                    if (salePriceFieldController.text != '' &&
-                        salePriceFieldController.text != '-') {
-                      max = double.parse(salePriceFieldController.text);
-                    }
-                    return Validate.valid(text!,
-                        type: Validate.positiveNum, maxVal: max);
+              Positioned(
+                bottom: -10,
+                right: -10,
+                child: InkWell(
+                  onTap: () async {
+                    image = await HelperLogicFunctions.pickImage(
+                        ImageSource.gallery);
+                    update();
                   },
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'product sale price',
-                  ),
-                  keyboardType: TextInputType.number,
-                  controller: salePriceFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    double min = 0;
-                    if (purchasePriceFieldController.text != '' &&
-                        purchasePriceFieldController.text != '-') {
-                      min = double.parse(purchasePriceFieldController.text);
-                    }
-                    return Validate.valid(text!,
-                        type: Validate.positiveNum, minVal: min);
-                  },
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: GetBuilder<MainController>(
-                  builder: (controller) => DropdownSearch<Category>(
-                    popupProps: PopupProps.dialog(
-                      title: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text("Chose Category"),
-                      ),
-                      showSearchBox: true,
-                      itemBuilder: (context, item, isSelected) => Container(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Card(
-                            color: AppColors.primary0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Text(
-                                item.name,
-                                style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          )),
+                  child: const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: AppColors.primary30,
+                    child: Icon(
+                      Icons.camera,
+                      size: 30,
+                      color: AppColors.black,
                     ),
-                    dropdownDecoratorProps: const DropDownDecoratorProps(
-                      dropdownSearchDecoration: InputDecoration(
-                        labelText: "Category",
-                      ),
-                    ),
-                    compareFn: (item1, item2) => true,
-                    itemAsString: (item) => item.name,
-                    items: controller.categories,
-                    selectedItem: controller.selectedCategory,
-                    onChanged: (value) {
-                      controller.selectedCategory = value!;
-                    },
                   ),
                 ),
               )
             ],
           ),
-        ));
-    update();
+        ),
+        const SizedBox(height: 25),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Name',
+            ),
+            controller: nameFieldController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (text) {
+              return Validate.valid(text!);
+            },
+          ),
+        ),
+        Row(children: [
+          Expanded(child: Padding(
+            padding: const EdgeInsets.all(10).copyWith(left: 0),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Purchase price',
+              ),
+              keyboardType: TextInputType.number,
+              controller: purchasePriceFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                double max = double.infinity;
+                if (salePriceFieldController.text != '' &&
+                    salePriceFieldController.text != '-') {
+                  max = double.parse(salePriceFieldController.text);
+                }
+                return Validate.valid(text!,
+                    type: Validate.positiveNum, maxVal: max);
+              },
+            ),
+          ),),
+          Expanded(child: Padding(
+            padding: const EdgeInsets.all(10).copyWith(right: 0),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                labelText: 'Sale price',
+              ),
+              keyboardType: TextInputType.number,
+              controller: salePriceFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                double min = 0;
+                if (purchasePriceFieldController.text != '' &&
+                    purchasePriceFieldController.text != '-') {
+                  min = double.parse(purchasePriceFieldController.text);
+                }
+                return Validate.valid(text!,
+                    type: Validate.positiveNum, minVal: min);
+              },
+            ),
+          ),),
+        ],),
+        Row(children: [
+          Expanded(child: Padding(
+            padding: const EdgeInsets.all(10).copyWith(left: 0),
+            child: GetBuilder<MainController>(
+              builder: (controller) => DropdownSearch<String>(
+                popupProps: PopupProps.dialog(
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("Chose Unit"),
+                  ),
+                  showSearchBox: true,
+                  itemBuilder: (context, item, isSelected) => Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      child: Card(
+                        color: AppColors.primary0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            item,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      )),
+                ),
+                dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownSearchDecoration: InputDecoration(
+                    labelText: "Category",
+                  ),
+                ),
+                compareFn: (item1, item2) => true,
+                itemAsString: (item) => item,
+                items: units,
+                selectedItem: controller.selectedUnit,
+                onChanged: (value) {
+                  controller.selectedUnit = value!;
+                },
+              ),
+            ),
+          ),),
+          Expanded(child: Padding(
+            padding: const EdgeInsets.all(10).copyWith(right: 0),
+            child: GetBuilder<MainController>(
+              builder: (controller) => DropdownSearch<Category>(
+                popupProps: PopupProps.dialog(
+                  title: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("Chose Category"),
+                  ),
+                  showSearchBox: true,
+                  itemBuilder: (context, item, isSelected) => Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      child: Card(
+                        color: AppColors.primary0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(
+                            item.name,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      )),
+                ),
+                dropdownDecoratorProps: const DropDownDecoratorProps(
+                  dropdownSearchDecoration: InputDecoration(
+                    labelText: "Category",
+                  ),
+                ),
+                compareFn: (item1, item2) => true,
+                itemAsString: (item) => item.name,
+                items: controller.categories,
+                selectedItem: controller.selectedCategory,
+                onChanged: (value) {
+                  controller.selectedCategory = value!;
+                },
+              ),
+            ),
+          ),),
+        ],),
+      ]
+    );
   }
   Future<bool> _createProduct() async {
     if (formKeyCreateProduct.currentState!.validate()) {
@@ -387,7 +416,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
             name: nameFieldController.text,
             salePrice: double.parse(salePriceFieldController.text),
             purchasePrice: double.parse(purchasePriceFieldController.text),
-            measuringUnit: "Kg",
+            measuringUnit: selectedUnit,
             categoryId: selectedCategory.id,
             photo: image,
           );
@@ -413,124 +442,117 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   }
   void showSheetCreateClientOrSupplier(BuildContext context, {required bool isClient, Future Function()? onSuccess}) {
     clearFields();
-    HelperDesignFunctions.showMainBottomSheet(context,
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyCreateClientOrSupplier,
+        btnOkOnPress: () async {
+          bool result = false;
+          if (isClient) {
+            result = await _createClient();
+          } else {
+            result = await _createSupplier();
+          }
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
         title: "Create ${isClient ? 'Client' : 'Supplier'}",
-        height: Get.height, btnOkOnPress: () async {
-      bool result = false;
-      if (isClient) {
-        result = await _createClient();
-      } else {
-        result = await _createSupplier();
-      }
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-      }
-    }, btnCancelOnPress: () {
-      Get.back();
-    },
-        content: Form(
-          key: formKeyCreateClientOrSupplier,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    GetBuilder<MainController>(
-                      builder: (controller) => CircleAvatar(
-                        radius: 105,
-                        backgroundColor: AppColors.primary,
-                        child: CircleAvatar(
-                          backgroundImage: controller.image != null
-                              ? FileImage(controller.image!)
-                              : null,
-                          radius: 100,
-                          backgroundColor: AppColors.whiteSecondary,
-                          child: controller.image == null
-                              ? SvgPicture.asset(
-                                  AppAssets.clientsIconSvg,
-                                  color: AppColors.primary,
-                                  height: 100,
-                                )
-                              : null,
-                        ),
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                GetBuilder<MainController>(
+                  builder: (controller) => CircleAvatar(
+                    radius: 105,
+                    backgroundColor: AppColors.primary50,
+                    child: CircleAvatar(
+                      backgroundImage: controller.image != null
+                          ? FileImage(controller.image!)
+                          : null,
+                      radius: 100,
+                      backgroundColor: AppColors.primary0,
+                      child: controller.image == null
+                          ? SvgPicture.asset(
+                        AppAssets.clientsIconSvg,
+                        color: AppColors.primary50,
+                        height: 100,
+                      )
+                          : null,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: InkWell(
+                    onTap: () async {
+                      image = await HelperLogicFunctions.pickImage(
+                          ImageSource.gallery);
+                      update();
+                    },
+                    child: const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppColors.primary30,
+                      child: Icon(
+                        Icons.camera,
+                        size: 30,
+                        color: AppColors.black,
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: InkWell(
-                        onTap: () async {
-                          image = await HelperLogicFunctions.pickImage(
-                              ImageSource.gallery);
-                          update();
-                        },
-                        child: const CircleAvatar(
-                          radius: 30,
-                          backgroundColor: AppColors.primaryAccent200,
-                          child: Icon(
-                            Icons.camera,
-                            size: 30,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(height: 25),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  autofocus: true,
-                  controller: nameFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Phone number',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  keyboardType: TextInputType.phone,
-                  controller: phoneNumberFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!, type: Validate.phone);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Address',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  keyboardType: TextInputType.text,
-                  controller: addressFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
-                ),
-              ),
-            ],
+                  ),
+                )
+              ],
+            ),
           ),
-        ));
-    update();
+          const SizedBox(height: 25),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              controller: nameFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Phone number',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.phone,
+              controller: phoneNumberFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!, type: Validate.phone);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Address',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.text,
+              controller: addressFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
+            ),
+          ),
+        ]
+    );
   }
   Future<bool> _createClient() async {
     if (formKeyCreateClientOrSupplier.currentState!.validate()) {
@@ -598,93 +620,106 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   }
   void showSheetCreateExpense(BuildContext context, {Future Function()? onSuccess}) {
     clearFields();
-    HelperDesignFunctions.showMainBottomSheet(context,
-        title: "Add Expense", height: Get.height, btnOkOnPress: () async {
-      bool result = await _createExpense();
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-      }
-    }, btnCancelOnPress: () {
-      Get.back();
-    },
-        content: Form(
-          key: formKeyCreateExpense,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 15,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  autofocus: true,
-                  controller: nameFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Cost',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  keyboardType: TextInputType.number,
-                  controller: amountFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    String? message =
-                        Validate.valid(text!, type: Validate.positiveNum);
-                    if (message == null && double.parse(text) > totalMoneyBox) {
-                      return 'Money not enough to Expense you have $totalMoneyBox \$';
-                    }
-                    return message;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Details',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  keyboardType: TextInputType.text,
-                  controller: detailsFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Date',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  controller: dateFieldController,
-                  readOnly: true,
-                  onTap: () async {
-                    dateFieldController.text =
-                        await HelperDesignFunctions.choseDate(context) ??
-                            dateFieldController.text;
-                  },
-                ),
-              ),
-            ],
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyCreateExpense,
+        btnOkOnPress: () async {
+          bool result = await _createExpense();
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
+        title: "Add Expense",
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              controller: nameFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
+            ),
           ),
-        ));
-    update();
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Details',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              keyboardType: TextInputType.text,
+              controller: detailsFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                return Validate.valid(text!);
+              },
+            ),
+          ),
+          Row(children: [
+            Expanded(child: Padding(
+              padding: const EdgeInsets.all(10).copyWith(left: 0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                    labelText: 'Total',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)))),
+                keyboardType: TextInputType.number,
+                controller: totalPriceFieldController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (text) {
+                  String? message =
+                  Validate.valid(text!, type: Validate.positiveNum);
+                  if (message == null && double.parse(text) > totalMoneyBox) {
+                    return 'Money not enough to Expense you have $totalMoneyBox \$';
+                  }
+                  return message;
+                },
+              ),
+            ),),
+            Expanded(child: Padding(
+              padding: const EdgeInsets.all(10).copyWith(right: 0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                    labelText: 'Paid',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)))),
+                keyboardType: TextInputType.number,
+                controller: paidFieldController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (text) {
+                  String? message =
+                  Validate.valid(text!, type: Validate.positiveNum);
+                  if (message == null && double.parse(text) > totalMoneyBox) {
+                    return 'Money not enough to Expense you have $totalMoneyBox \$';
+                  }
+                  return message;
+                },
+              ),
+            ),),
+          ],),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Date',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              controller: dateFieldController,
+              readOnly: true,
+              onTap: () async {
+                dateFieldController.text =
+                    await HelperDesignFunctions.choseDate(context) ??
+                        dateFieldController.text;
+              },
+            ),
+          ),
+        ]
+    );
   }
   Future<bool> _createExpense() async {
     if (formKeyCreateExpense.currentState!.validate()) {
@@ -694,8 +729,8 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
         request: () async {
           return await mainApiController.addExpense(
             name: nameFieldController.text,
-            totalPrice: double.parse(amountFieldController.text),
-            paid: double.parse(amountFieldController.text),
+            totalPrice: double.parse(totalPriceFieldController.text),
+            paid: double.parse(paidFieldController.text),
             date: dateFieldController.text,
             details: detailsFieldController.text,
           );
@@ -720,68 +755,58 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   }
   void showSheetCreateCacheMoney(BuildContext context, {required bool isPush, Future Function()? onSuccess}) {
     clearFields();
-    HelperDesignFunctions.showMainBottomSheet(context,
+    HelperDesignFunctions.showFormDialog(context,
+        formKey: formKeyCreateMoneyOperation,
+        btnOkOnPress: () async {
+          bool result = await _createCacheMoney(isPush);
+          if (result && onSuccess != null) {
+            await onSuccess.call();
+          }
+        },
         title: "${isPush ? 'Push' : 'Pull'} Cache Money",
-        height: 0.8 * Get.height, btnOkOnPress: () async {
-      bool result = await _createCacheMoney(isPush);
-      if (result && onSuccess != null) {
-        await onSuccess.call();
-      }
-    }, btnCancelOnPress: () {
-      Get.back();
-    },
-        content: Form(
-          key: formKeyCreateMoneyOperation,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 13,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                      labelText: 'Money amount',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  autofocus: true,
-                  keyboardType: TextInputType.number,
-                  controller: amountFieldController,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (text) {
-                    if (isPush) {
-                      return Validate.valid(text!, type: Validate.positiveNum);
-                    }
-                    String? message =
-                        Validate.valid(text!, type: Validate.positiveNum);
-                    if (message == null && double.parse(text) > totalMoneyBox) {
-                      return 'Money not enough to Pull you have $totalMoneyBox \$';
-                    }
-                    return message;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      labelText: '${isPush ? 'Push' : 'Pull'} date',
-                      border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)))),
-                  controller: dateFieldController,
-                  readOnly: true,
-                  onTap: () async {
-                    dateFieldController.text =
-                        await HelperDesignFunctions.choseDate(context) ??
-                            dateFieldController.text;
-                  },
-                ),
-              ),
-            ],
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  labelText: 'Money amount',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              controller: totalPriceFieldController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (text) {
+                if (isPush) {
+                  return Validate.valid(text!, type: Validate.positiveNum);
+                }
+                String? message =
+                Validate.valid(text!, type: Validate.positiveNum);
+                if (message == null && double.parse(text) > totalMoneyBox) {
+                  return 'Money not enough to Pull you have $totalMoneyBox \$';
+                }
+                return message;
+              },
+            ),
           ),
-        ));
-    update();
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: TextFormField(
+              decoration: InputDecoration(
+                  labelText: '${isPush ? 'Push' : 'Pull'} date',
+                  border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)))),
+              controller: dateFieldController,
+              readOnly: true,
+              onTap: () async {
+                dateFieldController.text =
+                    await HelperDesignFunctions.choseDate(context) ??
+                        dateFieldController.text;
+              },
+            ),
+          ),
+        ]
+    );
   }
   Future<bool> _createCacheMoney(bool isPush) async {
     if (formKeyCreateMoneyOperation.currentState!.validate()) {
@@ -791,7 +816,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
         request: () async {
           return await mainApiController.addOrRemoveCash(
             totalPrice:
-                (isPush ? 1 : -1) * double.parse(amountFieldController.text),
+                (isPush ? 1 : -1) * double.parse(totalPriceFieldController.text),
             date: dateFieldController.text.toString(),
           );
         },
@@ -799,7 +824,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
           Get.back();
           HelperDesignFunctions.showSuccessSnackBar(
               message:
-                  "Done ${isPush ? 'Push' : 'Pull'} Money ${amountFieldController.text} \$");
+                  "Done ${isPush ? 'Push' : 'Pull'} Money ${totalPriceFieldController.text} \$");
           onNavBarChange(selectedBottomNavigationBarItem);
           update();
         },
@@ -815,30 +840,19 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     return false;
   }
   void showDialogMeetDebt(BuildContext context, double debts, Future<bool> Function() meetDebt) {
-    amountFieldController.clear();
+    totalPriceFieldController.clear();
     remainder = debts;
-    HelperDesignFunctions.showAwesomeDialog(context, btnOkOnPress: () async {
-      await meetDebt.call();
-    },
-        btnCancelOnPress: () {},
-        body: Form(
-          key: formKeyMeetDebt,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          await meetDebt.call();
+        },
+        title: "Repayment debt",
+        children: [
+          Form(
+            key: formKeyMeetDebt,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  "Repayment debt",
-                  style: TextStyle(
-                      color: AppColors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                ),
-                const Divider(
-                  thickness: 2,
-                  height: 40,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -847,7 +861,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary),
+                          color: AppColors.primary50),
                     ),
                     Text(
                       "$debts \$",
@@ -866,7 +880,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                       style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary),
+                          color: AppColors.primary50),
                     ),
                     GetBuilder<MainController>(
                       builder: (controller) => Text(
@@ -886,13 +900,13 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                         labelText: 'payment amount',
                         border: OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(10)))),
+                            BorderRadius.all(Radius.circular(10)))),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       if (Validate.valid(value, type: Validate.positiveNum) ==
                           null) {
                         double amount =
-                            double.parse(amountFieldController.text);
+                        double.parse(totalPriceFieldController.text);
                         if (debts < amount) {
                           return;
                         }
@@ -900,7 +914,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                         update();
                       }
                     },
-                    controller: amountFieldController,
+                    controller: totalPriceFieldController,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     validator: (text) {
                       return Validate.valid(text!,
@@ -910,9 +924,9 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
                 ),
               ],
             ),
-          ),
-        ));
-    update();
+          )
+        ]
+    );
   }
   void individualStocktaking(BuildContext context, {required StocktakingType stocktakingType, bool enabledSelect = true, dynamic item}) {
     startDate = HelperDesignFunctions.formatDate(DateTime.now().subtract(const Duration(days: 30)));
@@ -937,104 +951,99 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     if (!enabledSelect) {
       selectedItem = item;
     }
-    HelperDesignFunctions.showAwesomeDialog(context, btnOkOnPress: () {
-      Get.toNamed(AppPagesRoutes.individualStocktaking, arguments: {
-        AppSharedKeys.passStocktakingType: stocktakingType,
-        AppSharedKeys.passId: selectedItem.id,
-        AppSharedKeys.passName: selectedItem.name,
-        AppSharedKeys.passStartDate: startDate,
-        AppSharedKeys.passEndDate: endDate,
-      });
-    },
-        btnCancelOnPress: () {},
-        body: GetBuilder<MainController>(
-          builder: (controller) => Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+    HelperDesignFunctions.showAlertDialog(context,
+        btnOkOnPress: () async {
+          Get.back();
+          await Future.delayed(const Duration(milliseconds: 1));
+          Get.toNamed(AppPagesRoutes.individualStocktaking, arguments: {
+            AppSharedKeys.passStocktakingType: stocktakingType,
+            AppSharedKeys.passId: selectedItem.id,
+            AppSharedKeys.passName: selectedItem.name,
+            AppSharedKeys.passStartDate: startDate,
+            AppSharedKeys.passEndDate: endDate,
+          });
+        },
+        title: "$type Stocktaking",
+        children: [
+          GetBuilder<MainController>(
+            builder: (controller) => Column(
               children: [
-                Text(
-                  "$type Stocktaking",
-                  style: const TextStyle(
-                      color: AppColors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          ' From: ',
-                          style: TextStyle(color: AppColors.gray),
+                    Material(
+                      color: AppColors.primary10,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () async {
+                          await choseDateRange(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(controller.startDate),
                         ),
-                        ActionChip(
-                          label: Text(controller.startDate),
-                          onPressed: () async {
-                            await choseDateRange(context);
-                          },
-                        ),
-                      ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          ' To: ',
-                          style: TextStyle(color: AppColors.gray),
+                    const Icon(Icons.arrow_forward),
+                    Material(
+                      color: AppColors.primary10,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () async {
+                          await choseDateRange(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(controller.endDate),
                         ),
-                        ActionChip(
-                          label: Text(controller.endDate),
-                          onPressed: () async {
-                            await choseDateRange(context);
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownSearch<dynamic>(
-                    popupProps: PopupProps.menu(
-                      showSearchBox: true,
-                      itemBuilder: (context, item, isSelected) => Container(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 5),
-                          child: Card(
-                            color: AppColors.primary0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Text(
-                                item.name,
-                                style: const TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w600),
-                              ),
+                DropdownSearch<dynamic>(
+                  popupProps: PopupProps.menu(
+                    showSearchBox: true,
+                    itemBuilder: (context, item, isSelected) => Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: Card(
+                          color: AppColors.primary0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Text(
+                              item.name,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w600),
                             ),
-                          )),
-                    ),
-                    dropdownDecoratorProps: DropDownDecoratorProps(
-                      dropdownSearchDecoration: InputDecoration(
-                        labelText: "Chose $type",
-                      ),
-                    ),
-                    compareFn: (item1, item2) => true,
-                    itemAsString: (item) => item.name,
-                    items: items,
-                    selectedItem: selectedItem,
-                    enabled: enabledSelect,
-                    onChanged: (value) {
-                      selectedItem = value;
-                    },
+                          ),
+                        )),
                   ),
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                      labelText: "Chose $type",
+                    ),
+                  ),
+                  compareFn: (item1, item2) => true,
+                  itemAsString: (item) => item.name,
+                  items: items,
+                  selectedItem: selectedItem,
+                  enabled: enabledSelect,
+                  onChanged: (value) {
+                    selectedItem = value;
+                  },
                 ),
               ],
             ),
-          ),
-        ));
+          )
+        ]
+    );
   }
   Future<bool> getFullStocktaking() async {
     statusView = StatusView.loading;
@@ -1306,8 +1315,9 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     phoneNumberFieldController.clear();
     addressFieldController.clear();
     detailsFieldController.clear();
-    amountFieldController.clear();
+    totalPriceFieldController.clear();
     dateFieldController.clear();
+    paidFieldController.clear();
     dateFieldController.text = HelperDesignFunctions.formatDate(DateTime.now());
   }
   bool onNotification(notification) {

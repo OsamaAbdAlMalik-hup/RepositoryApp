@@ -1,26 +1,25 @@
+
 import 'package:repository/core/constant/app_response_keys.dart';
-import 'package:repository/data/models/product.dart';
-import 'package:repository/data/models/purchases_invoice.dart';
 
 class Purchase {
   int id;
   double amount;
   int productId;
   int supplierId;
+  int invoiceNumber;
   String productName;
-  double totalpurchasePrice;
+  String supplierName;
   double totalPurchasePrice;
-  PurchaseDetails details;
 
   Purchase(
       {this.id = 0,
       this.productId = 0,
+      this.invoiceNumber = 0,//TODO invoiceNumber
       this.productName = '',
+      this.supplierName = '',
       this.supplierId = 0,
       this.amount = 0,
-      this.totalpurchasePrice = 0,
-      this.totalPurchasePrice = 0,
-      required this.details});
+      this.totalPurchasePrice = 0});
 
   static List<Purchase> jsonToList(List<dynamic> purchasesMap) {
     List<Purchase> purchases = [];
@@ -41,6 +40,11 @@ class Purchase {
                       .containsKey(AppResponseKeys.name)
               ? purchase[AppResponseKeys.product][AppResponseKeys.name]
               : '',
+          supplierName: purchase.containsKey(AppResponseKeys.supplier) &&
+                  purchase[AppResponseKeys.supplier]
+                      .containsKey(AppResponseKeys.name)
+              ? purchase[AppResponseKeys.supplier][AppResponseKeys.name]
+              : '',
           supplierId: purchase.containsKey(AppResponseKeys.supplierId)
               ? purchase[AppResponseKeys.supplierId]
               : 0,
@@ -48,21 +52,11 @@ class Purchase {
               purchase[AppResponseKeys.product]
                   .containsKey(AppResponseKeys.id)
               ? purchase[AppResponseKeys.product][AppResponseKeys.id]
-              : 0,
-          details: PurchaseDetails(product: Product(details: ProductDetails(), stocktaking: ProductStocktaking()), purchasesInvoice: PurchasesInvoice(details: PurchasesInvoiceDetails()))));
+              : 0
+      )
+      );
     }
     return purchases;
   }
 }
 
-class PurchaseDetails {
-  Product product;
-  PurchasesInvoice purchasesInvoice;
-
-  PurchaseDetails({
-    required this.product,
-    required this.purchasesInvoice,
-  });
-}
-
-// TODO FIX DETAILS OF SALES AND PURCHASES

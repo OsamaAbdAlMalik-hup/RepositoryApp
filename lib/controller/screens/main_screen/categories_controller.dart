@@ -1,12 +1,13 @@
 
-import 'dart:io';
-import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repository/controller/api/categories_api_controller.dart';
 import 'package:repository/controller/screens/main_controller.dart';
 import 'package:repository/controller/screens/registration_controller.dart';
+import 'package:repository/core/constant/app_assets.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/helper/design_functions.dart';
@@ -28,16 +29,17 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
     SortItem(label: "sales amount", icon: Icons.multiline_chart, isSelected: false),
     SortItem(label: "purchase amount", icon: Icons.stacked_line_chart, isSelected: false),
   ];
+  List<String> searchItem=['name','product amount','sales amount','purchases amount'];
   List<Category> allCategories = [], categories = [];
   StatusView statusView= StatusView.loading;
-
+  int filterTabIndex=0;
   bool ascending = true, isSearchMode=false;
 
 
 
   @override
   onInit() async {
-    filterTabController = TabController(length: sortItems.length, vsync: this);
+    filterTabController = TabController(length: searchItem.length, vsync: this);
     await getCategories();
     super.onInit();
   }
@@ -79,40 +81,44 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
   void showDialogUpdateCategory(BuildContext context, {required Category category, Future Function()? onSuccess}) {
     mainController.clearFields();
     mainController.nameFieldController.text = category.name;
-    HelperDesignFunctions.showAwesomeDialog(
-        context,
+    HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
           bool result = await _updateCategory(category);
           if(result && onSuccess!=null){
             await onSuccess.call();
           }
         },
-        btnCancelOnPress: () {},
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
+        title: "Update Category",
+        children:[
+          Form(
             key: formKeyUpdate,
             child: Column(
               children: [
-                Text(
-                  "Update Category",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 15),
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
                     GetBuilder<CategoriesController>(
                       builder: (controller) => CircleAvatar(
                         radius: 52,
-                        backgroundColor: AppColors.primary,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColors.whiteSecondary,
-                          backgroundImage: controller.mainController.image == null
-                              ? FileImage(File(category.photo))
-                              : FileImage(controller.mainController.image!),
-                        ),
+                        backgroundColor: AppColors.primary50,
+                        child: controller.mainController.image != null
+                            ? CircleAvatar(
+                              radius: 50,
+                              //
+                              backgroundColor: AppColors.primary0,
+                              backgroundImage: FileImage(controller.mainController.image!),)
+                            : category.photo != ''
+                                ? CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: AppColors.primary0,
+                                  backgroundImage: CachedNetworkImageProvider(category.photo),)
+                                : CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: AppColors.primary0,
+                                  child: SvgPicture.asset(
+                                    AppAssets.categoriesIconSvg,
+                                    color: AppColors.primary60,
+                                  ),),
                       ),
                     ),
                     Positioned(
@@ -126,7 +132,7 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
                         child: const CircleAvatar(
                           radius: 20,
                           backgroundColor:
-                          AppColors.primaryAccent200,
+                          AppColors.primary30,
                           child: Icon(
                             Icons.camera,
                             color: AppColors.black,
@@ -150,10 +156,9 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
                 )
               ],
             ),
-          ),
-        )
+          )
+        ]
     );
-    update();
   }
   Future<bool> _updateCategory(Category category) async {
     if (formKeyUpdate.currentState!.validate()) {
@@ -186,28 +191,18 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
   }
 
   void showDialogDeleteCategory(BuildContext context, {required Category category, Future Function()? onSuccess}) {
-    HelperDesignFunctions.showAwesomeDialog(context, dialogType: DialogType.error,
+    HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
           bool result = await _deleteCategory(category);
           if(result && onSuccess!=null){
             await onSuccess.call();
             HelperDesignFunctions.showSuccessSnackBar(message: "Category '${category.name}' deleted");
           }
-        }, btnCancelOnPress: () {},
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                "Delete Category",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 15),
-              Text("Are you sure from delete ${category.name} !")
-            ],
-          ),
-        )
+        },
+        title: "Delete Category",
+        subTitle: "Are you sure from delete ${category.name} !",
+        okText: "Delete",
+        dialogType: "delete",
     );
   }
   Future<bool> _deleteCategory(Category category) async {
@@ -234,14 +229,23 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
 
   Future<void> search(String val) async {
     if (val != '') {
-      if (sortItems[0].isSelected) {
-        categories = allCategories.where((element) => element.name.toLowerCase().contains(val.toLowerCase())).toList();
-      } else if (sortItems[1].isSelected) {
-        categories = allCategories.where((element) => element.productsAmount.toString().contains(val.toLowerCase())).toList();
-      }else if (sortItems[2].isSelected) {
-        categories = allCategories.where((element) => element.salesAmount.toString().contains(val.toLowerCase())).toList();
-      } else if (sortItems[3].isSelected) {
-        categories = allCategories.where((element) => element.purchasesAmount.toString().contains(val.toLowerCase())).toList();
+      switch(filterTabIndex){
+        case 0:{
+          categories = allCategories.where((element) => element.name.toLowerCase().contains(val.toLowerCase())).toList();
+          break;
+        }
+        case 1:{
+          categories = allCategories.where((element) => element.productsAmount.toString().contains(val)).toList();
+          break;
+        }
+        case 2:{
+          categories = allCategories.where((element) => element.salesAmount.toString().contains(val)).toList();
+          break;
+        }
+        case 3:{
+          categories = allCategories.where((element) => element.purchasesAmount.toString().contains(val)).toList();
+          break;
+        }
       }
     } else {
       categories = allCategories;
@@ -253,24 +257,17 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
       categories = allCategories..sort((a, b) => ascending ? a.name.compareTo(b.name) : b.name.compareTo(a.name),);
     } else if (sortItems[1].isSelected) {
       categories = allCategories
-        ..sort((a, b) {return ascending ? (a.productsAmount - a.productsAmount).ceil() : (b.productsAmount - b.productsAmount).ceil();});
+        ..sort((a, b) {return ascending ? (a.productsAmount - b.productsAmount).ceil() : (b.productsAmount - a.productsAmount).ceil();});
     } else if (sortItems[2].isSelected) {
       categories = allCategories
-        ..sort((a, b) {return ascending ? (a.salesAmount - a.salesAmount).ceil() : (b.salesAmount - b.salesAmount).ceil();});
+        ..sort((a, b) {return ascending ? (a.salesAmount - b.salesAmount).ceil() : (b.salesAmount - a.salesAmount).ceil();});
 
     } else if (sortItems[3].isSelected) {
       categories = allCategories
-        ..sort((a, b) {return ascending ? (a.purchasesAmount - a.purchasesAmount).ceil() : (b.purchasesAmount - b.purchasesAmount).ceil();});
+        ..sort((a, b) {return ascending ? (a.purchasesAmount - b.purchasesAmount).ceil() : (b.purchasesAmount - a.purchasesAmount).ceil();});
     } else {
       categories = allCategories;
     }
-    update();
-  }
-  Future<void> onFilterTab(int index) async {
-    for (int i = 0; i < sortItems.length; i++) {
-      sortItems[i].isSelected = (i == 0);
-    }
-    search(mainController.searchFieldController.text);
     update();
   }
 

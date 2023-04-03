@@ -10,16 +10,18 @@ import 'package:repository/core/service/api_service.dart';
 import 'package:repository/data/models/category.dart';
 import 'package:repository/data/models/register.dart';
 
-class CategoryDetailsController extends GetxController {
+class CategoryDetailsController extends GetxController with GetSingleTickerProviderStateMixin{
   CategoriesController categoriesController = Get.find();
   int categoryId = 0;
   Category category =
       Category(details: CategoryDetails(), stocktaking: CategoryStocktaking());
   List<Register> registers = [];
+  late TabController tabController;
   StatusView statusView = StatusView.loading;
 
   @override
   void onInit() async {
+    tabController=TabController(length: 3, vsync: this);
     categoryId = await Get.arguments[AppSharedKeys.passId];
     await getCategory();
     super.onInit();
@@ -61,59 +63,53 @@ class CategoryDetailsController extends GetxController {
       onSuccess: (response) async {
         if (response is List<Register>) {
           registers = response;
-          HelperDesignFunctions.showMainBottomSheet(context,
-              height: Get.height,
+          HelperDesignFunctions.showAlertDialog(context,
+              hasButtonsAction: false,
               title: "Registers",
-              content: SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: registers.length,
-                  itemBuilder: (context, index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      extentRatio: 0.25,
+              children: List.generate(registers.length, (index) => Slidable(
+                startActionPane: ActionPane(
+                  motion: const StretchMotion(),
+                  extentRatio: 0.25,
+                  children: [
+                    SlidableAction(
+                      onPressed: (c) async {
+                        await deleteCategoryRegister(
+                            registerId: registers[index].id);
+                      },
+                      borderRadius:
+                      const BorderRadius.all(Radius.circular(10)),
+                      backgroundColor: AppColors.danger50,
+                      icon: Icons.delete_outlined,
+                    ),
+                  ],
+                ),
+                child: Card(
+                  child: ListTile(
+                    title: Row(
                       children: [
-                        SlidableAction(
-                          onPressed: (c) async {
-                            await deleteCategoryRegister(
-                                registerId: registers[index].id);
-                          },
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          backgroundColor: AppColors.red,
-                          icon: Icons.delete_outlined,
+                        const Icon(Icons.person),
+                        const SizedBox(
+                          width: 20,
                         ),
+                        Text(registers[index].userName),
                       ],
                     ),
-                    child: Card(
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].userName),
-                          ],
+                    subtitle: Row(
+                      children: [
+                        const Icon(Icons.date_range),
+                        const SizedBox(
+                          width: 20,
                         ),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].date),
-                          ],
-                        ),
-                        trailing: registers[index].typeOperation == "edit"
-                            ? const Icon(Icons.edit)
-                            : const Icon(Icons.add),
-                      ),
+                        Text(registers[index].date),
+                      ],
                     ),
+                    trailing: registers[index].typeOperation == "edit"
+                        ? const Icon(Icons.edit)
+                        : const Icon(Icons.add),
                   ),
                 ),
-              ));
+              ))
+          );
         }
         statusView = StatusView.none;
         update();

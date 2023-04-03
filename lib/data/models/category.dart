@@ -75,7 +75,7 @@ class CategoryDetails {
           ? Sale.jsonToList(categoryDetailsMap[AppResponseKeys.sales])
           : [],
       purchases: categoryDetailsMap.containsKey(AppResponseKeys.purchases)
-          ? Purchase.jsonToList(categoryDetailsMap  [AppResponseKeys.purchases])
+          ? Purchase.jsonToList(categoryDetailsMap[AppResponseKeys.purchases])
           : [],
 
     );

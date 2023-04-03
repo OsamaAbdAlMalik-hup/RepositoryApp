@@ -64,7 +64,7 @@ class SupplierDetailsController extends GetxController {
         request: () async {
           return await suppliersController.suppliersApiController.meetDebtSupplier(
               id: supplier.id,
-              payment: double.parse(suppliersController.mainController.amountFieldController.text)
+              payment: double.parse(suppliersController.mainController.totalPriceFieldController.text)
           );
         },
         onSuccess: (response) async {
@@ -124,63 +124,66 @@ class SupplierDetailsController extends GetxController {
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showMainBottomSheet(context,
-              height: Get.height,
+          HelperDesignFunctions.showAlertDialog(context,
+              hasButtonsAction: false,
               title: "Registers",
-              content: SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: registers.length,
-                  itemBuilder: (context, index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      extentRatio: 0.25,
-                      children: [
-                        SlidableAction(
-                          onPressed: (c) async {
-                            await deleteSupplierRegister(registerId: registers[index].id);
-                          },
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          backgroundColor: AppColors.red,
-                          icon: Icons.delete_outlined,
+              children:[
+                SlidableAutoCloseBehavior(
+                  closeWhenOpened: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: registers.length,
+                    itemBuilder: (context, index) => Slidable(
+                      startActionPane: ActionPane(
+                        motion: const StretchMotion(),
+                        extentRatio: 0.25,
+                        children: [
+                          SlidableAction(
+                            onPressed: (c) async {
+                              await deleteSupplierRegister(registerId: registers[index].id);
+                            },
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            backgroundColor: AppColors.danger50,
+                            icon: Icons.delete_outlined,
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              const Icon(Icons.person),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].userName),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.date_range),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].date),
+                            ],
+                          ),
+                          trailing: registers[index].typeOperation == "edit"
+                              ? const Icon(Icons.edit)
+                              : registers[index].typeOperation == "add_to_archive"
+                              ? const Icon(Icons.archive_outlined)
+                              : registers[index].typeOperation == "remove_to_archive"
+                              ? const Icon(Icons.unarchive_outlined)
+                              : registers[index].typeOperation == "meet_debt"
+                              ? const Icon(Icons.account_balance_wallet_outlined)
+                              : const Icon(Icons.add),
                         ),
-                      ],
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].userName),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].date),
-                          ],
-                        ),
-                        trailing: registers[index].typeOperation == "edit"
-                            ? const Icon(Icons.edit)
-                            : registers[index].typeOperation == "add_to_archive"
-                            ? const Icon(Icons.archive_outlined)
-                            : registers[index].typeOperation == "remove_to_archive"
-                            ? const Icon(Icons.unarchive_outlined)
-                            : registers[index].typeOperation == "meet_debt"
-                            ? const Icon(Icons.account_balance_wallet_outlined)
-                            : const Icon(Icons.add),
                       ),
                     ),
                   ),
-                ),
-              ));
+                )
+              ]
+          );
         }
         statusView = StatusView.none;
         update();

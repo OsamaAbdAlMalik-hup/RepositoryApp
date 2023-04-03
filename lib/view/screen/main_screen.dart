@@ -68,350 +68,339 @@ class MainScreen extends GetView<MainController> {
               visible: !controller.isSearchMode,
               child: IconButton(
                 onPressed: () {
-                  HelperDesignFunctions.showAwesomeDialog(context,
-                      body: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                  HelperDesignFunctions.showAlertDialog(context,
+                      title: "Shortcut Creation",
+                      hasButtonsAction: false,
+                      children: [
+                        GridView(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              childAspectRatio: 1,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 30
+                          ),
                           children: [
-                            Text(
-                              "Shortcut Creation",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const Divider(
-                              thickness: 2,
-                              height: 20,
-                            ),
-                            GridView(
-                              padding: const EdgeInsets.symmetric(vertical: 15),
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 1.1,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 30
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async {
+                                Get.back();
+                                controller.showSheetCreateCacheMoney(context, isPush: true);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        SvgPicture.asset(
+                                          AppAssets.moneyIconSvg,
+                                          height: 30,
+                                          color: AppColors.primary60,
+                                        ),
+                                        const Positioned(
+                                            left: -15,
+                                            child: Icon(
+                                              Icons.arrow_forward,
+                                              color: AppColors.primary60,
+                                              size: 20,
+                                            )),
+                                      ],
+                                    ),
+                                    const Text(
+                                      "Push",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
                               ),
-                              children: [
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async {
-                                    Get.back();
-                                    controller.showSheetCreateCacheMoney(context, isPush: true);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            SvgPicture.asset(
-                                              AppAssets.moneyIconSvg,
-                                              height: 30,
-                                              color: AppColors.primary60,
-                                            ),
-                                            const Positioned(
-                                                left: -15,
-                                                child: Icon(
-                                                  Icons.arrow_forward,
-                                                  color: AppColors.primary60,
-                                                  size: 20,
-                                                )),
-                                          ],
-                                        ),
-                                        const Text(
-                                          "Push",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async {
-                                    Get.back();
-                                    controller.showSheetCreateCacheMoney(context, isPush: false);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Stack(
-                                          clipBehavior: Clip.none,
-                                          children: [
-                                            SvgPicture.asset(
-                                              AppAssets.moneyIconSvg,
-                                              height: 30,
-                                              color: AppColors.primary60,
-                                            ),
-                                            const Positioned(
-                                                left: -15,
-                                                child: Icon(
-                                                  Icons.arrow_back,
-                                                  color: AppColors.primary60,
-                                                  size: 20,
-                                                )),
-                                          ],
-                                        ),
-                                        const Text(
-                                          "Pull",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    controller.showSheetCreateExpense(context);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: const [
-                                        Icon(
-                                          Icons.clean_hands,
-                                          color: AppColors.primary60,
-                                          size: 30,
-                                        ),
-                                        Text(
-                                          "Expense",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.toNamed(
-                                        AppPagesRoutes
-                                            .operationOnInvoiceScreen,
-                                        arguments: {
-                                          AppSharedKeys.passInvoiceType: InvoiceType.sales,
-                                          AppSharedKeys.passOperationType: OperationType.create
-                                        });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.invoiceIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Sales",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    Get.toNamed(
-                                        AppPagesRoutes
-                                            .operationOnInvoiceScreen,
-                                        arguments: {
-                                          AppSharedKeys.passInvoiceType: InvoiceType.purchases,
-                                          AppSharedKeys.passOperationType: OperationType.create
-                                        });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.invoiceIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Purchase",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    controller.showDialogCreateCategory(context);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.categoriesIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Category",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    controller.showSheetCreateProduct(context);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.productsIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Product",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    controller.showSheetCreateClientOrSupplier(context,isClient: true);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.clientsIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Client",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () async{
-                                    Get.back();
-                                    controller.showSheetCreateClientOrSupplier(context,isClient: false);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(width: 1,color: AppColors.primary90)
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SvgPicture.asset(
-                                          height: 30,
-                                          AppAssets.suppliersIconSvg,
-                                          color: AppColors.primary60,
-                                        ),
-                                        const Text(
-                                          "Supplier",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: AppColors.primary90),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
-
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async {
+                                Get.back();
+                                controller.showSheetCreateCacheMoney(context, isPush: false);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        SvgPicture.asset(
+                                          AppAssets.moneyIconSvg,
+                                          height: 30,
+                                          color: AppColors.primary60,
+                                        ),
+                                        const Positioned(
+                                            left: -15,
+                                            child: Icon(
+                                              Icons.arrow_back,
+                                              color: AppColors.primary60,
+                                              size: 20,
+                                            )),
+                                      ],
+                                    ),
+                                    const Text(
+                                      "Pull",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                controller.showSheetCreateExpense(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: const [
+                                    Icon(
+                                      Icons.clean_hands,
+                                      color: AppColors.primary60,
+                                      size: 30,
+                                    ),
+                                    Text(
+                                      "Expense",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                Get.toNamed(
+                                    AppPagesRoutes
+                                        .operationOnInvoiceScreen,
+                                    arguments: {
+                                      AppSharedKeys.passInvoiceType: InvoiceType.sales,
+                                      AppSharedKeys.passOperationType: OperationType.create
+                                    });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.invoiceIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Sales",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                Get.toNamed(
+                                    AppPagesRoutes
+                                        .operationOnInvoiceScreen,
+                                    arguments: {
+                                      AppSharedKeys.passInvoiceType: InvoiceType.purchases,
+                                      AppSharedKeys.passOperationType: OperationType.create
+                                    });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.invoiceIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Purchase",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                controller.showDialogCreateCategory(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.categoriesIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Category",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                controller.showSheetCreateProduct(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.productsIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Product",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                controller.showSheetCreateClientOrSupplier(context,isClient: true);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.clientsIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Client",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () async{
+                                Get.back();
+                                controller.showSheetCreateClientOrSupplier(context,isClient: false);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(width: 1,color: AppColors.primary90)
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SvgPicture.asset(
+                                      height: 30,
+                                      AppAssets.suppliersIconSvg,
+                                      color: AppColors.primary60,
+                                    ),
+                                    const Text(
+                                      "Supplier",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.primary90),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
-                        ),
-                      ));
+                        )
+                      ]
+                  );
                 },
                 icon: const Icon(
                   Icons.add,
@@ -445,14 +434,7 @@ class MainScreen extends GetView<MainController> {
             if(canExit) {
               return true;
             } else {
-              Get.snackbar('Not', "Click back again to Exit",
-                  icon: const Icon(
-                    Icons.done,
-                    color: AppColors.white,
-                  ),
-                  colorText: AppColors.black,
-                  snackPosition: SnackPosition.BOTTOM,
-                  animationDuration: const Duration(seconds: 1));
+              HelperDesignFunctions.showInfoSnackBar(message: "Click back again to Exit");
               return false;
             }
           },

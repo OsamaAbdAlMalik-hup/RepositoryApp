@@ -34,9 +34,8 @@ class InvoiceDetailsController extends GetxController {
   Future<bool> getInvoice() async {
     if (invoiceType == InvoiceType.sales) {
       statusView = StatusView.loading;
-        update();
-    return await ApiService.sendRequest(
-
+      update();
+      return await ApiService.sendRequest(
         request: () async {
           return invoicesController.isArchived
               ? await invoicesController.invoicesApiController
@@ -48,14 +47,13 @@ class InvoiceDetailsController extends GetxController {
           if (response is SaleInvoice) {
             saleInvoice = response;
             isPurchase = false;
-
           }
           statusView = StatusView.none;
           update();
         },
-        onFailure: (statusView,message) async {
+        onFailure: (statusView, message) async {
           this.statusView = statusView;
-          if(statusView==StatusView.none) {
+          if (statusView == StatusView.none) {
             HelperDesignFunctions.showErrorSnackBar(message: message.text);
           }
           update();
@@ -63,11 +61,13 @@ class InvoiceDetailsController extends GetxController {
       );
     }
     statusView = StatusView.loading;
-        update();
+    update();
     return await ApiService.sendRequest(
-
       request: () async {
-        return await invoicesController.invoicesApiController
+        return invoicesController.isArchived
+             ? await invoicesController.invoicesApiController
+            .getPurchasesInvoiceArchive(id: invoiceId)
+            : await invoicesController.invoicesApiController
             .getPurchasesInvoice(id: invoiceId);
       },
       onSuccess: (response) async {
@@ -78,46 +78,42 @@ class InvoiceDetailsController extends GetxController {
         statusView = StatusView.none;
         update();
       },
-
-      onFailure: (statusView,message) async {
-          this.statusView = statusView;
-          if(statusView==StatusView.none) {
-            HelperDesignFunctions.showErrorSnackBar(message: message.text);
-          }
-          update();
-        },
+      onFailure: (statusView, message) async {
+        this.statusView = statusView;
+        if (statusView == StatusView.none) {
+          HelperDesignFunctions.showErrorSnackBar(message: message.text);
+        }
+        update();
+      },
     );
   }
 
   Future<bool> meetDebtInvoice() async {
-    if (invoicesController.mainController.formKeyMeetDebt.currentState!
-        .validate()) {
+    if (invoicesController.mainController.formKeyMeetDebt.currentState!.validate()) {
       statusView = StatusView.loading;
-        update();
-    return await ApiService.sendRequest(
-
+      update();
+      return await ApiService.sendRequest(
         request: () async {
           return invoiceType == InvoiceType.sales
               ? await invoicesController.invoicesApiController
                   .meetDebtSalesInvoice(
                       id: invoiceId,
                       payment: double.parse(invoicesController
-                          .mainController.amountFieldController.text))
+                          .mainController.totalPriceFieldController.text))
               : await invoicesController.invoicesApiController
                   .meetDebtPurchasesInvoice(
                       id: invoiceId,
                       payment: double.parse(invoicesController
-                          .mainController.amountFieldController.text));
+                          .mainController.totalPriceFieldController.text));
         },
         onSuccess: (response) async {
           HelperDesignFunctions.showSuccessSnackBar(
               message: "done meet his debts");
           await getInvoice();
         },
-
-        onFailure: (statusView,message) async {
+        onFailure: (statusView, message) async {
           this.statusView = statusView;
-          if(statusView==StatusView.none) {
+          if (statusView == StatusView.none) {
             HelperDesignFunctions.showErrorSnackBar(message: message.text);
           }
           update();
@@ -126,11 +122,11 @@ class InvoiceDetailsController extends GetxController {
     }
     return false;
   }
+
   Future<bool> getInvoiceRegisters({required BuildContext context}) async {
     statusView = StatusView.loading;
-        update();
+    update();
     return await ApiService.sendRequest(
-
       request: () async {
         return invoiceType == InvoiceType.sales
             ? await invoicesController.invoicesApiController
@@ -141,82 +137,85 @@ class InvoiceDetailsController extends GetxController {
       onSuccess: (response) async {
         if (response is List<Register>) {
           registers = response;
-          HelperDesignFunctions.showMainBottomSheet(context,
-              height: Get.height,
+          HelperDesignFunctions.showAlertDialog(context,
+              hasButtonsAction: false,
               title: "Registers",
-              content: SlidableAutoCloseBehavior(
-                closeWhenOpened: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: registers.length,
-                  itemBuilder: (context, index) => Slidable(
-                    startActionPane: ActionPane(
-                      motion: const StretchMotion(),
-                      extentRatio: 0.25,
-                      children: [
-                        SlidableAction(
-                          onPressed: (c) async {
-                            await deleteInvoiceRegister(
-                                registerId: registers[index].id);
-                          },
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          backgroundColor: AppColors.red,
-                          icon: Icons.delete_outlined,
+              children:[
+                SlidableAutoCloseBehavior(
+                  closeWhenOpened: true,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: registers.length,
+                    itemBuilder: (context, index) => Slidable(
+                      startActionPane: ActionPane(
+                        motion: const StretchMotion(),
+                        extentRatio: 0.25,
+                        children: [
+                          SlidableAction(
+                            onPressed: (c) async {
+                              await deleteInvoiceRegister(
+                                  registerId: registers[index].id);
+                            },
+                            borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                            backgroundColor: AppColors.danger50,
+                            icon: Icons.delete_outlined,
+                          ),
+                        ],
+                      ),
+                      child: Card(
+                        child: ListTile(
+                          title: Row(
+                            children: [
+                              const Icon(Icons.person),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].userName),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.date_range),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(registers[index].date),
+                            ],
+                          ),
+                          trailing: registers[index].typeOperation == "edit"
+                              ? const Icon(Icons.edit)
+                              : registers[index].typeOperation == "add_to_archive"
+                              ? const Icon(Icons.archive_outlined)
+                              : registers[index].typeOperation ==
+                              "remove_to_archive"
+                              ? const Icon(Icons.unarchive_outlined)
+                              : registers[index].typeOperation ==
+                              "meet_debt"
+                              ? const Icon(Icons
+                              .account_balance_wallet_outlined)
+                              : const Icon(Icons.add),
                         ),
-                      ],
-                    ),
-                    child: Card(
-                      child: ListTile(
-                        title: Row(
-                          children: [
-                            const Icon(Icons.person),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].userName),
-                          ],
-                        ),
-                        subtitle: Row(
-                          children: [
-                            const Icon(Icons.date_range),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(registers[index].date),
-                          ],
-                        ),
-                        trailing: registers[index].typeOperation == "edit"
-                            ? const Icon(Icons.edit)
-                            : registers[index].typeOperation == "add_to_archive"
-                                ? const Icon(Icons.archive_outlined)
-                                : registers[index].typeOperation ==
-                                        "remove_to_archive"
-                                    ? const Icon(Icons.unarchive_outlined)
-                                    : registers[index].typeOperation ==
-                                            "meet_debt"
-                                        ? const Icon(Icons
-                                            .account_balance_wallet_outlined)
-                                        : const Icon(Icons.add),
                       ),
                     ),
                   ),
-                ),
-              ));
+                )
+              ]
+          );
         }
         statusView = StatusView.none;
         update();
       },
-
-      onFailure: (statusView,message) async {
-          this.statusView = statusView;
-          if(statusView==StatusView.none) {
-            HelperDesignFunctions.showErrorSnackBar(message: message.text);
-          }
-          update();
-        },
+      onFailure: (statusView, message) async {
+        this.statusView = statusView;
+        if (statusView == StatusView.none) {
+          HelperDesignFunctions.showErrorSnackBar(message: message.text);
+        }
+        update();
+      },
     );
   }
+
   Future<bool> deleteInvoiceRegister({required int registerId}) async {
     statusView = StatusView.loading;
     update();
@@ -233,14 +232,13 @@ class InvoiceDetailsController extends GetxController {
         statusView = StatusView.none;
         update();
       },
-
-      onFailure: (statusView,message) async {
-          this.statusView = statusView;
-          if(statusView==StatusView.none) {
-            HelperDesignFunctions.showErrorSnackBar(message: message.text);
-          }
-          update();
-        },
+      onFailure: (statusView, message) async {
+        this.statusView = statusView;
+        if (statusView == StatusView.none) {
+          HelperDesignFunctions.showErrorSnackBar(message: message.text);
+        }
+        update();
+      },
     );
   }
 }

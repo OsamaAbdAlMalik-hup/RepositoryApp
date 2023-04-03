@@ -149,34 +149,13 @@ class DrawerContentHome extends GetView<MainController> {
                                     focusColor: AppColors.primary30,
                                     tileColor: AppColors.primary50,
                                     onTap: () {
-                                      HelperDesignFunctions.showAwesomeDialog(context,
+                                      HelperDesignFunctions.showAlertDialog(context,
                                           btnOkOnPress: () async {
                                             await controller.registrationController.loginWithToken(newAccount: controller.registrationController.myAccounts[index]);
                                             controller.update();
                                           },
-                                          btnCancelOnPress: () {},
-                                          body: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Form(
-                                              key: controller.formKeyUpdateProfileDebt,
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    "Switch Account",
-                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                  ),
-                                                  const Divider(
-                                                    thickness: 2,
-                                                    height: 20,
-                                                  ),
-                                                  Text(
-                                                    "Are you login by: ${controller.registrationController.myAccounts[index].name}",
-                                                    style: Theme.of(context).textTheme.bodyMedium,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
+                                          title: "Switch Account",
+                                          subTitle: "Are you login by: ${controller.registrationController.myAccounts[index].name}",
                                       );
                                     },
                                     title: Text(
@@ -250,34 +229,13 @@ class DrawerContentHome extends GetView<MainController> {
                 ...List.generate(controller.registrationController.myRepositories.length,
                       (index) => ListTile(
                   onTap: () {
-                    HelperDesignFunctions.showAwesomeDialog(context,
+                    HelperDesignFunctions.showAlertDialog(context,
                         btnOkOnPress: () async {
                           await controller.registrationController.switchRepo(newRepository: controller.registrationController.myRepositories[index]);
                           controller.update();
                         },
-                        btnCancelOnPress: () {},
-                        body: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Form(
-                            key: controller.formKeyUpdateProfileDebt,
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Switch Repository",
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const Divider(
-                                  thickness: 2,
-                                  height: 20,
-                                ),
-                                Text(
-                                  "Are you switch to: ${controller.registrationController.myRepositories[index].name}",
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
+                        title: "Switch Repository",
+                        subTitle: "Are you switch to: ${controller.registrationController.myRepositories[index].name}",
                     );
                   },
                   title: Text(
@@ -390,7 +348,7 @@ class DrawerContentHome extends GetView<MainController> {
                     child: SvgPicture.asset(
                       AppAssets.invoiceIconSvg,
                       height: 25,
-                      color: AppColors.primaryAccent,
+                      color: AppColors.primary40,
                     ),
                   ),
                   onTap: () {
@@ -408,7 +366,7 @@ class DrawerContentHome extends GetView<MainController> {
                   leading: SvgPicture.asset(
                     AppAssets.clientsIconSvg,
                     height: 25,
-                    color: AppColors.primaryAccent,
+                    color: AppColors.primary40,
                   ),
                   onTap: () {
                     Get.toNamed(AppPagesRoutes.clientsScreen, arguments: {
@@ -424,7 +382,7 @@ class DrawerContentHome extends GetView<MainController> {
                   leading: SvgPicture.asset(
                     AppAssets.suppliersIconSvg,
                     height: 25,
-                    color: AppColors.primaryAccent,
+                    color: AppColors.primary40,
                   ),
                   onTap: () {
                     Get.toNamed(AppPagesRoutes.suppliersScreen, arguments: {
@@ -468,33 +426,12 @@ class DrawerContentHome extends GetView<MainController> {
               title: Text('Logout', style: Theme.of(context).textTheme.bodyLarge),
               leading: const Icon(Icons.exit_to_app),
               onTap: () async {
-                HelperDesignFunctions.showAwesomeDialog(context,
+                HelperDesignFunctions.showAlertDialog(context,
                     btnOkOnPress: () async {
                       await controller.registrationController.logout();
                     },
-                    btnCancelOnPress: () {},
-                    body: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Form(
-                        key: controller.formKeyUpdateProfileDebt,
-                        child: Column(
-                          children: [
-                            Text(
-                              "Logout",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const Divider(
-                              thickness: 2,
-                              height: 20,
-                            ),
-                            Text(
-                              "Are you sure remove the account : ${RegistrationController.currentUser.name}",
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                    title: "Logout",
+                    subTitle: "Are you sure remove the account : ${RegistrationController.currentUser.name}",
                 );
               },
             ),
@@ -511,7 +448,7 @@ class DrawerContentHome extends GetView<MainController> {
   void showDialogUpdateProfile(BuildContext context) {
     controller.clearFields();
     controller.nameFieldController.text=RegistrationController.currentUser.name;
-    HelperDesignFunctions.showAwesomeDialog(context,
+    HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
           if(controller.formKeyUpdateProfileDebt.currentState!.validate()){
             controller.profileStatusView=StatusView.loading;
@@ -528,81 +465,73 @@ class DrawerContentHome extends GetView<MainController> {
             HelperDesignFunctions.showErrorSnackBar(message: "the name can't be empty ");
           }
         },
-        btnCancelOnPress: () {},
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: controller.formKeyUpdateProfileDebt,
-            child: Column(
-              children: [
-                Text(
-                  "Update Your Profile",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Divider(
-                  thickness: 2,
-                  height: 20,
-                ),
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    GetBuilder<MainController>(
-                      builder: (controller) => CircleAvatar(
-                        radius: 52,
-                        backgroundColor: AppColors.primary60,
-                        child: CircleAvatar(
-                          backgroundImage: controller.image != null
-                              ? FileImage(controller.image!)
-                              : RegistrationController.currentUser.photo!=''
-                              ? FileImage(File(RegistrationController.currentUser.photo))
-                              : null,
-                          radius: 50,
-                          backgroundColor: AppColors.primary5,
-                          child: controller.image == null && RegistrationController.currentUser.photo==''
-                              ? Image.asset(
-                            AppAssets.person,
-                          )
-                              : null,
+      title: "Update Your Profile",
+      children: [
+        Form(
+          key: controller.formKeyUpdateProfileDebt,
+          child: Column(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  GetBuilder<MainController>(
+                    builder: (controller) => CircleAvatar(
+                      radius: 52,
+                      backgroundColor: AppColors.primary60,
+                      child: CircleAvatar(
+                        backgroundImage: controller.image != null
+                            ? FileImage(controller.image!)
+                            : RegistrationController.currentUser.photo!=''
+                            ? FileImage(File(RegistrationController.currentUser.photo))
+                            : null,
+                        radius: 50,
+                        backgroundColor: AppColors.primary5,
+                        child: controller.image == null && RegistrationController.currentUser.photo==''
+                            ? Image.asset(
+                          AppAssets.person,
+                        )
+                            : null,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -10,
+                    right: -10,
+                    child: InkWell(
+                      onTap: () async {
+                        controller.image = await HelperLogicFunctions.pickImage(
+                            ImageSource.gallery);
+                        controller.update();
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primary10,
+                        child: Icon(
+                          Icons.camera,
+                          color: AppColors.black,
                         ),
                       ),
                     ),
-                    Positioned(
-                      bottom: -10,
-                      right: -10,
-                      child: InkWell(
-                        onTap: () async {
-                          controller.image = await HelperLogicFunctions.pickImage(
-                              ImageSource.gallery);
-                          controller.update();
-                        },
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: AppColors.primary10,
-                          child: Icon(
-                            Icons.camera,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
+                  )
+                ],
+              ),
+              const SizedBox(height: 25),
+              TextFormField(
+                decoration: const InputDecoration(
+                  label: Text("Name"),
+                  hintText: 'Enter your name',
                 ),
-                const SizedBox(height: 25),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    label: Text("Name"),
-                    hintText: 'Enter your name',
-                  ),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  controller: controller.nameFieldController,
-                  validator: (text) {
-                    return Validate.valid(text!);
-                  },
-                )
-              ],
-            ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                controller: controller.nameFieldController,
+                validator: (text) {
+                  return Validate.valid(text!);
+                },
+              )
+            ],
           ),
-        ));
+        )
+      ]
+    );
   }
 
 }
