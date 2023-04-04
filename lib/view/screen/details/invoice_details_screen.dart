@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:repository/controller/screens/details/invoice_details_controller.dart';
 import 'package:repository/core/constant/app_assets.dart';
 import 'package:repository/core/constant/app_colors.dart';
@@ -8,7 +8,7 @@ import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/view/widget/shared/handle_request.dart';
-import 'package:repository/view/widget/shared/title_section.dart';
+import 'package:repository/view/widget/shared/text_icon.dart';
 
 class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
   const InvoiceDetailsScreen({Key? key}) : super(key: key);
@@ -17,471 +17,441 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
   Widget build(BuildContext context) {
     return GetBuilder<InvoiceDetailsController>(
       builder: (controller) => Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "${controller.isPurchase ? 'Purchases' : "Sales"} invoice",
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {
-                controller.invoicesController.mainController.showDialogMeetDebt(
-                    context,
-                    controller.invoiceType == InvoiceType.purchases
-                        ? controller.purchasesInvoice.remained
-                        : controller.saleInvoice.remained,
-                    controller.meetDebtInvoice);
-              },
-              icon: const Icon(
-                Icons.account_balance_wallet_outlined,
-              ),
-            ),
-            PopupMenuButton<OperationType>(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              tooltip: "Operation",
-              onSelected: (value) async {
-                switch (value) {
-                  case OperationType.update:
-                    {
-                      Get.toNamed(AppPagesRoutes.operationOnInvoiceScreen,
-                          arguments: {
-                            AppSharedKeys.passInvoiceType:
-                                controller.invoiceType,
-                            AppSharedKeys.passOperationType:
-                                OperationType.update,
-                            AppSharedKeys.passId:
-                                controller.invoiceType == InvoiceType.sales
-                                    ? controller.saleInvoice.id
-                                    : controller.purchasesInvoice.id,
-                          });
-                      break;
-                    }
-                  case OperationType.delete:
-                    {
-                      controller.invoicesController.showDialogDeleteInvoice(
-                        context,
-                        invoice: controller.invoiceType == InvoiceType.sales
-                            ? controller.saleInvoice
-                            : controller.purchasesInvoice,
-                        invoiceType: controller.invoiceType,
-                        onSuccess: () async {
-                          Get.back();
-                        },
-                      );
-                      break;
-                    }
-                  case OperationType.archive:
-                    {
-                      await controller.invoicesController.archiveInvoice(
-                          invoice:
-                              controller.invoiceType == InvoiceType.purchases
-                                  ? controller.purchasesInvoice
-                                  : controller.saleInvoice,
-                          invoiceType: controller.invoiceType,
-                          onSuccess: () {
-                            Get.back();
-
-                          },
-                      );
-                      break;
-                    }
-                  case OperationType.registers:
-                  default:
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<OperationType>(
-                  value: OperationType.update,
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.edit_outlined,
-                        color: AppColors.success50,
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text('Edit'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<OperationType>(
-                    value: OperationType.archive,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.archive_outlined,
-                          color: AppColors.primary60,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Archive'),
-                      ],
-                    )),
-                PopupMenuItem<OperationType>(
-                    value: OperationType.delete,
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.delete_outlined,
-                          color: AppColors.danger50,
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Text('Delete'),
-                      ],
-                    )),
-              ],
-            )
-          ],
-        ),
         body: HandleRequest(
           statusView: controller.statusView,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Row(
+          child: SafeArea(
+            child: NestedScrollView(
+              floatHeaderSlivers: true,
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxIsScrolled) => [
+                SliverAppBar(
+                  expandedHeight: 0.35 * Get.height,
+                  pinned: true,
+                  floating: true,
+                  primary: true,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    collapseMode: CollapseMode.pin,
+                    stretchModes: const [
+                      StretchMode.zoomBackground,
+                    ],
+                    background: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        const SizedBox(
+                          height: kToolbarHeight,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: AppColors.primary0,
+                            boxShadow: const [
+                              BoxShadow(
+                                  offset: Offset(0, 1),
+                                  spreadRadius: 0,
+                                  blurRadius: 1,
+                                  color: AppColors.gray)
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                "# ${controller.isPurchase ? controller.purchasesInvoice.number : controller.saleInvoice.number}",
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.person,
+                                    color: AppColors.primary50,
+                                    size: 18,
+                                  ),
+                                  Text(
+                                    ' ${controller.isPurchase ? controller.purchasesInvoice.supplierName : controller.saleInvoice.clientName}',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.gray,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.date_range,
+                                    color: AppColors.primary50,
+                                    size: 18,
+                                  ),
+                                  Text(
+                                    ' ${controller.isPurchase ? controller.purchasesInvoice.date : controller.saleInvoice.date}',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.gray,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Total: ",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice : controller.saleInvoice.totalPrice}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Paid: ",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.paid : controller.saleInvoice.paid}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Debt: ",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remained}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    Expanded(
+                      child: Container(
+                        color: AppColors.primary0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      Get.back();
+                                    },
+                                    icon: const Icon(Icons.arrow_back)),
+                                Text(
+                                  "${controller.isPurchase ? 'Purchases' : "Sales"} invoice",
+                                  style: GoogleFonts.oswald(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1,
+                                    color: AppColors.primary70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    controller.invoicesController.mainController
+                                        .showDialogMeetDebt(
+                                            context,
+                                            controller.invoiceType ==
+                                                    InvoiceType.purchases
+                                                ? controller
+                                                    .purchasesInvoice.remained
+                                                : controller
+                                                    .saleInvoice.remained,
+                                            controller.meetDebtInvoice);
+                                  },
+                                  icon: const Icon(
+                                    Icons.account_balance_wallet_outlined,
+                                  ),
+                                ),
+                                PopupMenuButton<OperationType>(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  tooltip: "Operation",
+                                  onSelected: (value) async {
+                                    switch (value) {
+                                      case OperationType.update:
+                                        {
+                                          Get.toNamed(
+                                              AppPagesRoutes
+                                                  .operationOnInvoiceScreen,
+                                              arguments: {
+                                                AppSharedKeys.passInvoiceType:
+                                                    controller.invoiceType,
+                                                AppSharedKeys.passOperationType:
+                                                    OperationType.update,
+                                                AppSharedKeys.passId: controller
+                                                            .invoiceType ==
+                                                        InvoiceType.sales
+                                                    ? controller.saleInvoice.id
+                                                    : controller
+                                                        .purchasesInvoice.id,
+                                              });
+                                          break;
+                                        }
+                                      case OperationType.delete:
+                                        {
+                                          controller.invoicesController
+                                              .showDialogDeleteInvoice(
+                                            context,
+                                            invoice: controller.invoiceType ==
+                                                    InvoiceType.sales
+                                                ? controller.saleInvoice
+                                                : controller.purchasesInvoice,
+                                            invoiceType: controller.invoiceType,
+                                            onSuccess: () async {
+                                              Get.back();
+                                            },
+                                          );
+                                          break;
+                                        }
+                                      case OperationType.archive:
+                                        {
+                                          await controller.invoicesController
+                                              .archiveInvoice(
+                                            invoice: controller.invoiceType ==
+                                                    InvoiceType.purchases
+                                                ? controller.purchasesInvoice
+                                                : controller.saleInvoice,
+                                            invoiceType: controller.invoiceType,
+                                            onSuccess: () {
+                                              Get.back();
+                                            },
+                                          );
+                                          break;
+                                        }
+                                      case OperationType.registers:
+                                      default:
+                                        break;
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem<OperationType>(
+                                      value: OperationType.update,
+                                      child: Row(
+                                        children: const [
+                                          Icon(
+                                            Icons.edit_outlined,
+                                            color: AppColors.success50,
+                                          ),
+                                          SizedBox(
+                                            width: 15,
+                                          ),
+                                          Text('Edit'),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuItem<OperationType>(
+                                        value: OperationType.archive,
+                                        child: Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.archive_outlined,
+                                              color: AppColors.primary60,
+                                            ),
+                                            SizedBox(
+                                              width: 15,
+                                            ),
+                                            Text('Archive'),
+                                          ],
+                                        )),
+                                    PopupMenuItem<OperationType>(
+                                        value: OperationType.delete,
+                                        child: Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.delete_outlined,
+                                              color: AppColors.danger50,
+                                            ),
+                                            SizedBox(
+                                              width: 15,
+                                            ),
+                                            Text('Delete'),
+                                          ],
+                                        )),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+              body: Container(
+                margin: const EdgeInsets.only(top: 50),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                        flex: 1,
-                        child: CircleAvatar(
-                          backgroundColor: AppColors.primary50,
-                          radius: 55,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: AppColors.primary0,
-                            child: SvgPicture.asset(
-                              AppAssets.invoiceIconSvg,
-                              height: 60,
-                              color: AppColors.primary50,
-                              width: 60,
-                            ),
-                          ),
-                        )),
-                    const SizedBox(
-                      width: 10,
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5, left: 15),
+                      child: Text(controller.isPurchase ? 'Purchases' : 'Sales',
+                          style: Theme.of(context).textTheme.titleLarge),
                     ),
-                    Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "# ${controller.isPurchase ? controller.purchasesInvoice.number : controller.saleInvoice.number}",
-                              style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.person,
-                                  color: AppColors.primary50,
-                                  size: 18,
-                                ),
-                                Text(
-                                  ' ${controller.isPurchase ? controller.purchasesInvoice.supplierName : controller.saleInvoice.clientName}',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.gray,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.date_range,
-                                  color: AppColors.primary50,
-                                  size: 18,
-                                ),
-                                Text(
-                                  ' ${controller.isPurchase ? controller.purchasesInvoice.date : controller.saleInvoice.date}',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.gray,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              IntrinsicHeight(
-                child: Row(
-                  children: [
-                    Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Expanded(
-                                child: Text(
-                              ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice : controller.saleInvoice.totalPrice} \$',
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            )),
-                            const Text(
-                              "Total",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.gray,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        )),
-                    const VerticalDivider(
-                      width: 5,
-                      color: AppColors.black,
-                      thickness: 1,
-                    ),
-                    Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Expanded(
-                                child: Text(
-                              ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice - controller.purchasesInvoice.remained : controller.saleInvoice.totalPrice - controller.saleInvoice.remained} \$',
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            )),
-                            const Text(
-                              "Paid",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.gray,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        )),
-                    const VerticalDivider(
-                      width: 5,
-                      color: AppColors.black,
-                      thickness: 1,
-                    ),
-                    Expanded(
-                        flex: 1,
-                        child: Column(
-                          children: [
-                            Expanded(
-                                child: Text(
-                              ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remained} \$',
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            )),
-                            const Text(
-                              "Debt",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.gray,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        )),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              const Divider(
-                thickness: 2,
-                height: 20,
-              ),
-              TitleSection(
-                title: controller.isPurchase ? 'Purchases' : 'Sales',
-              ),
-              SizedBox(
-                height: 0.01 * Get.height,
-              ),
-              Scrollbar(
-                child: SingleChildScrollView(
-                  child: Table(
-                    border: TableBorder.all(
-                        width: 2,
-                        borderRadius: BorderRadius.circular(10),
-                        color: AppColors.primary30),
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    columnWidths: const {
-                      0: FractionColumnWidth(0.25),
-                      1: FractionColumnWidth(0.2),
-                      2: FractionColumnWidth(0.25),
-                      3: FractionColumnWidth(0.3),
-                    },
-                    children: [
-                      TableRow(
-                          decoration: BoxDecoration(
-                            color: AppColors.black90,
-                            borderRadius: BorderRadius.vertical(
-                              top: const Radius.circular(15),
-                              bottom: controller.isEmpty
-                                  ? const Radius.circular(15)
-                                  : const Radius.circular(0),
-                            ),
-                          ),
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "Name",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: AppColors.primary30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "Count",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: AppColors.primary30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                controller.isPurchase
-                                    ? 'Purchase Price'
-                                    : 'Sales Price',
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    color: AppColors.primary30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "Total",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: AppColors.primary30,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ]),
-                      ...List.generate(
-                          controller.isPurchase
-                              ? controller
-                                  .purchasesInvoice.details.purchases.length
-                              : controller.saleInvoice.details.sales.length,
-                          (index) => TableRow(
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary0,
-                                  ),
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        Get.toNamed(
-                                            AppPagesRoutes.productDetailsScreen,
-                                            arguments: {
-                                              AppSharedKeys.passId:
-                                                  controller.isPurchase
-                                                      ? controller
-                                                          .purchasesInvoice
-                                                          .details
-                                                          .purchases[index]
-                                                          .productId
-                                                      : controller
-                                                          .saleInvoice
-                                                          .details
-                                                          .sales[index]
-                                                          .productId,
-                                            });
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              AppColors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(0),
+                    (controller.isPurchase && controller.purchasesInvoice.details.purchases.isNotEmpty)
+                    ||(!controller.isPurchase && controller.saleInvoice.details.sales.isNotEmpty)
+                        ? ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            shrinkWrap: true,
+                            itemCount: controller.isPurchase
+                                ? controller.purchasesInvoice.details.purchases.length
+                            : controller.saleInvoice.details.sales.length,
+                            itemBuilder: (context, index) => Card(
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(15),
+                                onTap: () {
+                                  Get.toNamed(
+                                      AppPagesRoutes.productDetailsScreen,
+                                      arguments: {
+                                        AppSharedKeys.passId: controller.isPurchase
+                                              ?controller.purchasesInvoice.details.purchases[index].productId
+                                            :controller.saleInvoice.details.sales[index].productId
+                                      });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            controller.isPurchase
+                                                ?controller.purchasesInvoice.details.purchases[index].productName
+                                              :controller.saleInvoice.details.sales[index].productName,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .copyWith(
+                                                    fontSize: 22,
+                                                    letterSpacing: 1),
                                           ),
-                                          elevation: 0,
-                                          fixedSize: const Size(60, 15)),
-                                      child: Text(
-                                        controller.isPurchase
-                                            ? controller
-                                                .purchasesInvoice
-                                                .details
-                                                .purchases[index]
-                                                .productName
-                                            : controller.saleInvoice.details
-                                                .sales[index].productName,
+                                          TextIcon(
+                                            text:
+                                                " ${controller.isPurchase
+                                                        ?controller.purchasesInvoice.details.purchases[index].amount
+                                                      :controller.saleInvoice.details.sales[index].amount}",
+                                            icon: Icons.trending_down,
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        controller.isPurchase
-                                            ? controller.purchasesInvoice
-                                                .details.purchases[index].amount
-                                                .toString()
-                                            : controller.saleInvoice.details
-                                                .sales[index].amount
-                                                .toString(),
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        controller.isPurchase
-                                            ? (controller.purchasesInvoice.details.purchases[index].totalPurchasePrice/controller.purchasesInvoice.details.purchases[index].amount)
-                                                .toString()
-                                            : (controller
-                                                        .saleInvoice
-                                                        .details
-                                                        .sales[index]
-                                                        .totalSalePrice /
-                                                    controller
-                                                        .saleInvoice
-                                                        .details
-                                                        .sales[index]
-                                                        .amount)
-                                                .toString(),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextIcon(
+                                            text:
+                                                "${controller.isPurchase
+                                                    ?controller.purchasesInvoice.details.purchases[index].totalPurchasePrice / controller.purchasesInvoice.details.purchases[index].amount
+                                                    :controller.saleInvoice.details.sales[index].totalSalePrice / controller.saleInvoice.details.sales[index].amount} \$",
+                                            icon: Icons.upload,
+                                          ),
+                                          TextIcon(
+                                            text:
+                                                " ${controller.isPurchase
+                                                        ?controller.purchasesInvoice.details.purchases[index].totalPurchasePrice
+                                                      :controller.saleInvoice.details.sales[index].totalSalePrice} \$",
+                                            icon: Icons.download,
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        controller.isPurchase
-                                            ? (controller
-                                                        .purchasesInvoice
-                                                        .details
-                                                        .purchases[index]
-                                                        .totalPurchasePrice)
-                                                .toString()
-                                            : (controller
-                                                    .saleInvoice
-                                                    .details
-                                                    .sales[index]
-                                                    .totalSalePrice)
-                                                .toString(),
-                                      ),
-                                    ),
-                                  ]))
-                    ],
-                  ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : Wrap(
+                            direction: Axis.horizontal,
+                            alignment: WrapAlignment.center,
+                            runAlignment: WrapAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(15),
+                                alignment: Alignment.center,
+                                child: Image.asset(
+                                  AppAssets.noOrder,
+                                  width: 0.6 * Get.width,
+                                ),
+                              ),
+                              Text(
+                                "No any Purchase",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                        color: AppColors.primary70,
+                                        fontSize: 24),
+                              )
+                            ],
+                          )
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -25,6 +25,13 @@ class HelperLogicFunctions{
     return null;
   }
 
+  static String upperFirstChar(String string){
+    if(string.isNotEmpty) {
+      return string.replaceFirst(string[0], string[0].toUpperCase());
+    }
+    return string;
+  }
+
   static getVale({required Map map, required String key, required dynamic defaultVal}){
     if(map.containsKey(key) && map[key]!=null){
       if(defaultVal is double) {

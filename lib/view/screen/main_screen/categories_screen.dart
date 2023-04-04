@@ -9,7 +9,6 @@ import 'package:repository/core/constant/app_pages_routes.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/view/widget/shared/empty.dart';
 import 'package:repository/view/widget/shared/handle_request.dart';
 import 'package:repository/view/widget/shared/search_appbar.dart';

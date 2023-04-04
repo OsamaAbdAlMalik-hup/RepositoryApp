@@ -10,8 +10,10 @@ import 'package:repository/core/service/api_service.dart';
 import 'package:repository/data/models/client.dart';
 import 'package:repository/data/models/register.dart';
 
-class ClientDetailsController extends GetxController {
+class ClientDetailsController extends GetxController with GetTickerProviderStateMixin{
+
   ClientsController clientsController = Get.find();
+  late TabController tabController;
 
   int clientId = 1;
   Client client = Client(details: ClientDetails(), stocktaking: ClientStocktaking());
@@ -20,6 +22,7 @@ class ClientDetailsController extends GetxController {
 
   @override
   void onInit() async {
+    tabController=TabController(length: 2, vsync: this);
     clientId = await Get.arguments[AppSharedKeys.passId];
     await getClient();
     super.onInit();

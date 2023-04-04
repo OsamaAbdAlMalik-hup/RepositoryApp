@@ -11,9 +11,10 @@ import 'package:repository/core/service/api_service.dart';
 import 'package:repository/data/models/register.dart';
 import 'package:repository/data/models/supplier.dart';
 
-class SupplierDetailsController extends GetxController {
+class SupplierDetailsController extends GetxController with GetTickerProviderStateMixin{
 
   SuppliersController suppliersController=Get.find();
+  late TabController tabController;
   int supplierId=1;
   Supplier supplier=Supplier(details: SupplierDetails(),stocktaking: SupplierStocktaking());
   StatusView statusView= StatusView.loading;
@@ -22,6 +23,7 @@ class SupplierDetailsController extends GetxController {
 
   @override
   void onInit() async {
+    tabController=TabController(length: 2, vsync: this);
     supplierId = await Get.arguments[AppSharedKeys.passId];
     await getSupplier();
     super.onInit();
