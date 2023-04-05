@@ -19,6 +19,7 @@ class ProductDetailsController extends GetxController with GetSingleTickerProvid
   Product product=Product(details: ProductDetails(),stocktaking: ProductStocktaking());
   List<Register> registers=[];
   StatusView statusView= StatusView.loading;
+  bool isShowDetails=true;
 
 
   @override
@@ -67,8 +68,9 @@ class ProductDetailsController extends GetxController with GetSingleTickerProvid
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(

@@ -52,7 +52,7 @@ class InvoicesApiController
         return ValidationMessage(map[AppResponseKeys.message]);
       }
     });
-  }// TODO remove calls that dont need to it
+  }
   Future<dynamic> getSalesInvoicesBetween({required String startDate,required String endDate,}) async {
     HelperLogicFunctions.printNote('Start getSalesInvoicesBetween() Api');
     var response = await apiService.post(url: AppApiRoute.getSalesInvoicesBetween,headers: {},  body: {

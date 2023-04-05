@@ -8,7 +8,6 @@ import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
 import 'package:repository/core/helper/design_functions.dart';
-import 'package:repository/core/helper/logic_functions.dart';
 import 'package:repository/core/helper/validator_functions.dart';
 import 'package:repository/core/service/api_service.dart';
 import 'package:repository/data/models/expense.dart';
@@ -18,45 +17,31 @@ import 'package:repository/view/screen/main_screen/products_screen.dart';
 
 class MoneyBoxController extends GetxController with GetTickerProviderStateMixin {
   MainController mainController = Get.find();
-  MoneyBoxManagementApiController moneyBoxManagementApiController =
-      MoneyBoxManagementApiController(Get.find());
+  MoneyBoxManagementApiController moneyBoxManagementApiController = MoneyBoxManagementApiController(Get.find());
   GlobalKey<FormState> formKeyUpdateExpense = GlobalKey<FormState>();
   GlobalKey<FormState> formKeyUpdateMoneyOperation = GlobalKey<FormState>();
-  TextEditingController searchFieldController = TextEditingController();
   late TabController filterCacheTabController,filterExpenseTabController, mainTabController;
-  int mainTabIndex = 0, filterTabIndex = 0;
+  int mainTabIndex = 0, filterCacheTabIndex = 0, filterExpensesTabIndex = 0;
   List<Register> registers=[];
 
-  List<MoneyBoxOperation> moneyBoxOperations = [],
-      pushCacheOperations = [],
-      pullCacheOperations = [];
-  List<MoneyBoxOperation> allMoneyBoxOperations = [],
-      allPullCacheOperations = [],
-      allPushCacheOperations = [];
+  List<MoneyBoxOperation> pushCacheOperations = [], pullCacheOperations = [];
+  List<MoneyBoxOperation> allPullCacheOperations = [], allPushCacheOperations = [];
   List<Expense> expenses = [], allExpenses = [];
 
-  bool byName = false,
-      byTotal = false,
-      byNumber = false,
-      byDate = true,
-      byCreateAt = false,
-      byUpdateAt = false,
-      isSelectCache = true,
-      isSelectSales = false,
-      isSelectPurchases = false,
-      isSelectExpense = false,
-      isFinish = false;
-  bool ascending = true, isSearchMode = false, isArchived = false;
+  bool ascending = true, isSearchMode = false;
   List<SortItem> sortItemsCache = [
-    SortItem(label: "total", icon: Icons.movie_filter, isSelected: false),
+    SortItem(label: "total", icon: Icons.movie_filter, isSelected: true),
     SortItem(label: "date", icon: Icons.date_range, isSelected: false),
   ];
   List<SortItem> sortItemsExpense = [
-    SortItem(label: "name", icon: Icons.text_fields, isSelected: false),
+    SortItem(label: "name", icon: Icons.text_fields, isSelected: true),
     SortItem(label: "details", icon: Icons.account_balance_wallet, isSelected: false),
     SortItem(label: "total", icon: Icons.movie_filter, isSelected: false),
     SortItem(label: "date", icon: Icons.date_range, isSelected: false),
   ];
+  List<String> searchItemsCache=['total','date'];
+  List<String> searchItemsExpense=['name','details','total','date'];
+
 
   PublicFilterType filterType = PublicFilterType.date;
   StatusView statusView = StatusView.loading;
@@ -78,7 +63,6 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   }
 
   Future<bool> getExpenses() async {
-    // TODO GET TOTAL MONEY FOR VALIDATION
     // totalMoneyBox = await moneyBoxManagementApiController.getTotalBox();
     statusView = StatusView.loading;
         update();
@@ -115,8 +99,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     );
   }
 
-  void showSheetUpdateExpense(BuildContext context,
-      {required Expense expense, Future Function()? onSuccess}) {
+  void showSheetUpdateExpense(BuildContext context, {required Expense expense, Future Function()? onSuccess}) {
     mainController.nameFieldController.text = expense.name;
     mainController.totalPriceFieldController.text = expense.totalPrice.toString();
     mainController.paidFieldController.text = expense.paid.toString();
@@ -264,8 +247,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     return false;
   }
 
-  void showDialogDeleteExpense(BuildContext context,
-      {required Expense expense, Future Function()? onSuccess}) {
+  void showDialogDeleteExpense(BuildContext context, {required Expense expense, Future Function()? onSuccess}) {
     HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
           bool result = await _deleteExpense(expense);
@@ -349,8 +331,9 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(
@@ -678,8 +661,9 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(
@@ -773,15 +757,14 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
   }
 
   Future<void> search(String val) async {
-    HelperLogicFunctions.printNote(mainTabIndex);
     if (mainTabIndex == 0) {
       if (val != '') {
-        if (sortItemsCache[0].isSelected) {
+        if (filterCacheTabIndex==0) {
           pushCacheOperations = allPushCacheOperations
               .where((element) =>
                   element.totalPrice.toString().contains(val.toLowerCase()))
               .toList();
-        } else if (sortItemsCache[1].isSelected) {
+        } else if (filterCacheTabIndex==1) {
           pushCacheOperations = allPushCacheOperations
               .where((element) => element.date.contains(val.toLowerCase()))
               .toList();
@@ -792,12 +775,12 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     }
     else if (mainTabIndex == 1) {
       if (val != '') {
-        if (sortItemsCache[0].isSelected) {
+        if (filterCacheTabIndex==0) {
           pullCacheOperations = allPullCacheOperations
               .where((element) =>
                   element.totalPrice.toString().contains(val.toLowerCase()))
               .toList();
-        } else if (sortItemsCache[1].isSelected) {
+        } else if (filterCacheTabIndex==0) {
           pullCacheOperations = allPullCacheOperations
               .where((element) => element.date.contains(val.toLowerCase()))
               .toList();
@@ -808,20 +791,20 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     }
     else {
       if (val != '') {
-        if (sortItemsExpense[0].isSelected) {
+        if (filterExpensesTabIndex==0) {
           expenses = allExpenses
               .where((element) => element.name.toLowerCase().contains(val.toLowerCase()))
               .toList();
-        } else if (sortItemsExpense[1].isSelected) {
+        } else if (filterExpensesTabIndex==1) {
           expenses = allExpenses
               .where((element) => element.details.toLowerCase().contains(val.toLowerCase()))
               .toList();
-        } else if (sortItemsExpense[2].isSelected) {
+        } else if (filterExpensesTabIndex==2) {
           expenses = allExpenses
               .where((element) =>
                   element.totalPrice.toString().contains(val.toLowerCase()))
               .toList();
-        } else if (sortItemsExpense[3].isSelected) {
+        } else if (filterExpensesTabIndex==3) {
           expenses = allExpenses
               .where((element) => element.date.contains(val.toLowerCase()))
               .toList();
@@ -897,92 +880,7 @@ class MoneyBoxController extends GetxController with GetTickerProviderStateMixin
     }
     update();
   }
-  void selectTypeFilter(InvoiceFilterType invoiceFilterType) {
-    switch (invoiceFilterType) {
-      case InvoiceFilterType.name:
-        {
-          byName = true;
-          byTotal = false;
-          byNumber = false;
-          byDate = false;
-          byCreateAt = false;
-          byUpdateAt = false;
-          break;
-        }
-      case InvoiceFilterType.total:
-        {
-          byName = false;
-          byTotal = true;
-          byNumber = false;
-          byDate = false;
-          byCreateAt = false;
-          byUpdateAt = false;
-          break;
-        }
-      case InvoiceFilterType.number:
-        {
-          byName = false;
-          byTotal = false;
-          byNumber = true;
-          byDate = false;
-          byCreateAt = false;
-          byUpdateAt = false;
-          break;
-        }
-      case InvoiceFilterType.date:
-        {
-          byName = false;
-          byTotal = false;
-          byNumber = false;
-          byDate = true;
-          byCreateAt = false;
-          byUpdateAt = false;
-          break;
-        }
-      case InvoiceFilterType.createAt:
-        {
-          byName = false;
-          byTotal = false;
-          byNumber = false;
-          byDate = false;
-          byCreateAt = true;
-          byUpdateAt = false;
-          break;
-        }
-      case InvoiceFilterType.updateAt:
-        {
-          byName = false;
-          byTotal = false;
-          byNumber = false;
-          byDate = false;
-          byCreateAt = false;
-          byUpdateAt = true;
-          break;
-        }
-      case InvoiceFilterType.remainder:
-        break;
-    }
-    update();
-  }
 
-  void changeTab(int pageIndex) async {
-    mainTabIndex=pageIndex;
-    update();
-  }
-  Future<void> onFilterTabChange(int tabIndex) async {
-    if(mainTabIndex!=2){
-      for (int i = 0; i < sortItemsCache.length; i++) {
-        sortItemsCache[i].isSelected = (i == tabIndex);
-      }
-    } else{
-      for (int i = 0; i < sortItemsExpense.length; i++) {
-        sortItemsExpense[i].isSelected = (i == tabIndex);
-      }
-    }
-    search(mainController.searchFieldController.text);
-    HelperLogicFunctions.printNote(tabIndex);
-    update();
-  }
   Future<void> onMainTabChange(int tabIndex) async {
     mainTabIndex = tabIndex;
     if (tabIndex == 0) {

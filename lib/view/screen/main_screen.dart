@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -37,6 +38,7 @@ class MainScreen extends GetView<MainController> {
                 icon: const Icon(Icons.menu)),
           ),
           actions: [
+            // TODO Enable Life Search
             Visibility(
               visible: controller.isSearchMode,
               child: SearchAppbar(
@@ -45,7 +47,7 @@ class MainScreen extends GetView<MainController> {
                 onChanged: (value) {
                   // controller.search(value);
                 },
-                onBackIconPressed: () {
+                onBackIconPressed: () async {
                   controller.isSearchMode = false;
                   controller.update();
                 },
@@ -68,17 +70,16 @@ class MainScreen extends GetView<MainController> {
               visible: !controller.isSearchMode,
               child: IconButton(
                 onPressed: () {
-                  HelperDesignFunctions.showAlertDialog(context,
+                  HelperDesignFunctions.showFormDialog(context,
                       title: "Shortcut Creation",
                       hasButtonsAction: false,
                       children: [
                         GridView(
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
-                              childAspectRatio: 1,
+                              childAspectRatio: 1.1,
                               crossAxisSpacing: 10,
                               mainAxisSpacing: 30
                           ),
@@ -104,7 +105,7 @@ class MainScreen extends GetView<MainController> {
                                       children: [
                                         SvgPicture.asset(
                                           AppAssets.moneyIconSvg,
-                                          height: 30,
+                                          height: 45,
                                           color: AppColors.primary60,
                                         ),
                                         const Positioned(
@@ -146,7 +147,7 @@ class MainScreen extends GetView<MainController> {
                                       children: [
                                         SvgPicture.asset(
                                           AppAssets.moneyIconSvg,
-                                          height: 30,
+                                          height: 45,
                                           color: AppColors.primary60,
                                         ),
                                         const Positioned(
@@ -187,7 +188,7 @@ class MainScreen extends GetView<MainController> {
                                     Icon(
                                       Icons.clean_hands,
                                       color: AppColors.primary60,
-                                      size: 30,
+                                      size: 45,
                                     ),
                                     Text(
                                       "Expense",
@@ -222,7 +223,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.invoiceIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -259,7 +260,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.invoiceIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -290,7 +291,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.categoriesIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -321,7 +322,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.productsIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -352,7 +353,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.clientsIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -383,7 +384,7 @@ class MainScreen extends GetView<MainController> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SvgPicture.asset(
-                                      height: 30,
+                                      height: 45,
                                       AppAssets.suppliersIconSvg,
                                       color: AppColors.primary60,
                                     ),
@@ -416,141 +417,24 @@ class MainScreen extends GetView<MainController> {
                   child: Wrap(
                     children: [
                       NavigationBar(
-                          selectedIndex:
-                              controller.selectedBottomNavigationBarItem,
+                          selectedIndex: controller.selectedBottomNavigationBarItem,
                           onDestinationSelected: (index) async {
                             await controller.onNavBarChange(index);
                           },
                           animationDuration: const Duration(milliseconds: 750),
-                          destinations: bottomNavigationBarItems)
+                          destinations: bottomNavigationBarItems
+                      )
                     ],
                   ),
                 )),
         body: WillPopScope(
-          onWillPop: () async {
-            bool canExit = controller.lastPressedGoBack != null &&
-                DateTime.now().difference(controller.lastPressedGoBack!) < const Duration(seconds: 2);
-            controller.lastPressedGoBack=DateTime.now();
-            if(canExit) {
-              return true;
-            } else {
-              HelperDesignFunctions.showInfoSnackBar(message: "Click back again to Exit");
-              return false;
-            }
-          },
+          onWillPop: controller.alertExit,
           child: HandleRequest(
             statusView: controller.statusView,
-            child: bottomNavigationBarPages[
-                controller.selectedBottomNavigationBarItem],
+            child: bottomNavigationBarPages[controller.selectedBottomNavigationBarItem],
           ),
         ),
       ),
     );
   }
 }
-
-/*
-        leading: InkWell(
-          onTap: () {
-            controller.scaffoldKey.currentState!.openDrawer();
-            // controller.test(context);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SvgPicture.asset(
-              AppAssets.logoIconSvg,
-              height: 40,
-              width: 40,
-              fit: BoxFit.fill,
-              color: AppColors.primary,
-            ),
-          ),
-        ),
-
-        BottomNavigationBar(
-          selectedItemColor: AppColors.primaryDeepAccent,
-          unselectedItemColor: AppColors.gray,
-          currentIndex: controller.selectedBottomNavigationBarItem,
-          onTap: (index) async {
-            await controller.changeNavigationBar(index);
-          },
-          items: bottomNavigationBarItems,
-        ),
-
- */
-
-/*
-ActionChip(
-                                            label: const Text('Push'),
-                                            avatar: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  AppAssets.moneyIconSvg,
-                                                  height: 28,
-                                                  color: AppColors.primary60,
-                                                ),
-                                                const Positioned(
-                                                    left: -15,
-                                                    child: Icon(
-                                                      Icons.arrow_forward,
-                                                      color: AppColors.primary60,
-                                                      size: 20,
-                                                    )),
-                                              ],
-                                            ),
-                                            padding: const EdgeInsets.all(8)
-                                                .copyWith(left: 20),
-                                            onPressed: () async {
-                                              Get.back();
-                                              await controller
-                                                  .showSheetCreateCacheMoney(
-                                                      context,
-                                                      isPush: true);
-                                            },
-                                          ),
-                                          ActionChip(
-                                            label: const Text('Pull'),
-                                            avatar: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  AppAssets.moneyIconSvg,
-                                                  height: 28,
-                                                  color: AppColors.primary60,
-                                                ),
-                                                const Positioned(
-                                                    left: -15,
-                                                    child: Icon(
-                                                      Icons.arrow_back,
-                                                      color: AppColors.primary60,
-                                                      size: 20,
-                                                    )),
-                                              ],
-                                            ),
-                                            padding: const EdgeInsets.only(
-                                                top: 8,
-                                                bottom: 8,
-                                                right: 8,
-                                                left: 20),
-                                            onPressed: () async {
-                                              Get.back();
-                                              await controller
-                                                  .showSheetCreateCacheMoney(
-                                                      context,
-                                                      isPush: false);
-                                            },
-                                          ),
-                                          ActionChip(
-                                            label: const Text('Expense'),
-                                            avatar: const Icon(
-                                              Icons.clean_hands,
-                                              color: AppColors.primary60,
-                                            ),
-                                            padding: const EdgeInsets.all(8),
-                                            onPressed: () async {
-                                              Get.back();
-                                              await controller.showSheetCreateExpense(context);
-                                            },
-                                          ),
- */

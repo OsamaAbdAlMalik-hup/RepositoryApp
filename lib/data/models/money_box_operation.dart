@@ -58,7 +58,6 @@ class MoneyBoxOperation {
 }
 
 class FullStocktaking {
-  // TODO LATER RENAME
   double salesAmount,
       purchasesAmount,
       salesTotalPrice,

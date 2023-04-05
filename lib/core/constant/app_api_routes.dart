@@ -1,8 +1,9 @@
 
 class AppApiRoute {
 
-  // static const String server = "10.0.2.2:8000";
-  static const String server = "192.168.43.114:8000";
+  // static const String server = "10.0.2.2:8000"; // For Emulator
+  // static const String server = "192.168.43.114:8000"; // For Infinix device
+  static const String server = "192.168.228.114:8000"; // For A20 device
 
   // Registration
     // Auth

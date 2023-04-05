@@ -1,5 +1,5 @@
-import 'dart:io';
 
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -306,20 +306,9 @@ class DrawerContentHome extends GetView<MainController> {
                       controller.registrationController.myCurrentTeam[index].email,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
-                    leading: CachedNetworkImage(
-                      fit: BoxFit.fill,
-                      imageUrl: controller.registrationController.myCurrentTeam[index].photo,
-                      placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => CircleAvatar(
-                        radius: 36,
-                        backgroundColor: AppColors.primary0,
-                        child: Text(
-                            controller.registrationController.myCurrentTeam[index].name[0],
-                            style: const TextStyle(
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.black)),
+                    leading: CircleAvatar(
+                      backgroundImage: CachedNetworkImageProvider(
+                        controller.registrationController.myCurrentTeam[index].photo,
                       ),
                     ),
                   ),),
@@ -430,6 +419,7 @@ class DrawerContentHome extends GetView<MainController> {
                     btnOkOnPress: () async {
                       await controller.registrationController.logout();
                     },
+                    dialogType: 'delete',
                     title: "Logout",
                     subTitle: "Are you sure remove the account : ${RegistrationController.currentUser.name}",
                 );

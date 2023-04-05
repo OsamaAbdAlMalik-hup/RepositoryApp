@@ -14,7 +14,7 @@ class Purchase {
   Purchase(
       {this.id = 0,
       this.productId = 0,
-      this.invoiceNumber = 0,//TODO invoiceNumber
+      this.invoiceNumber = 0,
       this.productName = '',
       this.supplierName = '',
       this.supplierId = 0,

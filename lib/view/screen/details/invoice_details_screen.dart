@@ -25,8 +25,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) => [
                 SliverAppBar(
-                  expandedHeight: 0.35 * Get.height,
-                  pinned: true,
+                  expandedHeight: 0.4 * Get.height,
                   floating: true,
                   primary: true,
                   automaticallyImplyLeading: false,
@@ -42,11 +41,11 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                           height: kToolbarHeight,
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
-                            color: AppColors.primary0,
+                            color: AppColors.primary5,
                             boxShadow: const [
                               BoxShadow(
                                   offset: Offset(0, 1),
@@ -57,49 +56,84 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                           ),
                           child: Column(
                             children: [
-                              Text(
-                                "# ${controller.isPurchase ? controller.purchasesInvoice.number : controller.saleInvoice.number}",
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.person,
-                                    color: AppColors.primary50,
-                                    size: 18,
-                                  ),
-                                  Text(
-                                    ' ${controller.isPurchase ? controller.purchasesInvoice.supplierName : controller.saleInvoice.clientName}',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.gray,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.date_range,
-                                    color: AppColors.primary50,
-                                    size: 18,
-                                  ),
-                                  Text(
-                                    ' ${controller.isPurchase ? controller.purchasesInvoice.date : controller.saleInvoice.date}',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        color: AppColors.gray,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ],
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Invoice Number",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.number : controller.saleInvoice.number}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                const EdgeInsets.symmetric(vertical: 8.0),
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      controller.isPurchase?"Supplier:":"Client:",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.supplierName : controller.saleInvoice.clientName}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Date: ",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: AppColors.primary60),
+                                    ),
+                                    Text(
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.date : controller.saleInvoice.date}',
+                                      style: const TextStyle(
+                                          fontSize: 17,
+                                          color: AppColors.black,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       "Total: ",
@@ -109,7 +143,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                           .copyWith(color: AppColors.primary60),
                                     ),
                                     Text(
-                                      ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice : controller.saleInvoice.totalPrice}',
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.totalPrice : controller.saleInvoice.totalPrice} \$',
                                       style: const TextStyle(
                                           fontSize: 17,
                                           color: AppColors.black,
@@ -133,7 +167,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                           .copyWith(color: AppColors.primary60),
                                     ),
                                     Text(
-                                      ' ${controller.isPurchase ? controller.purchasesInvoice.paid : controller.saleInvoice.paid}',
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.paid : controller.saleInvoice.paid} \$',
                                       style: const TextStyle(
                                           fontSize: 17,
                                           color: AppColors.black,
@@ -157,7 +191,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                           .copyWith(color: AppColors.primary60),
                                     ),
                                     Text(
-                                      ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remained}',
+                                      ' ${controller.isPurchase ? controller.purchasesInvoice.remained : controller.saleInvoice.remained} \$',
                                       style: const TextStyle(
                                           fontSize: 17,
                                           color: AppColors.black,
@@ -335,13 +369,9 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
               body: Container(
                 margin: const EdgeInsets.only(top: 50),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 5, left: 15),
-                      child: Text(controller.isPurchase ? 'Purchases' : 'Sales',
-                          style: Theme.of(context).textTheme.titleLarge),
-                    ),
+                    Text(controller.isPurchase ? 'Purchases' : 'Sales',
+                        style: Theme.of(context).textTheme.titleLarge),
                     (controller.isPurchase && controller.purchasesInvoice.details.purchases.isNotEmpty)
                     ||(!controller.isPurchase && controller.saleInvoice.details.sales.isNotEmpty)
                         ? ListView.builder(
@@ -438,7 +468,7 @@ class InvoiceDetailsScreen extends GetView<InvoiceDetailsController> {
                                 ),
                               ),
                               Text(
-                                "No any Purchase",
+                                "No any ${controller.isPurchase ? 'Purchases' : 'Sales'}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium!

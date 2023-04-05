@@ -13,21 +13,25 @@ class NestedScrollViewPage extends StatelessWidget {
 
   String title;
   String imageUrl;
-  double expandedHeight;
+  double? expandedHeight;
   List<Widget>? actions;
   List<Widget>? childrenBottomAppbar;
   TabBar tabBar;
   TabBarView tabBarView;
   StatusView statusView;
+  void Function()? onTapImage;
+  bool isShowDetails;
   NestedScrollViewPage({
     required this.title,
     this.actions,
     required this.imageUrl,
     this.childrenBottomAppbar,
-    required this.expandedHeight,
+    this.expandedHeight,
     required this.tabBar,
     required this.tabBarView,
     required this.statusView,
+    this.isShowDetails=true,
+    this.onTapImage,
     Key? key}) : super(key: key);
 
   @override
@@ -41,7 +45,7 @@ class NestedScrollViewPage extends StatelessWidget {
               headerSliverBuilder:
                   (BuildContext context, bool innerBoxIsScrolled) => [
                 SliverAppBar(
-                  expandedHeight: expandedHeight,
+                  expandedHeight: expandedHeight ?? Get.width+2*kToolbarHeight,
                   pinned: true,
                   floating: true,
                   primary: true,
@@ -55,43 +59,59 @@ class NestedScrollViewPage extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         const SizedBox(height: kToolbarHeight,),
-                        CachedNetworkImage(
-                          height: Get.width,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          imageUrl: imageUrl,
-                          placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                          const CircleAvatar(
-                            radius: 36,
-                            backgroundColor: AppColors.primary0,
-                            child: Text('',
-                                //${controller.category.name[0]}${controller.category.name[1]}
-                                style: TextStyle(
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.black)),
-                          ),
-                        ),
-                        if(childrenBottomAppbar!=null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: AppColors.primary0,
-                            boxShadow: const [
-                              BoxShadow(
-                                  offset: Offset(0, 1),
-                                  spreadRadius: 0,
-                                  blurRadius: 1,
-                                  color: AppColors.gray)
+                        InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          onTap: onTapImage,
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              CachedNetworkImage(
+                                height: Get.width,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                imageUrl: imageUrl,
+                                placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                      radius: 36,
+                                      backgroundColor: AppColors.primary0,
+                                      child: Text(
+                                          '',
+                                          style: TextStyle(
+                                              fontSize: 40,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.black)),
+                                    ),
+                              ),
+                              AnimatedOpacity(
+                                opacity: isShowDetails ? 1 : 0,
+                                duration: const Duration(milliseconds: 300),
+                                child: Container(
+                                  padding: const EdgeInsets.all(15),
+                                  decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            AppColors.black90,
+                                            AppColors.black50,
+                                          ])),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if(childrenBottomAppbar!=null)
+                                        ...childrenBottomAppbar!
+                                    ],
+                                  ),
+                                ),
+                              ),
+
                             ],
                           ),
-                          child: Column(
-                            children: childrenBottomAppbar!,
-                          ),
                         ),
+
                       ],
                     ),
                   ),
@@ -133,6 +153,7 @@ class NestedScrollViewPage extends StatelessWidget {
               ],
               body: Container(
                 margin: const EdgeInsets.only(top: 50),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: tabBarView,
               ),
             ),

@@ -32,8 +32,7 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
   List<String> searchItem=['name','product amount','sales amount','purchases amount'];
   List<Category> allCategories = [], categories = [];
   StatusView statusView= StatusView.loading;
-  int filterTabIndex=0;
-  bool ascending = true, isSearchMode=false;
+  bool ascending = true, isSearchMode = false;
 
 
 
@@ -229,7 +228,7 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
 
   Future<void> search(String val) async {
     if (val != '') {
-      switch(filterTabIndex){
+      switch(mainController.filterTabIndex){
         case 0:{
           categories = allCategories.where((element) => element.name.toLowerCase().contains(val.toLowerCase())).toList();
           break;
@@ -270,5 +269,4 @@ class CategoriesController extends GetxController with GetSingleTickerProviderSt
     }
     update();
   }
-
 }

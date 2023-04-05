@@ -17,7 +17,6 @@ class ProductDetailsScreen extends GetView<ProductDetailsController> {
       builder: (controller) => NestedScrollViewPage(
         title: "${HelperLogicFunctions.upperFirstChar(controller.product.name)} Product",
         statusView: controller.statusView,
-        expandedHeight: 0.8 * Get.height,
         imageUrl: controller.product.photo,
         tabBar: TabBar(
           controller: controller.tabController,
@@ -312,17 +311,39 @@ class ProductDetailsScreen extends GetView<ProductDetailsController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
+                  "Category: ",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: AppColors.primary40),
+                ),
+                Text(
+                  controller.product.categoryName,
+                  style: const TextStyle(
+                      fontSize: 17,
+                      color: AppColors.primary0,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
                   "Products amount: ",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
-                  "${controller.product.amount}",
+                  "${controller.product.amount} ${controller.product.measuringUnit}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -334,17 +355,17 @@ class ProductDetailsScreen extends GetView<ProductDetailsController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Sales amount: ",
+                  "Purchases Price: ",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
-                  "${controller.product.salePrice}",
+                  "${controller.product.purchasePrice} \$",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -356,23 +377,28 @@ class ProductDetailsScreen extends GetView<ProductDetailsController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Purchases amount: ",
+                  "Sales Price: ",
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
-                  "${controller.product.purchasePrice}",
+                  "${controller.product.salePrice} \$",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
         ],
+        isShowDetails: controller.isShowDetails,
+        onTapImage: () {
+          controller.isShowDetails=!controller.isShowDetails;
+          controller.update();
+        },
       ),
     );
   }

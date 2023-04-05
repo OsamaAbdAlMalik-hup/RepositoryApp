@@ -14,14 +14,12 @@ import 'package:repository/view/widget/shared/text_icon.dart';
 class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
   const SupplierDetailsScreen({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SupplierDetailsController>(
       builder: (controller) => NestedScrollViewPage(
         title: "${HelperLogicFunctions.upperFirstChar(controller.supplier.name)} Supplier",
         statusView: controller.statusView,
-        expandedHeight: 0.9 * Get.height,
         imageUrl: controller.supplier.photo,
         tabBar: TabBar(
           controller: controller.tabController,
@@ -347,7 +345,7 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                         controller.suppliersController.isArchived
                             ? Icons.unarchive_outlined
                             : Icons.archive_outlined,
-                        color: AppColors.primary60,
+                        color: AppColors.primary40,
                       ),
                       const SizedBox(
                         width: 15,
@@ -398,13 +396,13 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   controller.supplier.address,
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -420,13 +418,13 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   controller.supplier.phoneNumber,
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -442,13 +440,13 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   "${controller.supplier.invoicesCount}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -464,13 +462,13 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   "${controller.supplier.debts}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -486,19 +484,24 @@ class SupplierDetailsScreen extends GetView<SupplierDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   "${controller.supplier.invoicesTotal}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
         ],
+        isShowDetails: controller.isShowDetails,
+        onTapImage: () {
+          controller.isShowDetails=!controller.isShowDetails;
+          controller.update();
+        },
       ),
     );
   }

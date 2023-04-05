@@ -86,9 +86,10 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
                 onChanged: (value) {
                   controller.search(value);
                 },
-                onBackIconPressed: () {
+                onBackIconPressed: () async {
                   controller.isSearchMode = false;
-                  controller.update();
+                  controller.mainController.searchFieldController.clear();
+                  await controller.search('');
                 },
                 onSearchIconPressed: () {},
               ),
@@ -98,7 +99,7 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
                 child: TabBarView(
                   controller: controller.filterCacheTabController,
                   children: List.generate(
-                    controller.sortItemsCache.length,
+                    controller.searchItemsCache.length,
                     (index) => Text(index.toString()),
                   ),
                 )),
@@ -107,20 +108,23 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
                 child: TabBarView(
                   controller: controller.filterExpenseTabController,
                   children: List.generate(
-                    controller.sortItemsExpense.length,
+                    controller.searchItemsExpense.length,
                     (index) => Text(index.toString()),
                   ),
                 )),
           ],
           bottom: controller.isSearchMode && controller.mainTabIndex != 2
               ? TabBar(
-                  onTap: controller.onFilterTabChange,
+                  onTap: (index) {
+                    controller.filterCacheTabIndex=index;
+                    controller.search(controller.mainController.searchFieldController.text);
+                  },
                   controller: controller.filterCacheTabController,
                   tabs: List.generate(
-                      controller.sortItemsCache.length,
+                      controller.searchItemsCache.length,
                       (index) => Tab(
                             child: Text(
-                              controller.sortItemsCache[index].label,
+                              controller.searchItemsCache[index],
                               style: Theme.of(context)
                                   .textTheme
                                   .labelMedium!
@@ -130,13 +134,16 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
                 )
               : controller.isSearchMode && controller.mainTabIndex == 2
                   ? TabBar(
-                      onTap: controller.onFilterTabChange,
+                      onTap: (index) {
+                        controller.filterExpensesTabIndex=index;
+                        controller.search(controller.mainController.searchFieldController.text);
+                      },
                       controller: controller.filterExpenseTabController,
                       tabs: List.generate(
-                          controller.sortItemsExpense.length,
+                          controller.searchItemsExpense.length,
                           (index) => Tab(
                                 child: Text(
-                                  controller.sortItemsExpense[index].label,
+                                  controller.searchItemsExpense[index],
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelMedium!
@@ -271,407 +278,417 @@ class MoneyBoxScreen extends GetView<MoneyBoxController> {
           },
           child: const Icon(Icons.add, color: AppColors.black),
         ),
-        body: InkWell(
-          splashColor: AppColors.transparent,
-          highlightColor: AppColors.transparent,
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: HandleRequest(
-            statusView: controller.statusView,
-            child: TabBarView(
-              controller: controller.mainTabController,
-              children: [
-                controller.pushCacheOperations.isNotEmpty
-                    ? SlidableAutoCloseBehavior(
-                        closeWhenOpened: true,
-                        child: ListView.builder(
-                          itemCount: controller.pushCacheOperations.length,
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          physics: const BouncingScrollPhysics(),
-                          itemBuilder: (context, index) => Slidable(
-                            endActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showSheetUpdateCacheMoney(
-                                        context,
-                                        operation: controller
-                                            .pushCacheOperations[index]);
-                                  },
-                                  foregroundColor: AppColors.white,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.success50,
-                                  icon: Icons.edit_outlined,
-                                ),
-                              ],
-                            ),
-                            startActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showDialogDeleteCacheMoney(
-                                        context,
-                                        operation: controller
-                                            .pushCacheOperations[index]);
-                                  },
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.danger50,
-                                  icon: Icons.delete_outlined,
-                                ),
-                              ],
-                            ),
-                            child: Card(
-                                child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: () {
-                                controller.getCacheRegisters(context: context, id: controller.pushCacheOperations[index].id);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          SvgPicture.asset(
-                                            AppAssets.moneyIconSvg,
-                                            height: 28,
-                                            color: AppColors.primary70,
-                                          ),
-                                          Positioned(
-                                              left: -10,
-                                              child: Icon(
-                                                controller
-                                                            .pushCacheOperations[
-                                                                index]
-                                                            .typeMoney ==
-                                                        MoneyType.addCashMoney
-                                                    ? Icons.arrow_forward
-                                                    : Icons.arrow_back,
-                                                color: AppColors.primary70,
-                                                size: 20,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 6,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            '${controller.pushCacheOperations[index].totalPrice} \$',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge!
-                                                .copyWith(
-                                                    fontSize: 20,
-                                                    letterSpacing: 1),
-                                          ),
-                                          const SizedBox(
-                                            height: 15,
-                                          ),
-                                          TextIcon(
-                                            icon: Icons.date_range,
-                                            text: controller
-                                                .pushCacheOperations[index]
-                                                .date,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+        body: WillPopScope(
+          onWillPop: () async {
+            if (controller.isSearchMode) {
+              controller.isSearchMode = false;
+              controller.update();
+              return false;
+            }
+            return true;
+          },
+          child: InkWell(
+            splashColor: AppColors.transparent,
+            highlightColor: AppColors.transparent,
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: HandleRequest(
+              statusView: controller.statusView,
+              child: TabBarView(
+                controller: controller.mainTabController,
+                children: [
+                  controller.pushCacheOperations.isNotEmpty
+                      ? SlidableAutoCloseBehavior(
+                          closeWhenOpened: true,
+                          child: ListView.builder(
+                            itemCount: controller.pushCacheOperations.length,
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) => Slidable(
+                              endActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showSheetUpdateCacheMoney(
+                                          context,
+                                          operation: controller
+                                              .pushCacheOperations[index]);
+                                    },
+                                    foregroundColor: AppColors.white,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.success50,
+                                    icon: Icons.edit_outlined,
+                                  ),
+                                ],
                               ),
-                            )),
-                          ),
-                        ),
-                      )
-                    : Empty(
-                        imagePath: AppAssets.noExpenses,
-                        text: "No any Cache operation",
-                        height: 200,
-                        fontSize: 24,
-                      ),
-                controller.pullCacheOperations.isNotEmpty
-                    ? SlidableAutoCloseBehavior(
-                        closeWhenOpened: true,
-                        child: ListView.builder(
-                          itemCount: controller.pullCacheOperations.length,
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          physics: const BouncingScrollPhysics(),
-                          itemBuilder: (context, index) => Slidable(
-                            endActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showSheetUpdateCacheMoney(
-                                        context,
-                                        operation: controller
-                                            .pullCacheOperations[index]);
-                                  },
-                                  foregroundColor: AppColors.white,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.success50,
-                                  icon: Icons.edit_outlined,
-                                ),
-                              ],
-                            ),
-                            startActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showDialogDeleteCacheMoney(
-                                        context,
-                                        operation: controller
-                                            .pullCacheOperations[index]);
-                                  },
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.danger50,
-                                  icon: Icons.delete_outlined,
-                                ),
-                              ],
-                            ),
-                            child: Card(
-                                child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: () {
-                                controller.getCacheRegisters(context: context, id: controller.pullCacheOperations[index].id);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          SvgPicture.asset(
-                                            AppAssets.moneyIconSvg,
-                                            height: 28,
-                                            color: AppColors.primary70,
-                                          ),
-                                          Positioned(
-                                              left: -10,
-                                              child: Icon(
-                                                controller
-                                                            .pullCacheOperations[
-                                                                index]
-                                                            .typeMoney ==
-                                                        MoneyType.addCashMoney
-                                                    ? Icons.arrow_forward
-                                                    : Icons.arrow_back,
-                                                color: AppColors.primary70,
-                                                size: 20,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 6,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            '${controller.pullCacheOperations[index].totalPrice} \$',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyLarge!
-                                                .copyWith(
-                                                    fontSize: 20,
-                                                    letterSpacing: 1),
-                                          ),
-                                          const SizedBox(
-                                            height: 15,
-                                          ),
-                                          TextIcon(
-                                            icon: Icons.date_range,
-                                            text: controller
-                                                .pullCacheOperations[index]
-                                                .date,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              startActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showDialogDeleteCacheMoney(
+                                          context,
+                                          operation: controller
+                                              .pushCacheOperations[index]);
+                                    },
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.danger50,
+                                    icon: Icons.delete_outlined,
+                                  ),
+                                ],
                               ),
-                            )),
-                          ),
-                        ),
-                      )
-                    : Empty(
-                        imagePath: AppAssets.noExpenses,
-                        text: "No any Cache operation",
-                        height: 200,
-                        fontSize: 24,
-                      ),
-                controller.expenses.isNotEmpty
-                    ? SlidableAutoCloseBehavior(
-                        closeWhenOpened: true,
-                        child: ListView.builder(
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          itemCount: controller.expenses.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          physics: const BouncingScrollPhysics(),
-                          itemBuilder: (context, index) => Slidable(
-                            endActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showSheetUpdateExpense(context,
-                                        expense: controller.expenses[index]);
-                                  },
-                                  foregroundColor: AppColors.white,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.success50,
-                                  icon: Icons.edit_outlined,
-                                ),
-                              ],
-                            ),
-                            startActionPane: ActionPane(
-                              extentRatio: 0.25,
-                              motion: const StretchMotion(),
-                              children: [
-                                SlidableAction(
-                                  onPressed: (c) {
-                                    controller.showDialogDeleteExpense(context,
-                                        expense: controller.expenses[index]);
-                                  },
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10)),
-                                  backgroundColor: AppColors.danger50,
-                                  icon: Icons.delete_outlined,
-                                ),
-                              ],
-                            ),
-                            child: Card(
-                                child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
-                              onTap: () {
-                                controller.getExpenseRegisters(context: context, id: controller.expenses[index].id);
-                              },
-                              onLongPress: () {
-                                controller.meetDebtExpense(expense: controller.expenses[index], payment: 0);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    right: 15, top: 10, bottom: 10),
-                                child: Row(
-                                  children: [
-                                    const Expanded(
-                                      flex: 1,
-                                      child: Icon(
-                                        size: 28,
-                                        Icons.clean_hands,
-                                        color: AppColors.primary70,
+                              child: Card(
+                                  child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () {
+                                  controller.getCacheRegisters(context: context, id: controller.pushCacheOperations[index].id);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            SvgPicture.asset(
+                                              AppAssets.moneyIconSvg,
+                                              height: 28,
+                                              color: AppColors.primary70,
+                                            ),
+                                            Positioned(
+                                                left: -10,
+                                                child: Icon(
+                                                  controller
+                                                              .pushCacheOperations[
+                                                                  index]
+                                                              .typeMoney ==
+                                                          MoneyType.addCashMoney
+                                                      ? Icons.arrow_forward
+                                                      : Icons.arrow_back,
+                                                  color: AppColors.primary70,
+                                                  size: 20,
+                                                )),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
+                                      Expanded(
                                         flex: 6,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  controller
-                                                      .expenses[index].name,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyLarge!
-                                                      .copyWith(
-                                                          fontSize: 22,
-                                                          letterSpacing: 1),
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                  controller
-                                                      .expenses[index].details,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall,
-                                                ),
-                                              ],
+                                            Text(
+                                              '${controller.pushCacheOperations[index].totalPrice} \$',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                      fontSize: 20,
+                                                      letterSpacing: 1),
                                             ),
                                             const SizedBox(
-                                              height: 5,
+                                              height: 15,
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "${controller.expenses[index].totalPrice} \$",
-                                                  style: const TextStyle(
-                                                      color:
-                                                          AppColors.primary70,
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                TextIcon(
-                                                  icon: Icons.date_range,
-                                                  text: controller
-                                                      .expenses[index].date,
-                                                ),
-                                              ],
+                                            TextIcon(
+                                              icon: Icons.date_range,
+                                              text: controller
+                                                  .pushCacheOperations[index]
+                                                  .date,
                                             ),
                                           ],
-                                        )),
-                                  ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            )),
+                              )),
+                            ),
                           ),
+                        )
+                      : Empty(
+                          imagePath: AppAssets.noExpenses,
+                          text: "No any Cache operation",
+                          height: 200,
+                          fontSize: 24,
                         ),
-                      )
-                    : Empty(
-                        imagePath: AppAssets.noExpenses,
-                        text: "No any Expense",
-                        height: 200,
-                        fontSize: 24,
-                      ),
-              ],
+                  controller.pullCacheOperations.isNotEmpty
+                      ? SlidableAutoCloseBehavior(
+                          closeWhenOpened: true,
+                          child: ListView.builder(
+                            itemCount: controller.pullCacheOperations.length,
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) => Slidable(
+                              endActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showSheetUpdateCacheMoney(
+                                          context,
+                                          operation: controller
+                                              .pullCacheOperations[index]);
+                                    },
+                                    foregroundColor: AppColors.white,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.success50,
+                                    icon: Icons.edit_outlined,
+                                  ),
+                                ],
+                              ),
+                              startActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showDialogDeleteCacheMoney(
+                                          context,
+                                          operation: controller
+                                              .pullCacheOperations[index]);
+                                    },
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.danger50,
+                                    icon: Icons.delete_outlined,
+                                  ),
+                                ],
+                              ),
+                              child: Card(
+                                  child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () {
+                                  controller.getCacheRegisters(context: context, id: controller.pullCacheOperations[index].id);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 10),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 1,
+                                        child: Stack(
+                                          clipBehavior: Clip.none,
+                                          children: [
+                                            SvgPicture.asset(
+                                              AppAssets.moneyIconSvg,
+                                              height: 28,
+                                              color: AppColors.primary70,
+                                            ),
+                                            Positioned(
+                                                left: -10,
+                                                child: Icon(
+                                                  controller
+                                                              .pullCacheOperations[
+                                                                  index]
+                                                              .typeMoney ==
+                                                          MoneyType.addCashMoney
+                                                      ? Icons.arrow_forward
+                                                      : Icons.arrow_back,
+                                                  color: AppColors.primary70,
+                                                  size: 20,
+                                                )),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 6,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              '${controller.pullCacheOperations[index].totalPrice} \$',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge!
+                                                  .copyWith(
+                                                      fontSize: 20,
+                                                      letterSpacing: 1),
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            TextIcon(
+                                              icon: Icons.date_range,
+                                              text: controller
+                                                  .pullCacheOperations[index]
+                                                  .date,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )),
+                            ),
+                          ),
+                        )
+                      : Empty(
+                          imagePath: AppAssets.noExpenses,
+                          text: "No any Cache operation",
+                          height: 200,
+                          fontSize: 24,
+                        ),
+                  controller.expenses.isNotEmpty
+                      ? SlidableAutoCloseBehavior(
+                          closeWhenOpened: true,
+                          child: ListView.builder(
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
+                            itemCount: controller.expenses.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (context, index) => Slidable(
+                              endActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showSheetUpdateExpense(context,
+                                          expense: controller.expenses[index]);
+                                    },
+                                    foregroundColor: AppColors.white,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.success50,
+                                    icon: Icons.edit_outlined,
+                                  ),
+                                ],
+                              ),
+                              startActionPane: ActionPane(
+                                extentRatio: 0.25,
+                                motion: const StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (c) {
+                                      controller.showDialogDeleteExpense(context,
+                                          expense: controller.expenses[index]);
+                                    },
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    backgroundColor: AppColors.danger50,
+                                    icon: Icons.delete_outlined,
+                                  ),
+                                ],
+                              ),
+                              child: Card(
+                                  child: InkWell(
+                                borderRadius: BorderRadius.circular(10),
+                                onTap: () {
+                                  controller.getExpenseRegisters(context: context, id: controller.expenses[index].id);
+                                },
+                                onLongPress: () {
+                                  controller.meetDebtExpense(expense: controller.expenses[index], payment: 0);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 15, top: 10, bottom: 10),
+                                  child: Row(
+                                    children: [
+                                      const Expanded(
+                                        flex: 1,
+                                        child: Icon(
+                                          size: 28,
+                                          Icons.clean_hands,
+                                          color: AppColors.primary70,
+                                        ),
+                                      ),
+                                      Expanded(
+                                          flex: 6,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    controller
+                                                        .expenses[index].name,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .copyWith(
+                                                            fontSize: 22,
+                                                            letterSpacing: 1),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Text(
+                                                    controller
+                                                        .expenses[index].details,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall,
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "${controller.expenses[index].totalPrice} \$",
+                                                    style: const TextStyle(
+                                                        color:
+                                                            AppColors.primary70,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  TextIcon(
+                                                    icon: Icons.date_range,
+                                                    text: controller
+                                                        .expenses[index].date,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                              )),
+                            ),
+                          ),
+                        )
+                      : Empty(
+                          imagePath: AppAssets.noExpenses,
+                          text: "No any Expense",
+                          height: 200,
+                          fontSize: 24,
+                        ),
+                ],
+              ),
             ),
           ),
         ),

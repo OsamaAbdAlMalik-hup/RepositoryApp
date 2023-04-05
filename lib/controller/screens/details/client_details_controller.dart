@@ -19,6 +19,7 @@ class ClientDetailsController extends GetxController with GetTickerProviderState
   Client client = Client(details: ClientDetails(), stocktaking: ClientStocktaking());
   List<Register> registers=[];
   StatusView statusView = StatusView.loading;
+  bool isShowDetails=true;
 
   @override
   void onInit() async {
@@ -122,8 +123,9 @@ class ClientDetailsController extends GetxController with GetTickerProviderState
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(

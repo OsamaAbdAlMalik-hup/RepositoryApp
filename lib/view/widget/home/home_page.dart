@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      physics: const BouncingScrollPhysics(),
+      physics: const PageScrollPhysics(),
       itemCount: cardItems.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,

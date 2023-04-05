@@ -78,10 +78,11 @@ class InvoicesScreen extends GetView<InvoicesController> {
               onChanged: (value) {
                 controller.search(value);
               },
-              onBackIconPressed: () {
+              onBackIconPressed:  () async {
                 controller.isSearchMode = false;
-                controller.update();
-              },
+                controller.mainController.searchFieldController.clear();
+                await controller.search('');
+                },
               onSearchIconPressed: () {},
             ),
           ),
@@ -107,7 +108,9 @@ class InvoicesScreen extends GetView<InvoicesController> {
         bottom: controller.isSearchMode
             ? TabBar(
                 isScrollable: true,
-                onTap: controller.onFilterTabChange,
+                onTap: (index) {
+                  controller.mainController.onTapFilter(index,controller.search);
+                },
                 controller: controller.filterTabController,
                 tabs: List.generate(
                     controller.sortItems.length,
@@ -226,376 +229,386 @@ class InvoicesScreen extends GetView<InvoicesController> {
         },
         child: const Icon(Icons.add, color: AppColors.black),
       ),
-      body: InkWell(
-        splashColor: AppColors.transparent,
-                highlightColor: AppColors.transparent,
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: HandleRequest(
-                  statusView: controller.statusView,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: TabBarView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      controller: controller.mainTabController,
-                      children: [
-                        controller.purchasesInvoices.isNotEmpty
-                            ? SlidableAutoCloseBehavior(
-                                closeWhenOpened: true,
-                                child: ListView.builder(
-                                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                                    physics: const BouncingScrollPhysics(),
-                                    itemCount:
-                                        controller.purchasesInvoices.length,
-                                    itemBuilder: (context, index) => Slidable(
-                                          endActionPane: ActionPane(
-                                            extentRatio: 0.25,
-                                            motion: const StretchMotion(),
-                                            children: [
-                                              SlidableAction(
-                                                onPressed: (c) async {
-                                                  controller.archiveInvoice(
-                                                      invoice: controller
+      body: WillPopScope(
+        onWillPop: () async {
+          if (controller.isSearchMode) {
+            controller.isSearchMode = false;
+            controller.update();
+            return false;
+          }
+          return true;
+        },
+        child: InkWell(
+          splashColor: AppColors.transparent,
+                  highlightColor: AppColors.transparent,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: HandleRequest(
+                    statusView: controller.statusView,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: controller.mainTabController,
+                        children: [
+                          controller.purchasesInvoices.isNotEmpty
+                              ? SlidableAutoCloseBehavior(
+                                  closeWhenOpened: true,
+                                  child: ListView.builder(
+                                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount:
+                                          controller.purchasesInvoices.length,
+                                      itemBuilder: (context, index) => Slidable(
+                                            endActionPane: ActionPane(
+                                              extentRatio: 0.25,
+                                              motion: const StretchMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (c) async {
+                                                    controller.archiveInvoice(
+                                                        invoice: controller
+                                                                .purchasesInvoices[
+                                                            index],
+                                                        invoiceType:
+                                                            InvoiceType.purchases);
+                                                  },
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  backgroundColor:
+                                                      AppColors.grayAccent,
+                                                  icon: controller.isArchived
+                                                      ? Icons.unarchive
+                                                      : Icons.archive,
+                                                ),
+                                              ],
+                                            ),
+                                            startActionPane: ActionPane(
+                                              extentRatio: 0.25,
+                                              motion: const StretchMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (c) async {
+                                                    controller.showDialogDeleteInvoice(
+                                                        context,
+                                                        invoice: controller
+                                                                .purchasesInvoices[
+                                                            index],
+                                                        invoiceType:
+                                                            InvoiceType.purchases);
+                                                  },
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  backgroundColor: AppColors.danger50,
+                                                  icon: Icons.delete_outlined,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Card(
+                                                child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              onTap: () {
+                                                Get.toNamed(
+                                                    AppPagesRoutes
+                                                        .invoiceDetailsScreen,
+                                                    arguments: {
+                                                      AppSharedKeys.passId:
+                                                          controller
                                                               .purchasesInvoices[
-                                                          index],
-                                                      invoiceType:
-                                                          InvoiceType.purchases);
-                                                },
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(10)),
-                                                backgroundColor:
-                                                    AppColors.grayAccent,
-                                                icon: controller.isArchived
-                                                    ? Icons.unarchive
-                                                    : Icons.archive,
-                                              ),
-                                            ],
-                                          ),
-                                          startActionPane: ActionPane(
-                                            extentRatio: 0.25,
-                                            motion: const StretchMotion(),
-                                            children: [
-                                              SlidableAction(
-                                                onPressed: (c) async {
-                                                  controller.showDialogDeleteInvoice(
-                                                      context,
-                                                      invoice: controller
-                                                              .purchasesInvoices[
-                                                          index],
-                                                      invoiceType:
-                                                          InvoiceType.purchases);
-                                                },
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(10)),
-                                                backgroundColor: AppColors.danger50,
-                                                icon: Icons.delete_outlined,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Card(
-                                              child: InkWell(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            onTap: () {
-                                              Get.toNamed(
-                                                  AppPagesRoutes
-                                                      .invoiceDetailsScreen,
-                                                  arguments: {
-                                                    AppSharedKeys.passId:
-                                                        controller
-                                                            .purchasesInvoices[
-                                                                index]
-                                                            .id,
-                                                    AppSharedKeys.passInvoiceType:
-                                                        InvoiceType.purchases
-                                                  });
-                                            },
-                                            child: IntrinsicHeight(
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(10),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              '#${controller.purchasesInvoices[index].number}',
-                                                            ),
-                                                            Text(
-                                                              controller
-                                                                  .purchasesInvoices[
-                                                                      index]
-                                                                  .date,
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodySmall,
-                                                            ),
-                                                          ],
-                                                        )),
-                                                    const VerticalDivider(
-                                                        thickness: 1),
-                                                    Expanded(
-                                                        flex: 3,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              controller
-                                                                  .purchasesInvoices[
-                                                                      index]
-                                                                  .supplierName
-                                                                  .toString(),
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodyLarge!
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          22,
-                                                                      letterSpacing:
-                                                                          1),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                TextIcon(
-                                                                  text: controller
-                                                                      .purchasesInvoices[
-                                                                          index]
-                                                                      .totalPrice
-                                                                      .toString(),
-                                                                  color: AppColors
-                                                                      .black,
-                                                                  icon: Icons
-                                                                      .monetization_on_rounded,
-                                                                ),
-                                                                TextIcon(
-                                                                  text: controller
-                                                                      .purchasesInvoices[
-                                                                          index]
-                                                                      .remained
-                                                                      .toString(),
-                                                                  color: AppColors
-                                                                      .black,
-                                                                  icon: Icons
-                                                                      .money_off,
-                                                                ),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        )),
-                                                  ],
+                                                                  index]
+                                                              .id,
+                                                      AppSharedKeys.passInvoiceType:
+                                                          InvoiceType.purchases
+                                                    });
+                                              },
+                                              child: IntrinsicHeight(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(10),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                '#${controller.purchasesInvoices[index].number}',
+                                                              ),
+                                                              Text(
+                                                                controller
+                                                                    .purchasesInvoices[
+                                                                        index]
+                                                                    .date,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodySmall,
+                                                              ),
+                                                            ],
+                                                          )),
+                                                      const VerticalDivider(
+                                                          thickness: 1),
+                                                      Expanded(
+                                                          flex: 3,
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                controller
+                                                                    .purchasesInvoices[
+                                                                        index]
+                                                                    .supplierName
+                                                                    .toString(),
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodyLarge!
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            22,
+                                                                        letterSpacing:
+                                                                            1),
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 15,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  TextIcon(
+                                                                    text: controller
+                                                                        .purchasesInvoices[
+                                                                            index]
+                                                                        .totalPrice
+                                                                        .toString(),
+                                                                    color: AppColors
+                                                                        .black,
+                                                                    icon: Icons
+                                                                        .monetization_on_rounded,
+                                                                  ),
+                                                                  TextIcon(
+                                                                    text: controller
+                                                                        .purchasesInvoices[
+                                                                            index]
+                                                                        .remained
+                                                                        .toString(),
+                                                                    color: AppColors
+                                                                        .black,
+                                                                    icon: Icons
+                                                                        .money_off,
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          )),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            )),
                                           )),
-                                        )),
-                              )
-                            : Empty(
-                                imagePath: AppAssets.noInvoices,
-                                text: "No any Purchase Invoice",
-                                height: 200,
-                                fontSize: 24,
-                              ),
-                        controller.saleInvoices.isNotEmpty
-                            ? SlidableAutoCloseBehavior(
-                                closeWhenOpened: true,
-                                child: ListView.builder(
-                                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                                    physics: const BouncingScrollPhysics(),
-                                    itemCount: controller.saleInvoices.length,
-                                    itemBuilder: (context, index) => Slidable(
-                                          endActionPane: ActionPane(
-                                            extentRatio: 0.25,
-                                            motion: const StretchMotion(),
-                                            children: [
-                                              SlidableAction(
-                                                onPressed: (c) async {
-                                                  controller.archiveInvoice(
-                                                      invoice: controller
-                                                          .saleInvoices[index],
-                                                      invoiceType:
-                                                          InvoiceType.sales);
-                                                },
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(10)),
-                                                backgroundColor:
-                                                    AppColors.grayAccent,
-                                                icon: controller.isArchived
-                                                    ? Icons.unarchive
-                                                    : Icons.archive,
-                                              ),
-                                            ],
-                                          ),
-                                          startActionPane: ActionPane(
-                                            extentRatio: 0.25,
-                                            motion: const StretchMotion(),
-                                            children: [
-                                              SlidableAction(
-                                                onPressed: (c) async {
-                                                  controller
-                                                      .showDialogDeleteInvoice(
-                                                          context,
-                                                          invoice: controller
-                                                                  .saleInvoices[
-                                                              index],
-                                                          invoiceType:
-                                                              InvoiceType.sales);
-                                                },
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(10)),
-                                                backgroundColor:
-                                                    AppColors.danger50,
-                                                icon: Icons.delete_outlined,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Card(
-                                              child: InkWell(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            onTap: () {
-                                              Get.toNamed(
-                                                  AppPagesRoutes
-                                                      .invoiceDetailsScreen,
-                                                  arguments: {
-                                                    AppSharedKeys.passId:
-                                                        controller
-                                                            .saleInvoices[index]
-                                                            .id,
-                                                    AppSharedKeys.passInvoiceType:
-                                                        InvoiceType.sales
-                                                  });
-                                            },
-                                            child: IntrinsicHeight(
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(10),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(
-                                                              '#${controller.saleInvoices[index].number}',
-                                                            ),
-                                                            Text(
-                                                              controller
-                                                                  .saleInvoices[
-                                                                      index]
-                                                                  .date,
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodySmall,
-                                                            ),
-                                                          ],
-                                                        )),
-                                                    const VerticalDivider(
-                                                        thickness: 1),
-                                                    Expanded(
-                                                        flex: 3,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              controller
-                                                                  .saleInvoices[
-                                                                      index]
-                                                                  .clientName,
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodyLarge!
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          22,
-                                                                      letterSpacing:
-                                                                          1),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                TextIcon(
-                                                                  text: controller
-                                                                      .saleInvoices[
-                                                                          index]
-                                                                      .totalPrice
-                                                                      .toString(),
-                                                                  color: AppColors
-                                                                      .black,
-                                                                  icon: Icons
-                                                                      .monetization_on_rounded,
-                                                                ),
-                                                                TextIcon(
-                                                                  text: controller
-                                                                      .saleInvoices[
-                                                                          index]
-                                                                      .remained
-                                                                      .toString(),
-                                                                  color: AppColors
-                                                                      .black,
-                                                                  icon: Icons
-                                                                      .money_off,
-                                                                ),
-                                                              ],
-                                                            )
-                                                          ],
-                                                        )),
-                                                  ],
+                                )
+                              : Empty(
+                                  imagePath: AppAssets.noInvoices,
+                                  text: "No any Purchase Invoice",
+                                  height: 200,
+                                  fontSize: 24,
+                                ),
+                          controller.saleInvoices.isNotEmpty
+                              ? SlidableAutoCloseBehavior(
+                                  closeWhenOpened: true,
+                                  child: ListView.builder(
+                                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount: controller.saleInvoices.length,
+                                      itemBuilder: (context, index) => Slidable(
+                                            endActionPane: ActionPane(
+                                              extentRatio: 0.25,
+                                              motion: const StretchMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (c) async {
+                                                    controller.archiveInvoice(
+                                                        invoice: controller
+                                                            .saleInvoices[index],
+                                                        invoiceType:
+                                                            InvoiceType.sales);
+                                                  },
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  backgroundColor:
+                                                      AppColors.grayAccent,
+                                                  icon: controller.isArchived
+                                                      ? Icons.unarchive
+                                                      : Icons.archive,
+                                                ),
+                                              ],
+                                            ),
+                                            startActionPane: ActionPane(
+                                              extentRatio: 0.25,
+                                              motion: const StretchMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (c) async {
+                                                    controller
+                                                        .showDialogDeleteInvoice(
+                                                            context,
+                                                            invoice: controller
+                                                                    .saleInvoices[
+                                                                index],
+                                                            invoiceType:
+                                                                InvoiceType.sales);
+                                                  },
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  backgroundColor:
+                                                      AppColors.danger50,
+                                                  icon: Icons.delete_outlined,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Card(
+                                                child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              onTap: () {
+                                                Get.toNamed(
+                                                    AppPagesRoutes
+                                                        .invoiceDetailsScreen,
+                                                    arguments: {
+                                                      AppSharedKeys.passId:
+                                                          controller
+                                                              .saleInvoices[index]
+                                                              .id,
+                                                      AppSharedKeys.passInvoiceType:
+                                                          InvoiceType.sales
+                                                    });
+                                              },
+                                              child: IntrinsicHeight(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(10),
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                '#${controller.saleInvoices[index].number}',
+                                                              ),
+                                                              Text(
+                                                                controller
+                                                                    .saleInvoices[
+                                                                        index]
+                                                                    .date,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodySmall,
+                                                              ),
+                                                            ],
+                                                          )),
+                                                      const VerticalDivider(
+                                                          thickness: 1),
+                                                      Expanded(
+                                                          flex: 3,
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                controller
+                                                                    .saleInvoices[
+                                                                        index]
+                                                                    .clientName,
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .bodyLarge!
+                                                                    .copyWith(
+                                                                        fontSize:
+                                                                            22,
+                                                                        letterSpacing:
+                                                                            1),
+                                                              ),
+                                                              const SizedBox(
+                                                                height: 15,
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  TextIcon(
+                                                                    text: controller
+                                                                        .saleInvoices[
+                                                                            index]
+                                                                        .totalPrice
+                                                                        .toString(),
+                                                                    color: AppColors
+                                                                        .black,
+                                                                    icon: Icons
+                                                                        .monetization_on_rounded,
+                                                                  ),
+                                                                  TextIcon(
+                                                                    text: controller
+                                                                        .saleInvoices[
+                                                                            index]
+                                                                        .remained
+                                                                        .toString(),
+                                                                    color: AppColors
+                                                                        .black,
+                                                                    icon: Icons
+                                                                        .money_off,
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          )),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            )),
                                           )),
-                                        )),
-                              )
-                            : Empty(
-                                imagePath: AppAssets.noInvoices,
-                                text: "No any Sales Invoice",
-                                height: 200,
-                                fontSize: 24,
-                              ),
-                      ],
+                                )
+                              : Empty(
+                                  imagePath: AppAssets.noInvoices,
+                                  text: "No any Sales Invoice",
+                                  height: 200,
+                                  fontSize: 24,
+                                ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+        ),
       )),
     );
   }

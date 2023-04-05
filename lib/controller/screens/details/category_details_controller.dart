@@ -18,6 +18,7 @@ class CategoryDetailsController extends GetxController with GetSingleTickerProvi
   List<Register> registers = [];
   late TabController tabController;
   StatusView statusView = StatusView.loading;
+  bool isShowDetails=true;
 
   @override
   void onInit() async {
@@ -63,8 +64,9 @@ class CategoryDetailsController extends GetxController with GetSingleTickerProvi
       onSuccess: (response) async {
         if (response is List<Register>) {
           registers = response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children: List.generate(registers.length, (index) => Slidable(
                 startActionPane: ActionPane(

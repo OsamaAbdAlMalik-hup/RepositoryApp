@@ -20,6 +20,7 @@ class SupplierDetailsController extends GetxController with GetTickerProviderSta
   StatusView statusView= StatusView.loading;
   double remainder=0;
   List<Register> registers=[];
+  bool isShowDetails=true;
 
   @override
   void onInit() async {
@@ -126,8 +127,9 @@ class SupplierDetailsController extends GetxController with GetTickerProviderSta
       onSuccess: (response) async {
         if(response is List<Register>) {
           registers=response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(

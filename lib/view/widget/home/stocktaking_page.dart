@@ -14,28 +14,23 @@ class StocktakingPage extends GetView<MainController> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO fix exception NotificationListener
     return NotificationListener<UserScrollNotification>(
       onNotification: (notification) {
         return controller.onNotification(notification);
       },
       child: GetBuilder<MainController>(
           builder: (controller) => ListView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 controller: controller.stockingScrollController,
+                physics: const PageScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                    ),
-                    child: TitleSection(
-                      title: "Individual Stocktaking",
-                      onPressed: () {
-                        Get.toNamed(AppPagesRoutes.moneyBoxScreen, arguments: {
-                          AppSharedKeys.passFilter: PublicFilterType.date
-                        });
-                      },
+                    padding: const EdgeInsets.only(left: 10,),
+                    child: Text(
+                        "Individual Stocktaking",
+                        style: Theme.of(context).textTheme.titleLarge
                     ),
                   ),
                   Row(
@@ -194,9 +189,7 @@ class StocktakingPage extends GetView<MainController> {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                    ),
+                    padding: const EdgeInsets.only(left: 10,top: 20),
                     child: TitleSection(
                       title: "Full Stocktaking",
                       onPressed: () {
@@ -209,44 +202,46 @@ class StocktakingPage extends GetView<MainController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            ' From: ',
-                            style: TextStyle(color: AppColors.gray),
+                      Material(
+                        color: AppColors.primary5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () async {
+                            await controller.choseDateRange(context);
+                            await controller.getFullStocktaking();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(controller.startDate),
                           ),
-                          ActionChip(
-                            label: Text(controller.startDate),
-                            onPressed: () async {
-                              await controller.choseDateRange(context);
-                              await controller.getFullStocktaking();
-                            },
-                          ),
-                        ],
+                        ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            ' To: ',
-                            style: TextStyle(color: AppColors.gray),
+                      const Icon(Icons.arrow_forward),
+                      Material(
+                        color: AppColors.primary5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(10),
+                          onTap: () async {
+                            await controller.choseDateRange(context);
+                            await controller.getFullStocktaking();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(controller.endDate),
                           ),
-                          ActionChip(
-                            label: Text(controller.endDate),
-                            backgroundColor: AppColors.primary0,
-                            onPressed: () async {
-                              await controller.choseDateRange(context);
-                              await controller.getFullStocktaking();
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    margin: const EdgeInsets.only(top: 10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       boxShadow: const [
@@ -592,7 +587,8 @@ class StocktakingPage extends GetView<MainController> {
                         )
                       ],
                     ),
-                  ),],
+                  ),
+                ],
               )),
     );
   }

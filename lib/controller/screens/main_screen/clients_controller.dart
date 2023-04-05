@@ -1,11 +1,13 @@
 
-import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:repository/controller/api/clients_api_controller.dart';
 import 'package:repository/controller/screens/main_controller.dart';
 import 'package:repository/controller/screens/registration_controller.dart';
+import 'package:repository/core/constant/app_assets.dart';
 import 'package:repository/core/constant/app_colors.dart';
 import 'package:repository/core/constant/app_enums.dart';
 import 'package:repository/core/constant/app_shared_keys.dart';
@@ -26,13 +28,17 @@ class ClientsController extends GetxController
     SortItem(label: "name", icon: Icons.text_fields, isSelected: true),
     SortItem(label: "address", icon: Icons.add_location, isSelected: false),
     SortItem(label: "phone", icon: Icons.phone, isSelected: false),
-    SortItem(
-        label: "debt", icon: Icons.account_balance_wallet, isSelected: false),
+    SortItem(label: "debts", icon: Icons.account_balance_wallet, isSelected: false),
     SortItem(label: "invoices count", icon: Icons.animation, isSelected: false),
-    SortItem(
-        label: "invoices total",
-        icon: Icons.multiline_chart,
-        isSelected: false),
+    SortItem(label: "invoices total", icon: Icons.multiline_chart, isSelected: false),
+  ];
+  List<String> searchItem = [
+    'name',
+    'address',
+    'phone',
+    'debts',
+    'invoices count',
+    'invoices total'
   ];
   List<Client> clients = [], allClients = [];
   StatusView statusView = StatusView.loading;
@@ -125,12 +131,26 @@ class ClientsController extends GetxController
                   builder: (controller) => CircleAvatar(
                     radius: 105,
                     backgroundColor: AppColors.primary50,
-                    child: CircleAvatar(
+                    child: controller.mainController.image != null
+                        ? CircleAvatar(
                       radius: 100,
                       backgroundColor: AppColors.primary0,
-                      backgroundImage: controller.mainController.image == null
-                          ? FileImage(File(client.photo))
-                          : FileImage(controller.mainController.image!),
+                      backgroundImage: FileImage(controller.mainController.image!),
+                    )
+                        : client.photo != ''
+                        ? CircleAvatar(
+                      radius: 100,
+                      backgroundColor: AppColors.primary0,
+                      backgroundImage:
+                      CachedNetworkImageProvider(client.photo),
+                    )
+                        : CircleAvatar(
+                      radius: 100,
+                      backgroundColor: AppColors.primary0,
+                      child: SvgPicture.asset(
+                        AppAssets.clientsIconSvg,
+                        color: AppColors.primary60,
+                      ),
                     ),
                   ),
                 ),
@@ -291,31 +311,31 @@ class ClientsController extends GetxController
 
   Future<void> search(String val) async {
     if (val != '') {
-      if (sortItems[0].isSelected) {
+      if (mainController.filterTabIndex==0) {
         clients = allClients
             .where((element) =>
                 element.name.toLowerCase().contains(val.toLowerCase()))
             .toList();
-      } else if (sortItems[1].isSelected) {
+      } else if (mainController.filterTabIndex==1) {
         clients = allClients
             .where((element) =>
                 element.address.toLowerCase().contains(val.toLowerCase()))
             .toList();
-      } else if (sortItems[2].isSelected) {
+      } else if (mainController.filterTabIndex==2) {
         clients = allClients
             .where((element) => element.phoneNumber.contains(val.toLowerCase()))
             .toList();
-      } else if (sortItems[3].isSelected) {
+      } else if (mainController.filterTabIndex==3) {
         clients = allClients
             .where((element) =>
                 element.debts.toString().contains(val.toLowerCase()))
             .toList();
-      } else if (sortItems[4].isSelected) {
+      } else if (mainController.filterTabIndex==4) {
         clients = allClients
             .where((element) =>
                 element.invoicesCount.toString().contains(val.toLowerCase()))
             .toList();
-      } else if (sortItems[5].isSelected) {
+      } else if (mainController.filterTabIndex==5) {
         clients = allClients
             .where((element) =>
                 element.invoicesTotal.toString().contains(val.toLowerCase()))
@@ -352,22 +372,22 @@ class ClientsController extends GetxController
       clients = allClients
         ..sort((a, b) {
           return ascending
-              ? (a.debts - a.debts).ceil()
-              : (b.debts - b.debts).ceil();
+              ? (a.debts - b.debts).ceil()
+              : (b.debts - a.debts).ceil();
         });
     } else if (sortItems[4].isSelected) {
       clients = allClients
         ..sort((a, b) {
           return ascending
-              ? (a.invoicesCount - a.invoicesCount).ceil()
-              : (b.invoicesCount - b.invoicesCount).ceil();
+              ? (a.invoicesCount - b.invoicesCount).ceil()
+              : (b.invoicesCount - a.invoicesCount).ceil();
         });
     } else if (sortItems[5].isSelected) {
       clients = allClients
         ..sort((a, b) {
           return ascending
-              ? (a.invoicesTotal - a.invoicesTotal).ceil()
-              : (b.invoicesTotal - b.invoicesTotal).ceil();
+              ? (a.invoicesTotal - b.invoicesTotal).ceil()
+              : (b.invoicesTotal - a.invoicesTotal).ceil();
         });
     } else {
       clients = allClients;
@@ -375,11 +395,4 @@ class ClientsController extends GetxController
     update();
   }
 
-  Future<void> onFilterTab(int index) async {
-    for (int i = 0; i < sortItems.length; i++) {
-      sortItems[i].isSelected = (i == index);
-    }
-    search(mainController.searchFieldController.text);
-    update();
-  }
 }

@@ -14,7 +14,7 @@ class SectionTabs extends StatelessWidget {
   void Function(int)? onTab;
   void Function()? onArrowPressed;
   bool isScrollable;
-
+  // TODO FLEXIBLE HEIGHT
   SectionTabs(
       {Key? key,
       required this.title,

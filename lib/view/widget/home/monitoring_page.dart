@@ -56,7 +56,7 @@ class MonitoringPage extends GetView<MainController> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                      flex: 1,
+                                      flex: 2,
                                       child: Column(
                                         crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -80,7 +80,7 @@ class MonitoringPage extends GetView<MainController> {
                                       )),
                                   const VerticalDivider(thickness: 1),
                                   Expanded(
-                                      flex: 3,
+                                      flex: 5,
                                       child: Column(
                                         mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -148,7 +148,7 @@ class MonitoringPage extends GetView<MainController> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                      flex: 1,
+                                      flex: 2,
                                       child: Column(
                                         crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -171,7 +171,7 @@ class MonitoringPage extends GetView<MainController> {
                                       )),
                                   const VerticalDivider(thickness: 1),
                                   Expanded(
-                                      flex: 3,
+                                      flex: 5,
                                       child: Column(
                                         mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -312,6 +312,7 @@ class MonitoringPage extends GetView<MainController> {
                   ),
                 ],
               ),
+              // TODO Change design and data of it
               SectionTabs(
                 title: "Popular People",
                 tabsTitles: const [
@@ -338,8 +339,8 @@ class MonitoringPage extends GetView<MainController> {
                         child: Column(
                           children: [
                             Container(
-                                height: 100,
-                                width: 100,
+                                height: 150,
+                                width: 150,
                                 clipBehavior: Clip.hardEdge,
                                 decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
@@ -395,8 +396,8 @@ class MonitoringPage extends GetView<MainController> {
                         child: Column(
                           children: [
                             Container(
-                                height: 100,
-                                width: 100,
+                                height: 150,
+                                width: 150,
                                 clipBehavior: Clip.hardEdge,
                                 decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
@@ -449,7 +450,7 @@ class MonitoringPage extends GetView<MainController> {
                   "Most Benefit",
                   "Least Amount",
                 ],
-                tabViewHeight: 0.7 * Get.width,
+                tabViewHeight: 0.8 * Get.width,
                 controller: controller.tabProductsController,
                 onArrowPressed: controller.onArrowProductsTabPressed,
                 onTab: controller.onProductsTabChange,
@@ -641,3 +642,4 @@ class MonitoringPage extends GetView<MainController> {
     );
   }
 }
+

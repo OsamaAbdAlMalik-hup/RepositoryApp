@@ -249,15 +249,15 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
   Future<void> search(String val) async {
     if(mainTabIndex==1){
       if (val != '') {
-        if (sortItems[0].isSelected) {
+        if (mainController.filterTabIndex==0) {
           saleInvoices = allSaleInvoices.where((element) => element.number.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[1].isSelected) {
+        } else if (mainController.filterTabIndex==1) {
           saleInvoices = allSaleInvoices.where((element) => element.totalPrice.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[2].isSelected) {
+        } else if (mainController.filterTabIndex==2) {
           saleInvoices = allSaleInvoices.where((element) => element.remained.toString().contains(val.toLowerCase())).toList();
-        }else if (sortItems[3].isSelected) {
+        } else if (mainController.filterTabIndex==3) {
           saleInvoices = allSaleInvoices.where((element) => element.date.contains(val.toLowerCase())).toList();
-        }else if (sortItems[4].isSelected) {
+        } else if (mainController.filterTabIndex==4) {
           saleInvoices = allSaleInvoices.where((element) => element.clientName.toLowerCase().contains(val.toLowerCase())).toList();
         }
       } else {
@@ -265,16 +265,16 @@ class InvoicesController extends GetxController with GetTickerProviderStateMixin
       }
     } else {
       if (val != '') {
-        if (sortItems[0].isSelected) {
+        if (mainController.filterTabIndex==0) {
           purchasesInvoices = allPurchasesInvoices.where((element) => element.number.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[1].isSelected) {
+        } else if (mainController.filterTabIndex==1) {
           purchasesInvoices = allPurchasesInvoices.where((element) => element.totalPrice.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[2].isSelected) {
+        } else if (mainController.filterTabIndex==2) {
           purchasesInvoices = allPurchasesInvoices.where((element) => element.remained.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[3].isSelected) {
+        } else if (mainController.filterTabIndex==3) {
           purchasesInvoices = allPurchasesInvoices.where((element) => element.date.toString().contains(val.toLowerCase())).toList();
-        } else if (sortItems[4].isSelected) {
-          purchasesInvoices = allPurchasesInvoices.where((element) => element.supplierName.toString().contains(val.toLowerCase())).toList();
+        } else if (mainController.filterTabIndex==4) {
+          purchasesInvoices = allPurchasesInvoices.where((element) => element.supplierName.toLowerCase().contains(val.toLowerCase())).toList();
         }
       } else {
         purchasesInvoices = allPurchasesInvoices;

@@ -24,10 +24,12 @@ class AppColors {
   static const Color primary35=Color(0x8057BAF7);
   static const Color primary40=Color(0xFF57B9F7);
   static const Color primary50=Color(0xFF2196F3);
+  static const Color primary51=Color(0x4D2294F2);
   static const Color primary60=Color(0xFF1874D0);
   static const Color primary70=Color(0xFF1057AE);
   static const Color primary80=Color(0xFF0A3D8C);
   static const Color primary90=Color(0xFF062B74);
+  static const Color primary91=Color(0x4D0C4BD8);
 
   static const Color danger10=Color(0xFFFFE8D2);
   static const Color danger20=Color(0xFFFFCBA6);
@@ -87,9 +89,66 @@ class AppColors {
 }
 
 /*
+// blue
+  static const MaterialColor materialPrimary=MaterialColor(0xFF2196F3, {
+    50: Color(0xFFDFEDF9),
+    100: Color(0xFFD2F4FE),
+    200: Color(0xFFA6E5FD),
+    300: Color(0xFF79D0FB),
+    400: Color(0xFF57B9F7),
+    500: Color(0xFF2196F3),
+    600: Color(0xFF1874D0),
+    700: Color(0xFF1057AE),
+    800: Color(0xFF0A3D8C),
+    900: Color(0xFF062B74),
+  });
+
+  static const Color primary0=Color(0xFFF1F7FC);
+  static const Color primary5=Color(0xFFDFEDF9);
+  static const Color primary10=Color(0xFFD2F4FE);
+  static const Color primary20=Color(0xFFA6E5FD);
+  static const Color primary30=Color(0xFF79D0FB);
+  static const Color primary35=Color(0x8057BAF7);
+  static const Color primary40=Color(0xFF57B9F7);
+  static const Color primary50=Color(0xFF2196F3);
+  static const Color primary51=Color(0x4D2294F2);
+  static const Color primary60=Color(0xFF1874D0);
+  static const Color primary70=Color(0xFF1057AE);
+  static const Color primary80=Color(0xFF0A3D8C);
+  static const Color primary90=Color(0xFF062B74);
+  static const Color primary91=Color(0x4D0C4BD8);
+
+// purple
+  static const MaterialColor materialPrimary=MaterialColor(0xFFFF33A7, {
+    50: Color(0xFFFEE9ED),
+    100: Color(0xFFFFD6DD),
+    200: Color(0xFFFFADC3),
+    300: Color(0xFFFF84B1),
+    400: Color(0xFFFF66AD),
+    500: Color(0xFFFF33A7),
+    600: Color(0xFFDB259E),
+    700: Color(0xFFB71992),
+    800: Color(0xFF931082),
+    900: Color(0xFF7A0976),
+  });
+
+  static const Color primary0=Color(0xFFFCF5F6);
+  static const Color primary5=Color(0xFFFEE9ED);
+  static const Color primary10=Color(0xFFFFD6DD);
+  static const Color primary20=Color(0xFFFFADC3);
+  static const Color primary30=Color(0xFFFF84B1);
+  static const Color primary35=Color(0x80FF85B1);
+  static const Color primary40=Color(0xFFFF66AD);
+  static const Color primary50=Color(0xFFFF33A7);
+  static const Color primary60=Color(0xFFDB259E);
+  static const Color primary70=Color(0xFFB71992);
+  static const Color primary80=Color(0xFF931082);
+  static const Color primary90=Color(0xFF7A0976);
+
+
 // orange:
   // static const MaterialColor materialPrimary=Colors.brown;
-  static const MaterialColor materialPrimary=MaterialColor(0xFF7A3400, {
+  static const MaterialColor materialPrimary=MaterialColor(0xFFFF9800, {
     50: Color(0xFFF9F5E8),
     100: Color(0xFFFBF3DB),
     200: Color(0xFFFFF2CC),
@@ -115,7 +174,7 @@ class AppColors {
   static const Color primary90=Color(0xFF7A3400);
 
 // red
-    static const MaterialColor materialPrimary=MaterialColor(0xFF7A3400, {
+    static const MaterialColor materialPrimary=MaterialColor(0xFFFF4D21, {
     50: Color(0xFFF9ECDF),
     100: Color(0xFFFFE8D2),
     200: Color(0xFFFFCBA6),
@@ -141,7 +200,7 @@ class AppColors {
 
 // green:
 // static const MaterialColor materialPrimary=Colors.brown;
-  static const MaterialColor materialPrimary=MaterialColor(0xFF7A3400, {
+  static const MaterialColor materialPrimary=MaterialColor(0xFF71C120, {
     50: Color(0xFFF9ECDF),
     100: Color(0xFFEFFBD1),
     200: Color(0xFFDBF8A5),

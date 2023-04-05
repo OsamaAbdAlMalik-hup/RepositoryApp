@@ -29,7 +29,7 @@ List<Widget> bottomNavigationBarPages = [
   const HomePage(),
   const StocktakingPage(),
 ];
-
+// TODO Change this Icon To illustration Image
 List<CardDataHome> cardItems = [
   CardDataHome(AppAssets.categoriesIconSvg, "Categories",AppPagesRoutes.categoriesScreen),
   CardDataHome(AppAssets.productsIconSvg, "Products",AppPagesRoutes.productsScreen),

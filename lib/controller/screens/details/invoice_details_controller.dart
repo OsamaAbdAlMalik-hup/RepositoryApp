@@ -137,8 +137,9 @@ class InvoiceDetailsController extends GetxController {
       onSuccess: (response) async {
         if (response is List<Register>) {
           registers = response;
-          HelperDesignFunctions.showAlertDialog(context,
+          HelperDesignFunctions.showFormDialog(context,
               hasButtonsAction: false,
+              insetPaddingHorizontal: 50,
               title: "Registers",
               children:[
                 SlidableAutoCloseBehavior(

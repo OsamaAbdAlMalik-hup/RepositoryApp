@@ -1,4 +1,4 @@
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:repository/controller/screens/details/client_details_controller.dart';
@@ -21,7 +21,6 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
         title:
             "${HelperLogicFunctions.upperFirstChar(controller.client.name)} Client",
         statusView: controller.statusView,
-        expandedHeight: 0.9 * Get.height,
         imageUrl: controller.client.photo,
         tabBar: TabBar(
           controller: controller.tabController,
@@ -350,7 +349,7 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                         controller.clientsController.isArchived
                             ? Icons.unarchive_outlined
                             : Icons.archive_outlined,
-                        color: AppColors.primary60,
+                        color: AppColors.primary40,
                       ),
                       const SizedBox(
                         width: 15,
@@ -401,13 +400,13 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   controller.client.address,
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -423,13 +422,13 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   controller.client.phoneNumber,
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -445,13 +444,13 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
-                  "${controller.client.invoicesCount}",
+                  "${controller.client.details.salesInvoices.length}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -467,13 +466,13 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   "${controller.client.debts}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
@@ -489,19 +488,24 @@ class ClientDetailsScreen extends GetView<ClientDetailsController> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: AppColors.primary60),
+                      .copyWith(color: AppColors.primary40),
                 ),
                 Text(
                   "${controller.client.invoicesTotal}",
                   style: const TextStyle(
                       fontSize: 17,
-                      color: AppColors.black,
+                      color: AppColors.primary0,
                       fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
         ],
+        isShowDetails: controller.isShowDetails,
+        onTapImage: () {
+          controller.isShowDetails=!controller.isShowDetails;
+          controller.update();
+        },
       ),
     );
   }

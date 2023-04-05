@@ -74,9 +74,10 @@ class ProductsScreen extends GetView<ProductsController> {
                       onChanged: (value) {
                         controller.search(value);
                       },
-                      onBackIconPressed: () {
+                      onBackIconPressed: () async {
                         controller.isSearchMode = false;
-                        controller.update();
+                        controller.mainController.searchFieldController.clear();
+                        await controller.search('');
                       },
                       onSearchIconPressed: () {},
                     ),
@@ -94,8 +95,8 @@ class ProductsScreen extends GetView<ProductsController> {
                 bottom: controller.isSearchMode
                     ? TabBar(
                         isScrollable: true,
-                        onTap: (value) {
-                          controller.filterTabIndex=value;
+                        onTap: (index) {
+                          controller.mainController.onTapFilter(index,controller.search);
                         },
                         controller: controller.filterTabController,
                         tabs: List.generate(
@@ -122,7 +123,8 @@ class ProductsScreen extends GetView<ProductsController> {
                 onWillPop: () async {
                   if (controller.isSearchMode) {
                     controller.isSearchMode = false;
-                    controller.update();
+                    controller.mainController.searchFieldController.clear();
+                    await controller.search('');
                     return false;
                   }
                   return true;
@@ -202,39 +204,11 @@ class ProductsScreen extends GetView<ProductsController> {
                                             flex: 1,
                                             child: CircleAvatar(
                                                 radius: 38,
-                                                backgroundColor:
-                                                    AppColors.primary0,
-                                                child: Container(
-                                                  clipBehavior: Clip.hardEdge,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: CachedNetworkImage(
-                                                    fit: BoxFit.fill,
-                                                    imageUrl: controller
-                                                        .products[index].photo,
-                                                    placeholder: (context,
-                                                            url) =>
-                                                        const CircularProgressIndicator(),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            CircleAvatar(
-                                                      radius: 35,
-                                                      backgroundColor:
-                                                          AppColors.primary0,
-                                                      child: Text(
-                                                          '${controller.products[index].name[0]}${controller.products[index].name[1]}',
-                                                          style: const TextStyle(
-                                                              fontSize: 40,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: AppColors
-                                                                  .black)),
-                                                    ),
-                                                  ),
-                                                )),
+                                                backgroundImage: CachedNetworkImageProvider(
+                                                  controller.products[index].photo,
+
+                                                ),
+                                            ),
                                           ),
                                           Expanded(
                                             flex: 3,
@@ -338,361 +312,3 @@ class SortItem {
 
   SortItem({required this.label, required this.icon, required this.isSelected});
 }
-
-/*
-void get(BuildContext context) {
-    HelperDesignFunctions.showAwesomeDialog(context, btnOkOnPress: () async {
-      await controller.sort(controller.allProducts);
-    },
-        btnCancelOnPress: () {},
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GetBuilder<ProductsController>(
-            builder: (controller) => Column(
-              children: [
-                Text(
-                  "Sort Products",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Divider(
-                  thickness: 2,
-                ),
-                Row(
-                  children: [
-                    FilterChip(
-                      padding: EdgeInsets.zero,
-                      selectedColor: AppColors.primary0,
-                      backgroundColor: AppColors.primary0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
-                      label: const Icon(Icons.text_rotation_angledown),
-                      onSelected: (value) {
-                        controller.ascending = true;
-                        controller.update();
-                      },
-                      selected: controller.ascending,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    FilterChip(
-                      padding: EdgeInsets.zero,
-                      selectedColor: AppColors.primary0,
-                      backgroundColor: AppColors.primary0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
-                      label: const Icon(Icons.text_rotation_angleup),
-                      onSelected: (value) {
-                        controller.ascending = false;
-                        controller.update();
-                      },
-                      selected: !controller.ascending,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Wrap(
-                  direction: Axis.horizontal,
-                  alignment: WrapAlignment.center,
-                  spacing: 20,
-                  runSpacing: 20,
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller.selectTypeFilter(ProductFilterType.name);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.text_fields,
-                              color: controller.byName
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "name",
-                              style: TextStyle(
-                                  color: controller.byName
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller.selectTypeFilter(ProductFilterType.category);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.category,
-                              color: controller.byCategory
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "category",
-                              style: TextStyle(
-                                  color: controller.byCategory
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller.selectTypeFilter(ProductFilterType.benefit);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.add_chart,
-                              color: controller.byProfit
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "profit",
-                              style: TextStyle(
-                                  color: controller.byProfit
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller
-                            .selectTypeFilter(ProductFilterType.productsAmount);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.bar_chart,
-                              color: controller.byProductsAmount
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "product amount",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: controller.byProductsAmount
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller
-                            .selectTypeFilter(ProductFilterType.salePrice);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.text_fields,
-                              color: controller.bySalesPrice
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "selling price",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: controller.bySalesPrice
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        controller
-                            .selectTypeFilter(ProductFilterType.purchasePrice);
-                      },
-                      child: SizedBox(
-                        width: 70,
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.text_fields,
-                              color: controller.byPurchasesPrice
-                                  ? AppColors.primary60
-                                  : AppColors.black,
-                            ),
-                            Text(
-                              "purchase price",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: controller.byPurchasesPrice
-                                      ? AppColors.primary60
-                                      : AppColors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ));
-  }
-
-  ChoiceChip(
-                                              label: const Text("Name"),
-                                              selected: controller.byName,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType.name);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label: const Text("Category"),
-                                              selected: controller.byCategory,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType.category);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label: const Text("Profit"),
-                                              selected: controller.byProfit,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(ProductFilterType.benefit);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label:
-                                              const Text("Product Amount"),
-                                              selected:
-                                              controller.byProductsAmount,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType
-                                                        .productsAmount);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label: const Text("Sales Price"),
-                                              selected: controller.bySalesPrice,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType
-                                                        .salePrice);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label:
-                                              const Text("Purchase Price"),
-                                              selected:
-                                              controller.byPurchasesPrice,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType
-                                                        .purchasePrice);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label: const Text("Create At"),
-                                              selected: controller.byCreateAt,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType.createAt);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
-                                            ChoiceChip(
-                                              label: const Text("Update At"),
-                                              selected: controller.byUpdateAt,
-                                              side: const BorderSide(
-                                                  width: 2,
-                                                  color: AppColors.primary),
-                                              onSelected: (value) {
-                                                controller.selectTypeFilter(
-                                                    ProductFilterType.updateAt);
-                                              },
-                                              backgroundColor:
-                                              AppColors.whiteSecondary,
-                                              selectedColor:
-                                              AppColors.primaryAccent200,
-                                            ),
- */

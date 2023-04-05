@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:repository/core/constant/app_colors.dart';
 
 class HelperDesignFunctions{
@@ -124,13 +125,14 @@ class HelperDesignFunctions{
 
   static void showFormDialog(BuildContext context,
       {required String title,
-      required GlobalKey<FormState> formKey,
+      GlobalKey<FormState>? formKey,
       List<Widget> children = const [],
       String okText = 'Save',
       String cancelText = 'Cancel',
       double insetPaddingHorizontal = 30,
       Function()? btnOkOnPress,
       Function()? btnCancelOnPress,
+      bool hasButtonsAction = true,
       bool barrierDismissible = true}
       ){
     Get.dialog(
@@ -150,14 +152,19 @@ class HelperDesignFunctions{
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleLarge,
+                style: GoogleFonts.oswald(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                  color: AppColors.primary90,
+                ),
               ),
               const Divider(
                 thickness: 2,
                 height: 20,
               ),
               ...children,
-              Padding(
+              if(hasButtonsAction) Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Row(
                   children: [
@@ -165,10 +172,10 @@ class HelperDesignFunctions{
                       flex: 3,
                       child: MaterialButton(
                         onPressed: () {
-                          Get.back();
                           if(btnCancelOnPress!=null){
                             btnCancelOnPress.call();
                           }
+                          Get.back();
                         },
                         color: AppColors.gray,
                         disabledColor: AppColors.gray,
@@ -250,10 +257,10 @@ class HelperDesignFunctions{
                   flex: 3,
                   child: MaterialButton(
                     onPressed: () {
-                      Get.back();
                       if(btnCancelOnPress!=null) {
                         btnCancelOnPress.call();
                       }
+                      Get.back();
                     },
                     color: AppColors.gray,
                     disabledColor: AppColors.gray,

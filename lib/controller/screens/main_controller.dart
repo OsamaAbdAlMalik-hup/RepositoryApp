@@ -52,7 +52,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
 
   ScrollController monitoringScrollController = ScrollController();
   ScrollController stockingScrollController = ScrollController();
-  ScrollController homeScrollController = ScrollController(); // TODO SCROLL NOTIFICATION
+  ScrollController homeScrollController = ScrollController();
 
   late TabController tabLatestInvoiceController;
   late TabController tabPopularPeopleController;
@@ -77,7 +77,7 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
   String startDate = '', endDate = '', selectedUnit = units.first;
   double totalMoneyBox = 10000000000, invoicesHeight = 250, remainder = 0;
   bool isEmailsExpansion = false, isVisibleNav = true, isSearchMode = false;
-  int selectedBottomNavigationBarItem = 1,latestInvoiceTabIndex=0,popularPeopleTabIndex=0,productsTabIndex=0;
+  int selectedBottomNavigationBarItem = 1,latestInvoiceTabIndex=0,popularPeopleTabIndex=0,productsTabIndex=0,filterTabIndex = 0;
 
   @override
   onInit() async {
@@ -953,7 +953,6 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     }
     HelperDesignFunctions.showAlertDialog(context,
         btnOkOnPress: () async {
-          Get.back();
           await Future.delayed(const Duration(milliseconds: 1));
           Get.toNamed(AppPagesRoutes.individualStocktaking, arguments: {
             AppSharedKeys.passStocktakingType: stocktakingType,
@@ -1328,5 +1327,29 @@ class MainController extends GetxController with GetTickerProviderStateMixin{
     }
     update();
     return true;
+  }
+
+  Future<bool> alertExit() async {
+    if (isSearchMode) {
+      isSearchMode = false;
+      update();
+      return false;
+    }
+    bool canExit = lastPressedGoBack != null &&
+        DateTime.now().difference(lastPressedGoBack!) < const Duration(seconds: 2);
+    lastPressedGoBack=DateTime.now();
+    if(canExit) {
+      return true;
+    } else {
+      HelperDesignFunctions.showInfoSnackBar(message: "Click back again to Exit");
+      return false;
+    }
+  }
+
+
+
+  void onTapFilter(int index,Future<void> Function(String val) search){
+    filterTabIndex=index;
+    search(searchFieldController.text);
   }
 }

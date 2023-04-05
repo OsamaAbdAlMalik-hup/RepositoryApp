@@ -10,7 +10,7 @@ class SearchAppbar extends StatelessWidget {
   TextEditingController? controller;
   void Function(String value)? onChanged;
   void Function()? onSearchIconPressed;
-  void Function()? onBackIconPressed;
+  Future<void> Function()? onBackIconPressed;
 
   SearchAppbar(
       {this.hintText,
